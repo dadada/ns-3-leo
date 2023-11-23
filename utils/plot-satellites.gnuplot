@@ -7,13 +7,13 @@ unset xtics
 unset ytics
 unset ztics
 unset border
-set hidden3d
 unset key
 set view equal xyz
 
-n=600
+# number of nodes per time slot
+n=1200
 
 do for [j=0:100] {
 	set title 'time '.j
-	splot 'somefile' using 3:4:5:2 every ::(j*n)::((j+1)*n)
+	splot 'leo-circular-orbit-tracing-example.csv' using 3:4:5:2 every ::(j*n)::((j+1)*n)
 }

@@ -76,7 +76,8 @@ DotProduct (const Vector3D &l, const Vector3D &r)
 double
 LeoCircularOrbitMobilityModel::GetSpeed () const
 {
-   return sqrt (LEO_EARTH_GM_KM_E10 / m_orbitHeight) * 1e5;
+  // force non-retrograd movement
+  return sqrt (LEO_EARTH_GM_KM_E10 / m_orbitHeight) * 1e5;
 }
 
 Vector
@@ -90,9 +91,14 @@ LeoCircularOrbitMobilityModel::DoGetVelocity () const
 Vector3D
 LeoCircularOrbitMobilityModel::PlaneNorm () const
 {
-  return Vector3D (sin (-m_inclination) * cos (m_latitude),
-  		   sin (-m_inclination) * sin (m_latitude),
-  		   cos (m_inclination));
+  int sign = 1;
+  if (m_inclination < M_PI/4)
+    {
+      sign = -1;
+    }
+  return Vector3D (sign * sin (-m_inclination) * cos (m_latitude),
+  		   sign * sin (-m_inclination) * sin (m_latitude),
+  		   sign * cos (m_inclination));
 }
 
 double
@@ -173,7 +179,7 @@ void LeoCircularOrbitMobilityModel::SetAltitude (double h)
 
 double LeoCircularOrbitMobilityModel::GetInclination () const
 {
-  return (m_inclination / M_PI) * 180.0;
+  return (m_inclination / (M_PI)) * 180.0;
 }
 
 void LeoCircularOrbitMobilityModel::SetInclination (double incl)
