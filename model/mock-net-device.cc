@@ -192,6 +192,7 @@ MockNetDevice::AddHeader (Ptr<Packet> p,
 {
   NS_LOG_FUNCTION (this << p << protocolNumber);
   EthernetHeader ethernet;
+  ethernet.SetLengthType (protocolNumber);
   ethernet.SetSource (Mac48Address::ConvertFrom (src));
   ethernet.SetDestination (Mac48Address::ConvertFrom (dst));
   p->AddHeader (ethernet);
@@ -359,8 +360,6 @@ MockNetDevice::Receive (Ptr<Packet> packet, Ptr<MockNetDevice> senderDevice)
 {
   NS_LOG_FUNCTION (this << packet << senderDevice);
 
-  uint16_t protocol = 0;
-
   if (m_receiveErrorModel && m_receiveErrorModel->IsCorrupt (packet) )
     {
       //
@@ -388,6 +387,8 @@ MockNetDevice::Receive (Ptr<Packet> packet, Ptr<MockNetDevice> senderDevice)
 
       EthernetHeader header;
       packet->RemoveHeader (header);
+      uint16_t protocol = header.GetLengthType ();
+
       PacketType packetType;
       if (header.GetDestination ().IsBroadcast ())
       	{
