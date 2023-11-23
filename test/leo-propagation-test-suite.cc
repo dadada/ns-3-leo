@@ -121,14 +121,15 @@ void
 LeoPropagationRxNoLosTestCase::DoRun ()
 {
   Ptr<ConstantPositionMobilityModel> a = CreateObject<ConstantPositionMobilityModel> ();
-  a->SetPosition (Vector3D (1000000.0, 0, 0));
+  a->SetPosition (Vector3D (6.7e6, 0, 0));
   Ptr<ConstantPositionMobilityModel> b = CreateObject<ConstantPositionMobilityModel> ();
-  b->SetPosition (Vector3D (-1000000.0, 0, 0));
+  b->SetPosition (Vector3D (-7.0e6, 0, 0));
 
   Ptr<LeoPropagationLossModel> model = CreateObject<LeoPropagationLossModel> ();
-  model->SetAttribute ("MaxDistance", DoubleValue (1000000.0));
+  model->SetAttribute ("MaxDistance", DoubleValue (6000)); // km
+  model->SetAttribute ("ElevationAngle", DoubleValue (10.0));
 
-  NS_TEST_ASSERT_MSG_EQ (model->CalcRxPower (1.0, a, b), 0.0, "0 Rx power without LOS");
+  NS_TEST_ASSERT_MSG_LT (model->CalcRxPower (1.0, a, b), -500.0, "0 Rx power without LOS");
 }
 
 class LeoPropagationRxLosTestCase : public TestCase
@@ -183,9 +184,9 @@ LeoPropagationBadAngleTestCase::DoRun ()
   b->SetPosition (Vector3D (1000000.0, sin (M_PI / 9) * 1000000.0, 0));
 
   Ptr<LeoPropagationLossModel> model = CreateObject<LeoPropagationLossModel> ();
-  model->SetAttribute ("ElevationAngle", DoubleValue (M_PI / 9));
+  model->SetAttribute ("ElevationAngle", DoubleValue (90));
 
-  NS_TEST_ASSERT_MSG_EQ (model->CalcRxPower (1.0, a, b), 0.0, "Tx must be 0 if elevation is too large");
+  NS_TEST_ASSERT_MSG_LT (model->CalcRxPower (1.0, a, b), -500.0, "Tx must be 0 if elevation is too large");
 }
 
 class LeoPropagationLossTestCase : public TestCase

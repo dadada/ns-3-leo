@@ -69,23 +69,17 @@ void
 IslMockChannelTransmitKnownTestCase::DoRun (void)
 {
   Ptr<IslMockChannel> channel = CreateObject<IslMockChannel> ();
-  channel->SetAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
-  channel->SetAttribute ("PropagationLoss", StringValue ("ns3::IslPropagationLossModel"));
 
   Packet *packet = new Packet ();
   Ptr<Packet> p = Ptr<Packet>(packet);
 
   Ptr<Node> srcNode = CreateObject<Node> ();
-  Ptr<ConstantPositionMobilityModel> loc = CreateObject<ConstantPositionMobilityModel> ();
-  srcNode->AggregateObject (loc);
   Ptr<MockNetDevice> srcDev = CreateObject<MockNetDevice> ();
   srcDev->SetNode (srcNode);
   srcDev->SetAddress (Mac48Address::Allocate ());
   int32_t srcId = channel->Attach (srcDev);
 
   Ptr<Node> dstNode = CreateObject<Node> ();
-  loc = CreateObject<ConstantPositionMobilityModel> ();
-  dstNode->AggregateObject (loc);
   Ptr<MockNetDevice> dstDev = CreateObject<MockNetDevice> ();
   dstDev->SetNode (dstNode);
   dstDev->SetAddress (Mac48Address::Allocate ());
