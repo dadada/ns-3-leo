@@ -5,23 +5,23 @@
 #include "ns3/internet-module.h"
 #include "../model/leo-mock-net-device.h"
 
-#include "nd-cache-helper.h"
+#include "arp-cache-helper.h"
 
 namespace ns3
 {
 
 void
-NdCacheHelper::Install (NetDeviceContainer &devices, Ipv6InterfaceContainer &interfaces) const
+ArpCacheHelper::Install (NetDeviceContainer &devices, Ipv4InterfaceContainer &interfaces) const
 {
-  // prepare NDS cache
-  for (uint32_t i = 0; i < devices.GetN (); i++)
+  for (size_t i = 0; i < devices.GetN (); i ++)
     {
       Ptr<NetDevice> dev = devices.Get (i);
       Ptr<Node> node = dev->GetNode ();
-      Ptr<Ipv6L3Protocol> ipv6 = node->GetObject<Ipv6L3Protocol> ();
-      int32_t ifIndex = ipv6->GetInterfaceForDevice (dev);
-      Ptr<Ipv6Interface> interface = ipv6->GetInterface (ifIndex);
-      Ptr<NdiscCache> cache = interface->GetNdiscCache ();
+      Ptr<Ipv4L3Protocol> ipv4 = node->GetObject<Ipv4L3Protocol> ();
+      int32_t ifIndex = ipv4->GetInterfaceForDevice (dev);
+      Ptr<Ipv4Interface> interface = ipv4->GetInterface (ifIndex);
+      Ptr<ArpCache> cache = interface->GetArpCache ();
+
       for (uint32_t j = 0; j < devices.GetN (); j++)
         {
           // every other device, that is not of same "type"
@@ -38,17 +38,17 @@ NdCacheHelper::Install (NetDeviceContainer &devices, Ipv6InterfaceContainer &int
 
           // and associated address
           uint32_t otherIfIndex = otherDevice->GetIfIndex ();
-          Ipv6Address ipaddr = interfaces.GetAddress (otherIfIndex, 1); // IP
+          Ipv4Address ipaddr = interfaces.GetAddress (otherIfIndex, 1); // IP
 
           // update cache
-          NdiscCache::Entry* entry = cache->Lookup (ipaddr);
+          ArpCache::Entry* entry = cache->Lookup (ipaddr);
           if (entry == 0)
             {
               entry = cache->Add (ipaddr);
             }
           entry->SetMacAddress (address);
-        }
+      	}
     }
 }
 
-}; /* namespace ns3 */
+};

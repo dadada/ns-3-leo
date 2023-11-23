@@ -9,6 +9,7 @@
 def build(bld):
     module = bld.create_ns3_module('leo', ['core','internet', 'propagation', 'stats', 'traffic', 'flow-monitor', 'applications'])
     module.source = [
+        'helper/arp-cache-helper.cc',
         'helper/isl-helper.cc',
         'helper/leo-channel-helper.cc',
         'helper/leo-helper.cc',
@@ -41,6 +42,7 @@ def build(bld):
     headers = bld(features='ns3header')
     headers.module = 'leo'
     headers.source = [
+        'helper/arp-cache-helper.h',
         'helper/isl-helper.h',
         'helper/leo-channel-helper.h',
         'helper/leo-helper.h',

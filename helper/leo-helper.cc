@@ -1,7 +1,9 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
 #include "nd-cache-helper.h"
-
+#include "arp-cache-helper.h"
+#include "ns3/ipv4-address-helper.h"
+#include "ns3/ipv4-interface-container.h"
 #include "leo-helper.h"
 
 namespace ns3 {
@@ -39,6 +41,17 @@ LeoHelper::Install (NodeContainer &satellites, NodeContainer &gateways, NodeCont
   ndCache.Install (islNet, islAddrs);
   ndCache.Install (gwNet, gwAddrs);
   ndCache.Install (utNet, utAddrs);
+
+  // Make all networks addressable for legacy protocol
+  Ipv4AddressHelper legacy;
+  Ipv4InterfaceContainer islLegacy = legacy.Assign (islNet);
+  Ipv4InterfaceContainer gwLegacy = legacy.Assign (gwNet);
+  Ipv4InterfaceContainer utLegacy = legacy.Assign (utNet);
+
+  ArpCacheHelper arpCache;
+  arpCache.Install (islNet, islLegacy);
+  arpCache.Install (gwNet, gwLegacy);
+  arpCache.Install (utNet, utLegacy);
 
   // Add to resulting container of net devices
   container.Add (islNet);
