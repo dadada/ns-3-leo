@@ -7,6 +7,7 @@
 #include <ns3/propagation-loss-model.h>
 
 #define LEO_PROP_EARTH_RAD 6.37101e6
+#define LEO_SPEED_OF_LIGHT_IN_AIR 299702458
 
 namespace ns3 {
 

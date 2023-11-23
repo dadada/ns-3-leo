@@ -62,6 +62,7 @@ private:
   ObjectFactory m_channelFactory;
 
   ObjectFactory m_propagationLossFactory;
+  ObjectFactory m_propagationDelayFactory;
 
   void SetQueue (ObjectFactory &factory,
 	   	 std::string type,

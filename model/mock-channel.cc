@@ -191,4 +191,10 @@ MockChannel::Deliver (
   return true;
 }
 
+void
+MockChannel::SetPropagationDelay (Ptr<PropagationDelayModel> delay)
+{
+  m_propagationDelay = delay;
+}
+
 } // namespace ns3

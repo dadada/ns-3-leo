@@ -72,8 +72,11 @@ public:
   std::size_t GetNDevices (void) const;
   virtual bool TransmitStart (Ptr<const Packet> p, uint32_t devId, Address dst, Time txTime) = 0;
 
-  Ptr<PropagationLossModel> GetPropagationLoss () const;
+  Ptr<PropagationLossModel> GetPropagationLoss (void) const;
   void SetPropagationLoss (Ptr<PropagationLossModel> model);
+
+  Ptr<PropagationDelayModel> GetPropagationDelay (void) const;
+  void SetPropagationDelay (Ptr<PropagationDelayModel> delay);
 
 protected:
   TracedCallback<Ptr<const Packet>,     // Packet being transmitted
@@ -89,7 +92,6 @@ protected:
    */
   Time GetPropagationDelay (Ptr<MobilityModel> first, Ptr<MobilityModel> second, Time txTime) const;
 
-  Ptr<PropagationDelayModel> GetPropagationDelay () const;
   Ptr<MockNetDevice> GetDevice (Address &addr) const;
 
   bool Deliver ( Ptr<const Packet> p, Ptr<MockNetDevice> src, Ptr<MockNetDevice> dst, Time txTime);

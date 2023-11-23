@@ -39,7 +39,8 @@ LeoChannelHelper::LeoChannelHelper ()
   m_channelFactory.Set ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
 
   m_propagationLossFactory.SetTypeId ("ns3::LeoPropagationLossModel");
-
+  m_propagationDelayFactory.SetTypeId ("ns3::ConstantSpeedPropagationDelayModel");
+  m_propagationDelayFactory.Set ("Speed", DoubleValue (LEO_SPEED_OF_LIGHT_IN_AIR));
 }
 
 LeoChannelHelper::LeoChannelHelper (std::string constellation) :
@@ -338,6 +339,7 @@ LeoChannelHelper::Install (std::vector<Ptr<Node> > &satellites, std::vector<Ptr<
 
   Ptr<LeoMockChannel> channel = m_channelFactory.Create<LeoMockChannel> ();
   channel->SetPropagationLoss (m_propagationLossFactory.Create<LeoPropagationLossModel> ());
+  channel->SetPropagationDelay (m_propagationLossFactory.Create<ConstantSpeedPropagationDelayModel> ());
 
   NetDeviceContainer container;
 
