@@ -6,6 +6,8 @@
 #include <ns3/object.h>
 #include <ns3/propagation-loss-model.h>
 
+#define LEO_PROP_EARTH_RAD 6.37101e6
+
 namespace ns3 {
 
 class LeoPropagationLossModel : public PropagationLossModel
@@ -15,14 +17,7 @@ public:
   LeoPropagationLossModel ();
   virtual ~LeoPropagationLossModel ();
 
-  static double GetAngle (Ptr<MobilityModel> a, Ptr<MobilityModel> b);
-
 private:
-
-  /**
-   * Cutoff distance for signal
-   */
-  double m_cutoffDistance;
 
   /**
    * Maximum elevation angle
@@ -65,8 +60,7 @@ private:
   void SetElevationAngle (double angle);
   double GetElevationAngle () const;
 
-  void SetCutoffDistance (double d);
-  double GetCutoffDistance () const;
+  double GetCutoffDistance (const Ptr<MobilityModel> sat) const;
 };
 
 }

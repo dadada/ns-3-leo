@@ -21,12 +21,6 @@ LeoPropagationLossModel::GetTypeId (void)
     .SetParent<PropagationLossModel> ()
     .SetGroupName ("Leo")
     .AddConstructor<LeoPropagationLossModel> ()
-    .AddAttribute ("MaxDistance",
-                   "Cut-off distance for signal propagation",
-                   DoubleValue (2500.0),
-                   MakeDoubleAccessor (&LeoPropagationLossModel::SetCutoffDistance,
-				       &LeoPropagationLossModel::GetCutoffDistance),
-                   MakeDoubleChecker<double> ())
     .AddAttribute ("ElevationAngle",
                    "Cut-off angle for signal propagation",
                    DoubleValue (40.0),
@@ -60,54 +54,45 @@ LeoPropagationLossModel::~LeoPropagationLossModel ()
 {
 }
 
-double
-LeoPropagationLossModel::GetAngle (Ptr<MobilityModel> a, Ptr<MobilityModel> b)
-{
-  Vector3D x = a->GetPosition ();
-  Vector3D y = b->GetPosition ();
-
-  Vector3D pa, pb;
-  if (x.GetLength () < y.GetLength ())
-    {
-      pa = x - y;
-      pb = y;
-      NS_LOG_DEBUG ("LEO ground -> space");
-    }
-  else
-    {
-      pa = y - x;
-      pb = x;
-      NS_LOG_DEBUG ("LEO space -> ground");
-    }
-
-  double prod = abs ((pa.x*-pb.x) + (pa.y*-pb.y) + (pa.z*-pb.z));
-  double norm = pa.GetLength () * pb.GetLength ();
-
-  return acos (prod / norm);
-}
-
 void
 LeoPropagationLossModel::SetElevationAngle (double angle)
 {
-  m_elevationAngle = (90 - angle) * (M_PI/180.0);
+  m_elevationAngle = angle * (M_PI/180.0);
+}
+
+double
+LeoPropagationLossModel::GetCutoffDistance (const Ptr<MobilityModel> sat) const
+{
+  double angle = m_elevationAngle;
+  double hs = sat->GetPosition ().GetLength ();
+
+  double a = 1 + tan (angle) * tan (angle);
+  double b = 2.0 * tan (angle) * hs;
+  double c = hs*hs - LEO_PROP_EARTH_RAD*LEO_PROP_EARTH_RAD;
+
+  double disc = b*b + 4*a*c;
+
+  NS_LOG_DEBUG ("angle="<<angle<<" hs="<<hs<<" a="<<a<<" b="<<b<<" c="<<c<<" disc="<<disc);
+
+  if (disc < 0)
+    {
+      // point not on earth surface
+      return - 1.0;
+    }
+
+  double t1 = (-b - sqrt (disc)) / (2.0 * a);
+  double t2 = (-b + sqrt (disc)) / (2.0 * a);
+
+  double num1 = Vector2D (t1, - tan (angle) * t1).GetLength ();
+  double num2 = Vector2D (t2, - tan (angle) * t2).GetLength ();
+
+  return fmin (num1, num2);
 }
 
 double
 LeoPropagationLossModel::GetElevationAngle () const
 {
-  return 90 - (m_elevationAngle * (180.0/M_PI));
-}
-
-void
-LeoPropagationLossModel::SetCutoffDistance (double d)
-{
-  m_cutoffDistance = d * 1000.0;
-}
-
-double
-LeoPropagationLossModel::GetCutoffDistance () const
-{
-  return m_cutoffDistance / 1000.0;
+  return m_elevationAngle * (180.0/M_PI);
 }
 
 double
@@ -115,19 +100,13 @@ LeoPropagationLossModel::DoCalcRxPower (double txPowerDbm,
                                         Ptr<MobilityModel> a,
                                         Ptr<MobilityModel> b) const
 {
+  Ptr<MobilityModel> sat = a->GetPosition ().GetLength () > b->GetPosition ().GetLength () ? a : b;
   double distance = a->GetDistanceFrom (b);
-
-  if (distance > m_cutoffDistance)
+  double cutOff = GetCutoffDistance (sat);
+  if (distance > cutOff)
     {
-      NS_LOG_DEBUG ("LEO DROP distance: a=" << a->GetPosition () << " b=" << b->GetPosition ()<<" dist=" << distance);
+      NS_LOG_DEBUG ("LEO DROP distance: a=" << a->GetPosition () << " b=" << b->GetPosition ()<<" dist=" << distance<<" cutoff="<<cutOff);
 
-      return -1000.0;
-    }
-
-  double angle = GetAngle (a, b);
-  if (angle > m_elevationAngle)
-    {
-      NS_LOG_DEBUG ("LEO DROP angle: a=" << a->GetPosition () << " b=" << b->GetPosition () << " dist=" << distance << "angle=" << angle);
       return -1000.0;
     }
 
@@ -135,7 +114,7 @@ LeoPropagationLossModel::DoCalcRxPower (double txPowerDbm,
   // receiver loss and gain added at net device
   // P_{RX} = P_{TX} + G_{TX} - L_{TX} - L_{FS} - L_M + G_{RX} - L_{RX}
   double rxc = txPowerDbm - m_atmosphericLoss - m_freeSpacePathLoss - m_linkMargin;
-  NS_LOG_DEBUG ("LEO TRANSMIT: angle=" << angle <<";distance=" << distance << ";rxc=" << rxc);
+  NS_LOG_DEBUG ("LEO TRANSMIT distance: a=" << a->GetPosition () << " b=" << b->GetPosition ()<<" dist=" << distance <<" cutoff="<<cutOff<< "rxc=" << rxc);
 
   return rxc;
 }

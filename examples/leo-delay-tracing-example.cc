@@ -99,12 +99,13 @@ int main (int argc, char *argv[])
     }
   else
     {
-      // Install internet stack on nodes
       AodvHelper aodv;
-      aodv.Set ("EnableHello", BooleanValue (false));
+      //aodv.Set ("EnableHello", BooleanValue (false));
 
       stack.SetRoutingHelper (aodv);
     }
+
+  // Install internet stack on nodes
   stack.Install (satellites);
   stack.Install (stations);
 
