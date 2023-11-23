@@ -20,6 +20,7 @@ def build(bld):
         'helper/leo-helper.cc',
         'model/mock-net-device.cc',
         'model/mock-channel.cc',
+        'helper/nd-cache-helper.cc',
         ]
 
     module_test = bld.create_ns3_module_test_library('leo')
@@ -41,6 +42,7 @@ def build(bld):
         'helper/leo-helper.h',
         'model/mock-net-device.h',
         'model/mock-channel.h',
+        'helper/nd-cache-helper.h',
         ]
 
     if bld.env.ENABLE_EXAMPLES:

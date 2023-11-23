@@ -12,43 +12,6 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("IslExample");
 
-void PrepareNds (NodeContainer &nodes, Ipv6InterfaceContainer &interfaces)
-{
-  // prepare NDS cache
-  for (uint32_t i = 0; i < nodes.GetN (); i++)
-    {
-      Ptr<Node> node = nodes.Get (i);
-      Ptr<NetDevice> dev = node->GetDevice (1); // TODO right index?
-      uint32_t ifIndex = dev->GetIfIndex ();
-      Ptr<Ipv6L3Protocol> ipv6 = node->GetObject<Ipv6L3Protocol> ();
-      Ptr<Ipv6Interface> interface = ipv6->GetInterface (ifIndex);
-      Ptr<NdiscCache> cache = interface->GetNdiscCache ();
-      for (uint32_t j = 0; j < nodes.GetN (); j++)
-        {
-          // every other device
-          if (i == j)
-            {
-              continue;
-            }
-          Ptr<NetDevice> otherDevice = nodes.Get (j)->GetDevice (1);
-          Address address = otherDevice->GetAddress (); // MAC
-
-          // and associated address
-          uint32_t otherIfIndex = otherDevice->GetIfIndex ();
-          // TODO which address to use? site-local, global, link?
-          Ipv6Address ipaddr = interfaces.GetAddress (otherIfIndex, 1); // IP
-
-          // update cache
-          NdiscCache::Entry* entry = cache->Lookup (ipaddr);
-          if (entry == 0)
-            {
-              entry = cache->Add (ipaddr);
-            }
-          entry->SetMacAddress (address);
-        }
-    }
-}
-
 int
 main (int argc, char *argv[])
 {
@@ -79,7 +42,8 @@ main (int argc, char *argv[])
 
   Ipv6InterfaceContainer interfaces = address.Assign (devices);
 
-  PrepareNds (nodes, interfaces);
+  NdCacheHelper nsHelper;
+  nsHelper.Install (nodes, interfaces);
 
   UdpEchoServerHelper echoServer (9);
   ApplicationContainer serverApps = echoServer.Install (nodes);
