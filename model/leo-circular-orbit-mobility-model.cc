@@ -76,7 +76,6 @@ DotProduct (const Vector3D &l, const Vector3D &r)
 double
 LeoCircularOrbitMobilityModel::GetSpeed () const
 {
-  // force non-retrograd movement
   return sqrt (LEO_EARTH_GM_KM_E10 / m_orbitHeight) * 1e5;
 }
 
@@ -91,39 +90,48 @@ LeoCircularOrbitMobilityModel::DoGetVelocity () const
 Vector3D
 LeoCircularOrbitMobilityModel::PlaneNorm () const
 {
-  int sign = 1;
-  // ensure correct gradient (not against earth rotation)
-  if (m_inclination < M_PI/4)
-    {
-      sign = -1;
-    }
-  return Vector3D (sign * sin (-m_inclination) * cos (m_latitude),
-  		   sign * sin (-m_inclination) * sin (m_latitude),
-  		   sign * cos (m_inclination));
+  double lat = CalcLatitude ();
+  return Vector3D (sin (-m_inclination) * cos (lat),
+  		   sin (-m_inclination) * sin (lat),
+  		   cos (m_inclination));
 }
 
 double
 LeoCircularOrbitMobilityModel::GetProgress (Time t) const
 {
   // TODO use nanos or ms instead? does it give higher precision?
-  return (2 * M_PI * ((GetSpeed () * t.GetSeconds ()) / LEO_EARTH_RAD_M)) + m_offset;
+  int sign = 1;
+  // ensure correct gradient (not against earth rotation)
+  if (m_inclination > M_PI/2)
+    {
+      sign = -1;
+    }
+  return sign * (2 * M_PI * ((GetSpeed () * t.GetSeconds ()) / LEO_EARTH_RAD_M)) + m_offset;
 }
 
 Vector3D
 LeoCircularOrbitMobilityModel::RotatePlane (double a, const Vector3D &x) const
 {
-  Vector3D n = m_plane;
+  Vector3D n = PlaneNorm ();
 
   return Product (DotProduct (n, x), n)
     + Product (cos (a), CrossProduct (CrossProduct (n, x), n))
     + Product (sin (a), CrossProduct (n, x));
 }
 
+double
+LeoCircularOrbitMobilityModel::CalcLatitude () const
+{
+  return m_latitude + ((Simulator::Now ().GetDouble () / Hours (24).GetDouble ()) * 2 * M_PI);
+}
+
 Vector
 LeoCircularOrbitMobilityModel::CalcPosition (Time t) const
 {
-  Vector3D x = Product (m_orbitHeight, Vector3D (cos (m_inclination) * cos (m_latitude),
-  			       cos (m_inclination) * sin (m_latitude),
+  double lat = CalcLatitude ();
+  // account for orbit latitude and earth rotation offset
+  Vector3D x = Product (m_orbitHeight, Vector3D (cos (m_inclination) * cos (lat),
+  			       cos (m_inclination) * sin (lat),
   			       sin (m_inclination)));
 
   return RotatePlane (GetProgress (t), x);
@@ -131,8 +139,6 @@ LeoCircularOrbitMobilityModel::CalcPosition (Time t) const
 
 Vector LeoCircularOrbitMobilityModel::Update ()
 {
-  m_plane = PlaneNorm ();
-
   m_position = CalcPosition (Simulator::Now ());
   NotifyCourseChange ();
 
@@ -180,13 +186,13 @@ void LeoCircularOrbitMobilityModel::SetAltitude (double h)
 
 double LeoCircularOrbitMobilityModel::GetInclination () const
 {
-  return (m_inclination / (M_PI)) * 180.0;
+  return (m_inclination / M_PI) * 180.0;
 }
 
 void LeoCircularOrbitMobilityModel::SetInclination (double incl)
 {
   NS_ASSERT_MSG (incl != 0.0, "Plane must not be orthogonal to axis");
-  m_inclination = (incl / 180) * M_PI;
+  m_inclination = (incl / 180.0) * M_PI;
   Update ();
 }
 

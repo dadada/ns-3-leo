@@ -16,7 +16,7 @@ void CourseChange (std::string context, Ptr<const MobilityModel> position)
 {
   Vector pos = position->GetPosition ();
   Ptr<const Node> node = position->GetObject<Node> ();
-  outfile << Simulator::Now () << "," << node->GetId () << "," << pos.x << "," << pos.y << "," << pos.z << "," << position->GetVelocity ().GetLength() <<  std::endl;
+  outfile << Simulator::Now () << ":" << node->GetId () << ":" << pos.x << ":" << pos.y << ":" << pos.z << ":" << position->GetVelocity ().GetLength() << std::endl;
 }
 
 int main(int argc, char *argv[])
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 
   outfile << "Time,Satellite,x,y,z,Speed" << std::endl;
 
-  Simulator::Stop (Minutes (60.0));
+  Simulator::Stop (Hours (2.0));
   Simulator::Run ();
   Simulator::Destroy ();
 }

@@ -66,11 +66,6 @@ private:
   double m_offset;
 
   /**
-   * Normal vector of orbital plane.
-   */
-  Vector3D m_plane;
-
-  /**
    * Current position
    */
   Vector3D m_position;
@@ -111,6 +106,12 @@ private:
    * \param t time
    */
   Vector CalcPosition (Time t) const;
+
+  /**
+   * Calc the latitude depending on simulation time inside ITRF coordinate
+   * system
+   */
+  double CalcLatitude () const;
 
   Vector Update ();
 };
