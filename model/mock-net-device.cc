@@ -26,7 +26,7 @@
 #include "ns3/uinteger.h"
 #include "ns3/pointer.h"
 #include "ns3/net-device-queue-interface.h"
-#include "ns3/ppp-header.h"
+#include "ns3/ethernet-header.h"
 #include "mock-channel.h"
 #include "mock-net-device.h"
 
@@ -154,8 +154,6 @@ MockNetDevice::GetTypeId (void)
 
     //
     // Trace sources designed to simulate a packet sniffer facility (tcpdump).
-    // Note that there is really no difference between promiscuous and
-    // non-promiscuous traces in a point-to-point link.
     //
     .AddTraceSource ("Sniffer",
                     "Trace source simulating a non-promiscuous packet sniffer "
@@ -187,22 +185,16 @@ MockNetDevice::~MockNetDevice ()
 }
 
 void
-MockNetDevice::AddHeader (Ptr<Packet> p, uint16_t protocolNumber)
+MockNetDevice::AddHeader (Ptr<Packet> p,
+			  Address src,
+			  Address dst,
+			  uint16_t protocolNumber)
 {
   NS_LOG_FUNCTION (this << p << protocolNumber);
-  PppHeader ppp;
-  ppp.SetProtocol (EtherToPpp (protocolNumber));
-  p->AddHeader (ppp);
-}
-
-bool
-MockNetDevice::ProcessHeader (Ptr<Packet> p, uint16_t& param)
-{
-  NS_LOG_FUNCTION (this << p << param);
-  PppHeader ppp;
-  p->RemoveHeader (ppp);
-  param = PppToEther (ppp.GetProtocol ());
-  return true;
+  EthernetHeader ethernet;
+  ethernet.SetSource (Mac48Address::ConvertFrom (src));
+  ethernet.SetDestination (Mac48Address::ConvertFrom (dst));
+  p->AddHeader (ethernet);
 }
 
 void
@@ -285,7 +277,7 @@ MockNetDevice::TransmitStart (Ptr<Packet> p, const Address &dest)
   Time txTime = m_bps.CalculateBytesTxTime (p->GetSize ());
   Time txCompleteTime = txTime + m_tInterframeGap;
 
-  NS_LOG_LOGIC ("Schedule TransmitCompleteEvent in " << txCompleteTime.GetSeconds () << "sec");
+  NS_LOG_LOGIC ("Schedule TransmitCompleteEvent in " << txCompleteTime.GetNanoSeconds () << " nsec");
   Simulator::Schedule (txCompleteTime, &MockNetDevice::TransmitComplete, this, dest);
 
   bool result = m_channel->TransmitStart (p, m_channelDevId, dest, txTime);
@@ -367,8 +359,6 @@ MockNetDevice::Receive (Ptr<Packet> packet, Ptr<MockNetDevice> senderDevice)
 {
   NS_LOG_FUNCTION (this << packet << senderDevice);
 
-  NS_LOG_DEBUG (GetAddress () << " receiving packet from " << senderDevice->GetAddress ());
-
   uint16_t protocol = 0;
 
   if (m_receiveErrorModel && m_receiveErrorModel->IsCorrupt (packet) )
@@ -396,14 +386,27 @@ MockNetDevice::Receive (Ptr<Packet> packet, Ptr<MockNetDevice> senderDevice)
       //
       Ptr<Packet> originalPacket = packet->Copy ();
 
-      //
-      // Strip off the point-to-point protocol header and forward this packet
-      // up the protocol stack.  Since this is a simple point-to-point link,
-      // there is no difference in what the promisc callback sees and what the
-      // normal receive callback sees.
-      //
-      ProcessHeader (packet, protocol);
+      EthernetHeader header;
+      packet->RemoveHeader (header);
+      PacketType packetType;
+      if (header.GetDestination ().IsBroadcast ())
+      	{
+      	  packetType = PACKET_BROADCAST;
+      	}
+      else if (header.GetDestination () == m_address)
+      	{
+      	  packetType = PACKET_HOST;
+      	}
+      else if (header.GetDestination ().IsGroup ())
+      	{
+      	  packetType = PACKET_MULTICAST;
+      	}
+      else
+      	{
+      	  packetType = PACKET_OTHERHOST;
+      	}
 
+      // TODO sniffer trace
       Address remote = GetRemote (senderDevice);
       if (!m_promiscCallback.IsNull ())
         {
@@ -411,8 +414,10 @@ MockNetDevice::Receive (Ptr<Packet> packet, Ptr<MockNetDevice> senderDevice)
           m_promiscCallback (this, packet, protocol, remote, GetAddress (), NetDevice::PACKET_HOST);
         }
 
-      m_macRxTrace (originalPacket);
-      m_rxCallback (this, packet, protocol, remote);
+      if (packetType != PACKET_OTHERHOST) {
+      	  m_macRxTrace (originalPacket);
+      	  m_rxCallback (this, packet, protocol, remote);
+      }
     }
 }
 
@@ -569,11 +574,7 @@ MockNetDevice::Send (
       return false;
     }
 
-  //
-  // Stick a point to point protocol header on the packet in preparation for
-  // shoving it out the door.
-  //
-  AddHeader (packet, protocolNumber);
+  AddHeader (packet, m_address, dest, protocolNumber);
 
   m_macTxTrace (packet);
 

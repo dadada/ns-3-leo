@@ -59,25 +59,42 @@ LeoMockChannel::TransmitStart (Ptr<const Packet> p,
   DeviceIndex *dests;
   if (fromGround)
     {
+      NS_LOG_LOGIC ("ground to space: " << srcDev->GetAddress () << " to " << dst);
       dests = &m_satelliteDevices;
     }
   else if (fromSpace)
     {
+      NS_LOG_LOGIC ("space to ground: " << srcDev->GetAddress () << " to " << dst);
       dests = &m_groundDevices;
     }
   else
     {
-      NS_LOG_ERROR ("unable to find satellite with address " << dst);
+      NS_LOG_ERROR ("unable to find source interface " << srcDev);
       return false;
     }
 
-  for (DeviceIndex::iterator it = dests->begin (); it != dests->end (); it ++)
+  if (dst == srcDev->GetBroadcast () || dst == srcDev->GetMulticast (Ipv4Address ())) // mcast group ignored
     {
-      // TODO deliver only to devices in the same beam
-      Deliver (p, srcDev, it->second, txTime);
+      for (DeviceIndex::iterator it = dests->begin (); it != dests->end(); it ++)
+      	{
+      	  Deliver (p, srcDev, it->second, txTime);
+      	}
+      return true;
     }
-
-  return true;
+  else
+    {
+      DeviceIndex::iterator it = dests->find (dst);
+      if  (it == dests->end ())
+      	{
+      	  NS_LOG_ERROR ("unable to find destination interface: " << dst);
+      	  return false;
+      	}
+      else
+      	{
+      	  // TODO deliver only to devices in the same beam
+      	  return Deliver (p, srcDev, it->second, txTime);
+      	}
+    }
 }
 
 int32_t

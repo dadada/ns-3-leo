@@ -246,9 +246,11 @@ private:
    * Adds the necessary headers and trailers to a packet of data in order to
    * respect the protocol implemented by the agent.
    * \param p packet
+   * \param src source
+   * \param dst destination
    * \param protocolNumber protocol number
    */
-  void AddHeader (Ptr<Packet> p, uint16_t protocolNumber);
+  void AddHeader (Ptr<Packet> p, Address src, Address dst, uint16_t protocolNumber);
 
   /**
    * Removes, from a packet of data, all headers and trailers that
