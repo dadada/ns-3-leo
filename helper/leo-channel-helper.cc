@@ -33,6 +33,7 @@ LeoChannelHelper::LeoChannelHelper ()
   m_satDeviceFactory.Set ("DeviceType", EnumValue (LeoMockNetDevice::SAT));
 
   m_channelFactory.SetTypeId ("ns3::LeoMockChannel");
+  m_channelFactory.Set ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
 
   m_propagationLossFactory.SetTypeId ("ns3::LeoPropagationLossModel");
 

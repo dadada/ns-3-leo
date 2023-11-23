@@ -45,8 +45,12 @@ public:
 int main (int argc, char *argv[])
 {
   std::vector<Orbit> orbits = {
-      Orbit (1150, 53.0, 32, 50),
-      Orbit (1110, 53.8, 32, 50),
+  //Orbit (1000.0, 99.5, 6, 12),
+  //Orbit (1248.0, 37.4, 5, 9),
+Orbit (1150, 53.0, 32, 50),
+Orbit (1110, 53.8, 32, 50),
+//      Orbit (1150, 53.0, 32, 50),
+ //     Orbit (1110, 53.8, 32, 50),
   };
   NodeContainer satellites;
   for (Orbit orb: orbits)
@@ -78,12 +82,12 @@ int main (int argc, char *argv[])
   islNet = islCh.Install (satellites);
 
   LeoChannelHelper utCh;
-  utCh.SetConstellation ("TelesatUser");
+  utCh.SetConstellation ("StarlinkUser");
   utNet = utCh.Install (satellites, stations);
 
   // Install internet stack on nodes
   AodvHelper aodv;
-  // This is far better for performance (huge network)
+  // This disabled is far better for performance (huge network)
   aodv.Set ("EnableHello", BooleanValue (false));
   //aodv.Set ("HelloInterval", TimeValue (Seconds (10)));
   //aodv.Set ("TtlStart", UintegerValue (2));
@@ -121,7 +125,7 @@ int main (int argc, char *argv[])
   ApplicationContainer clientApps;
   Address remote = server->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();
   UdpClientHelper echoClient (remote, 9);
-  echoClient.SetAttribute ("MaxPackets", UintegerValue (60));
+  echoClient.SetAttribute ("MaxPackets", UintegerValue (6000));
   echoClient.SetAttribute ("Interval", TimeValue (Seconds (1)));
   echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
   clientApps.Add (echoClient.Install (client));
@@ -136,8 +140,6 @@ int main (int argc, char *argv[])
 
   serverApps.Start (Seconds (1));
   clientApps.Start (Seconds (1));
-  serverApps.Stop (Minutes (1));
-  clientApps.Stop (Minutes (1));
 
   Simulator::Stop (Minutes (10));
   Simulator::Run ();

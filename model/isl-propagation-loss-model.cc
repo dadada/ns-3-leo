@@ -22,7 +22,7 @@ IslPropagationLossModel::GetTypeId (void)
     .AddConstructor<IslPropagationLossModel> ()
     .AddAttribute ("MaxDistance",
                    "Cut-off distance for signal propagation",
-                   DoubleValue (1000.0),
+                   DoubleValue (2000.0),
                    MakeDoubleAccessor (&IslPropagationLossModel::SetCutoffDistance,
 				       &IslPropagationLossModel::GetCutoffDistance),
                    MakeDoubleChecker<double> ())
@@ -41,6 +41,8 @@ IslPropagationLossModel::~IslPropagationLossModel ()
 bool
 IslPropagationLossModel::GetLos (Ptr<MobilityModel> moda, Ptr<MobilityModel> modb)
 {
+  // TODO get max distance with line-sphere intersection
+
   // origin of LOS
   Vector3D oc = moda->GetPosition ();
   Vector3D bp = modb->GetPosition ();
