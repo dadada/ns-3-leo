@@ -31,7 +31,7 @@ namespace ns3 {
 #define LEO_STARLINK_PATH_DISTANCE    1684           // km
 #define LEO_STARLINK_ELEVATION_ANGLE  40             // deg
 #define LEO_STARLINK_FSPL             186.1          // dB
-#define LEO_STARLINK_ATMOSPHERIC_LOSS 2.9            // dBm
+#define LEO_STARLINK_ATMOSPHERIC_LOSS 2.9            // dB
 #define LEO_STARLINK_RX_ANTENNA_GAIN  40.9           // dBi
 #define LEO_STARLINK_SYSTEM_TEMP      535.9          // K
 #define LEO_STARLINK_G_T              13.6           // dB/K

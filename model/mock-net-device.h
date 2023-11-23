@@ -102,6 +102,16 @@ public:
   void SetTxPower (double txPower);
 
   /**
+   * Get the receive threshold in dBm
+   */
+  double GetRxTreshold () const;
+
+  /**
+   * Set the receive threshold in dBm
+   */
+  void SetRxThreshold (double rxThresh);
+
+  /**
    * Attach a queue to the MockNetDevice.
    *
    * The MockNetDevice "owns" a queue that implements a queueing
@@ -294,6 +304,11 @@ private:
    * Transmission power used for transmissions
    */
   double m_txPower;
+
+  /**
+   * Minimum threshold for received power
+   */
+  double m_rxThreshold;
 
   /**
    * The state of the Net Device transmit state machine.

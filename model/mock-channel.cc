@@ -155,6 +155,12 @@ MockChannel::GetPropagationLoss () const
   return m_propagationLoss;
 }
 
+void
+MockChannel::SetPropagationLoss (PropagationLossModel model)
+{
+  m_propagationLoss = model;
+}
+
 bool
 MockChannel::Deliver (
     		    Ptr<const Packet> p,
@@ -168,13 +174,17 @@ MockChannel::Deliver (
   Ptr<MobilityModel> srcMob = src->GetObject<MobilityModel> ();
   Ptr<MobilityModel> dstMob = dst->GetObject<MobilityModel> ();
 
+  double txPower = src->GetTxPower ();
+  double rxPower = txPower;
+
   if (srcMob != 0 && dstMob != 0)
     {
       Ptr<PropagationLossModel> pLoss = GetPropagationLoss ();
       if (pLoss != 0)
     	{
-      	  // check if Rx power is below link margin
-      	  if (pLoss->CalcRxPower (src->GetTxPower (), srcMob, dstMob) == 0.0)
+      	  // check if signal reaches destination
+      	  rxPower = pLoss->CalcRxPower (txPower, srcMob, dstMob);
+      	  if (rxPower == 0.0)
     	    {
       	      return false;
     	    }
@@ -187,7 +197,8 @@ MockChannel::Deliver (
         			  &MockNetDevice::Receive,
         			  dst,
         			  p->Copy (),
-        			  src);
+        			  src,
+        			  rxPower);
 
   // Call the tx anim callback on the net device
   m_txrxMock (p, src, dst, txTime, delay);

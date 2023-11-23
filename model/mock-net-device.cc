@@ -70,6 +70,11 @@ MockNetDevice::GetTypeId (void)
                    TimeValue (Seconds (0.0)),
                    MakeTimeAccessor (&MockNetDevice::m_tInterframeGap),
                    MakeTimeChecker ())
+    .AddAttribute ("RxThreshold",
+                   "Receive threshold in dBm",
+                   DoubleValue (0.0),
+                   MakeDoubleAccessor (&MockNetDevice::m_rxThreshold),
+                   MakeDoubleChecker<double> ())
     .AddAttribute ("TxPower",
                    "Transmit power in dBm",
                    DoubleValue (1.0),
@@ -410,7 +415,9 @@ MockNetDevice::SetReceiveErrorModel (Ptr<ErrorModel> em)
 }
 
 void
-MockNetDevice::Receive (Ptr<Packet> packet, Ptr<MockNetDevice> senderDevice)
+MockNetDevice::Receive (Ptr<Packet> packet,
+			Ptr<MockNetDevice> senderDevice,
+			double rxPower)
 {
   NS_LOG_FUNCTION (this << packet << senderDevice);
 
@@ -420,6 +427,13 @@ MockNetDevice::Receive (Ptr<Packet> packet, Ptr<MockNetDevice> senderDevice)
     }
 
   m_phyRxEndTrace (packet);
+
+  if (rxPower < m_rxThreshold)
+    {
+      // Received power is below threshold
+      m_phyRxDropTrace (packet);
+      return;
+    }
 
   if (m_receiveErrorModel && m_receiveErrorModel->IsCorrupt (packet) )
     {
@@ -781,6 +795,18 @@ void
 MockNetDevice::SetTxPower (double txPower)
 {
   m_txPower = txPower;
+}
+
+double
+MockNetDevice::GetRxTreshold () const
+{
+  return m_rxThreshold;
+}
+
+void
+MockNetDevice::SetRxThreshold (double rxThresh)
+{
+  m_rxThreshold = rxThresh;
 }
 
 } // namespace ns3

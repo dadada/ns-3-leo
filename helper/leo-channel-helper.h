@@ -20,6 +20,7 @@ class LeoChannelHelper : public PcapHelperForDevice,
 {
 public:
   LeoChannelHelper ();
+  LeoChannelHelper (std::string constellation);
   virtual ~LeoChannelHelper ()
     {};
 
@@ -49,6 +50,8 @@ public:
   				    Ptr<NetDevice> nd,
   				    bool explicitFilename);
 
+  void SetConstellation (std::string constellation);
+
 private:
   ObjectFactory m_satQueueFactory;
   ObjectFactory m_gndDeviceFactory;
@@ -58,6 +61,8 @@ private:
 
   ObjectFactory m_channelFactory;
 
+  ObjectFactory m_propagationLossFactory;
+
   void SetQueue (ObjectFactory &factory,
 	   	 std::string type,
            	 std::string n1, const AttributeValue &v1,
@@ -65,6 +70,13 @@ private:
            	 std::string n3, const AttributeValue &v3,
            	 std::string n4, const AttributeValue &v4);
 
+
+  void SetConstellationAttributes (double eirp,
+				   double elevationAngle,
+				   double fspl,
+				   double atmosphericLoss,
+				   double linkMargin,
+				   double dataRate);
 };
 
 };

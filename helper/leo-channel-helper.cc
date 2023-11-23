@@ -6,9 +6,13 @@
 #include "ns3/enum.h"
 #include "ns3/queue.h"
 #include "ns3/names.h"
+#include "ns3/assert.h"
+#include "ns3/string.h"
 
 #include "../model/leo-mock-channel.h"
 #include "../model/leo-mock-net-device.h"
+#include "../model/leo-starlink-constants.h"
+#include "../model/leo-telesat-constants.h"
 
 namespace ns3
 {
@@ -27,6 +31,61 @@ LeoChannelHelper::LeoChannelHelper ()
   m_satDeviceFactory.Set ("DeviceType", EnumValue (LeoMockNetDevice::SAT));
 
   m_channelFactory.SetTypeId ("ns3::LeoMockChannel");
+}
+
+LeoChannelHelper::LeoChannelHelper (std::string constellation) :
+  LeoChannelHelper ()
+{
+  SetConstellation (constellation);
+}
+
+void
+LeoChannelHelper::SetConstellation (std::string constellation);
+{
+  if (constellation == "Starlink")
+    {
+      SetConstellationAttributes (LEO_STARLINK_EIRP,
+      				  LEO_STARLINK_ELEVATION_ANGLE,
+      				  LEO_STARLINK_FSPL,
+      				  LEO_STARLINK_ATMOSPHERIC_LOSS,
+      				  LEO_STARLINK_LINK_MARGIN,
+      				  LEO_STARLINK_DATA_RATE);
+    }
+  else if (constellation == "Telesat")
+    {
+      SetConstellationAttributes (LEO_TELESAT_EIRP,
+      				  LEO_TELESAT_ELEVATION_ANGLE,
+      				  LEO_TELESAT_FSPL,
+      				  LEO_TELESAT_ATMOSPHERIC_LOSS,
+      				  LEO_TELESAT_LINK_MARGIN,
+      				  LEO_TELESAT_DATA_RATE);
+    }
+  else
+    {
+      NS_ASSERT_MSG (false, "Invalid constellation");
+    }
+}
+
+void
+LeoChannelHelper::SetConstellationAttributes (double eirp,
+					      double elevationAngle,
+					      double fspl,
+					      double atmosphericLoss,
+					      double linkMargin,
+					      double dataRate)
+{
+  m_gndDeviceFactory.Set ("TxPower", DoubleValue (eirp));
+  m_satDeviceFactory.Set ("TxPower", DoubleValue (eirp));
+
+  m_gndDeviceFactory.Set ("DataRate", DoubleValue (dataRate));
+  m_satDeviceFactory.Set ("DataRate", DoubleValue (dataRate));
+
+  m_propagationLossFactory.SetTypeId ("ns3::LeoPropagationLossModel");
+
+  m_propagationLossFactory.Set ("ElevationAngle", DoubleValue (elevationAngle));
+  m_propagationLossFactory.Set ("FreeSpaceLoss", DoubleValue (fspl));
+  m_propagationLossFactory.Set ("AtmosphericLoss", DoubleValue (atmosphericLoss));
+  m_propagationLossFactory.Set ("LinkMargin", DoubleValue (linkMargin));
 }
 
 void
@@ -233,6 +292,7 @@ LeoChannelHelper::Install (std::vector<Ptr<Node> > &satellites, std::vector<Ptr<
   NS_LOG_FUNCTION (this);
 
   Ptr<LeoMockChannel> channel = m_channelFactory.Create<LeoMockChannel> ();
+  channel->SetPropagationLoss (m_propagationLossFactory.Create ());
 
   NetDeviceContainer container;
 
