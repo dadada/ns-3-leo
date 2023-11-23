@@ -5,6 +5,9 @@
 #include "ns3/internet-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/node-container.h"
+#include "ns3/aodv-helper.h"
+#include "ns3/internet-stack-helper.h"
+#include "ns3/udp-client-server-helper.h"
 
 #include "ns3/leo-module.h"
 #include "ns3/test.h"
@@ -33,51 +36,59 @@ IslIcmpTestCase::~IslIcmpTestCase ()
 void
 IslIcmpTestCase::DoRun (void)
 {
-  NodeContainer nodes;
-  nodes.Create (3);
+  Time::SetResolution (Time::NS);
 
-  IslHelper isl;
-  isl.SetDeviceAttribute ("DataRate", StringValue ("5Gbps"));
-  isl.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
-  isl.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::IslPropagationLossModel"));
-  isl.SetDeviceAttribute ("MobilityModel", StringValue ("ns3::WaypointMobilityModel"));
+  std::vector<std::string> satWps =
+    {
+      // TODO use different waypoints
+      "contrib/leo/data/test/waypoints.txt",
+      "contrib/leo/data/test/waypoints.txt",
+      "contrib/leo/data/test/waypoints.txt",
+      "contrib/leo/data/test/waypoints.txt",
+    };
 
-  NetDeviceContainer devices;
-  devices = isl.Install (nodes);
+  LeoSatNodeHelper satHelper;
+  NodeContainer satellites = satHelper.Install (satWps);
 
+  IslHelper islCh;
+  islCh.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
+  islCh.SetDeviceAttribute ("ReceiveErrorModel", StringValue ("ns3::BurstErrorModel"));
+  islCh.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
+  islCh.SetDeviceAttribute ("InterframeGap", TimeValue (Seconds (0.001)));
+  islCh.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::IslPropagationLossModel"));
+  NetDeviceContainer islNet = islCh.Install (satellites);
+
+  // Install internet stack on nodes
   InternetStackHelper stack;
-  stack.Install (nodes);
+  AodvHelper aodv;
+  stack.SetRoutingHelper (aodv);
+  stack.Install (satellites);
 
-  Ipv6AddressHelper address;
-
-  Ipv6InterfaceContainer interfaces = address.Assign (devices);
-
-  NdCacheHelper nsHelper;
-  nsHelper.Install (devices, interfaces);
+  // Make all networks addressable for legacy protocol
+  Ipv4AddressHelper ipv4;
+  ipv4.SetBase ("10.1.0.0", "255.255.0.0");
+  Ipv4InterfaceContainer islIp = ipv4.Assign (islNet);
 
   // install echo server on all nodes
   UdpEchoServerHelper echoServer (9);
-  ApplicationContainer serverApps = echoServer.Install (nodes);
+  ApplicationContainer serverApps = echoServer.Install (satellites);
 
   ApplicationContainer clientApps;
-  UdpEchoClientHelper echoClient (devices.Get (0)->GetAddress (), 9);
-  echoClient.SetAttribute ("MaxPackets", UintegerValue (10));
-  echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
-  echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
-
-  for (uint32_t i = 1; i < nodes.GetN (); i++)
+  for (uint32_t i = 0; i < satellites.GetN (); i ++)
     {
-      Address destAddress = interfaces.GetAddress (i, 0);
-      echoClient.SetAttribute ("RemoteAddress", AddressValue (destAddress));
-
-      clientApps.Add (echoClient.Install (nodes.Get (0)));
+      UdpEchoClientHelper echoClient (islIp.GetAddress ((i+1) % satellites.GetN (), 0), 9);
+      echoClient.SetAttribute ("MaxPackets", UintegerValue (10));
+      echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
+      echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
+      echoClient.Install (satellites.Get (i));
     }
 
   serverApps.Start (Seconds (1.0));
-  clientApps.Start (Seconds (2.0));
-  clientApps.Stop (Seconds (10.0));
-  serverApps.Stop (Seconds (10.0));
+  clientApps.Start (Seconds (5.0));
+  clientApps.Stop (Seconds (20.0));
+  serverApps.Stop (Seconds (21.0));
 
+  Simulator::Stop (Seconds (22.0));
   Simulator::Run ();
   Simulator::Destroy ();
 }
