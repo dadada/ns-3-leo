@@ -32,6 +32,9 @@ LeoChannelHelper::LeoChannelHelper ()
   m_satDeviceFactory.Set ("DeviceType", EnumValue (LeoMockNetDevice::SAT));
 
   m_channelFactory.SetTypeId ("ns3::LeoMockChannel");
+
+  m_propagationLossFactory.SetTypeId ("ns3::LeoPropagationLossModel");
+
 }
 
 LeoChannelHelper::LeoChannelHelper (std::string constellation) :
@@ -118,8 +121,6 @@ LeoChannelHelper::SetConstellationAttributes (double eirp,
 
   m_gndDeviceFactory.Set ("DataRate", DoubleValue (dataRate));
   m_satDeviceFactory.Set ("DataRate", DoubleValue (dataRate));
-
-  m_propagationLossFactory.SetTypeId ("ns3::LeoPropagationLossModel");
 
   m_propagationLossFactory.Set ("ElevationAngle", DoubleValue (elevationAngle));
   m_propagationLossFactory.Set ("FreeSpaceLoss", DoubleValue (fspl));
