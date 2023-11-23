@@ -147,8 +147,10 @@ public:
    * arrived at the device.
    *
    * \param p Ptr to the received packet.
+   * \param senderDevice sender
+   * \param rxPower RX power excluding receiver gain and loss
    */
-  void Receive (Ptr<Packet> p, Ptr<MockNetDevice> senderDevice);
+  void Receive (Ptr<Packet> p, Ptr<MockNetDevice> senderDevice, double rxPower);
 
   // The remaining methods are documented in ns3::NetDevice*
 
@@ -205,6 +207,8 @@ protected:
 
   virtual void DoInitialize (void);
   virtual void NotifyNewAggregate (void);
+
+  virtual double DoCalcRxPower (double rxPower) const;
 
 private:
 

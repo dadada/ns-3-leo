@@ -156,7 +156,7 @@ MockChannel::GetPropagationLoss () const
 }
 
 void
-MockChannel::SetPropagationLoss (PropagationLossModel model)
+MockChannel::SetPropagationLoss (Ptr<PropagationLossModel> model)
 {
   m_propagationLoss = model;
 }

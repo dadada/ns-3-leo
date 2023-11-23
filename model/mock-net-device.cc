@@ -414,12 +414,18 @@ MockNetDevice::SetReceiveErrorModel (Ptr<ErrorModel> em)
   m_receiveErrorModel = em;
 }
 
+double
+MockNetDevice::DoCalcRxPower (double rxPower) const
+{
+  return rxPower;
+}
+
 void
 MockNetDevice::Receive (Ptr<Packet> packet,
 			Ptr<MockNetDevice> senderDevice,
 			double rxPower)
 {
-  NS_LOG_FUNCTION (this << packet << senderDevice);
+  NS_LOG_FUNCTION (this << packet << senderDevice << rxPower);
 
   if (senderDevice == this)
     {
@@ -427,6 +433,8 @@ MockNetDevice::Receive (Ptr<Packet> packet,
     }
 
   m_phyRxEndTrace (packet);
+
+  rxPower = DoCalcRxPower (rxPower);
 
   if (rxPower < m_rxThreshold)
     {

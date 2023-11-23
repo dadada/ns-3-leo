@@ -30,8 +30,13 @@ public:
   DeviceType GetDeviceType () const;
   void SetDeviceType (DeviceType deviceType);
 
+protected:
+  virtual double DoCalcRxPower (double rxPower) const;
+
 private:
   DeviceType m_deviceType;
+  double m_rxLoss;
+  double m_rxGain;
 };
 
 };

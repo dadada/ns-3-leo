@@ -76,7 +76,9 @@ private:
 				   double fspl,
 				   double atmosphericLoss,
 				   double linkMargin,
-				   double dataRate);
+				   double dataRate,
+				   double rxGain,
+				   double rxLoss);
 };
 
 };

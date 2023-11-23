@@ -40,25 +40,55 @@ LeoChannelHelper::LeoChannelHelper (std::string constellation) :
 }
 
 void
-LeoChannelHelper::SetConstellation (std::string constellation);
+LeoChannelHelper::SetConstellation (std::string constellation)
 {
-  if (constellation == "Starlink")
+  if (constellation == "StarlinkGateway")
     {
-      SetConstellationAttributes (LEO_STARLINK_EIRP,
-      				  LEO_STARLINK_ELEVATION_ANGLE,
-      				  LEO_STARLINK_FSPL,
-      				  LEO_STARLINK_ATMOSPHERIC_LOSS,
-      				  LEO_STARLINK_LINK_MARGIN,
-      				  LEO_STARLINK_DATA_RATE);
+      SetConstellationAttributes (LEO_STARLINK_GATEWAY_EIRP,
+      				  LEO_STARLINK_GATEWAY_ELEVATION_ANGLE,
+      				  LEO_STARLINK_GATEWAY_FSPL,
+      				  LEO_STARLINK_GATEWAY_ATMOSPHERIC_LOSS,
+      				  LEO_STARLINK_GATEWAY_LINK_MARGIN,
+      				  LEO_STARLINK_GATEWAY_DATA_RATE,
+      				  LEO_STARLINK_GATEWAY_RX_ANTENNA_GAIN,
+      				  0.0 // TODO
+      );
     }
-  else if (constellation == "Telesat")
+  else if (constellation == "StarlinkUser")
     {
-      SetConstellationAttributes (LEO_TELESAT_EIRP,
-      				  LEO_TELESAT_ELEVATION_ANGLE,
-      				  LEO_TELESAT_FSPL,
-      				  LEO_TELESAT_ATMOSPHERIC_LOSS,
-      				  LEO_TELESAT_LINK_MARGIN,
-      				  LEO_TELESAT_DATA_RATE);
+      SetConstellationAttributes (LEO_STARLINK_USER_EIRP,
+      				  LEO_STARLINK_USER_ELEVATION_ANGLE,
+      				  LEO_STARLINK_USER_FSPL,
+      				  LEO_STARLINK_USER_ATMOSPHERIC_LOSS,
+      				  LEO_STARLINK_USER_LINK_MARGIN,
+      				  LEO_STARLINK_USER_DATA_RATE,
+      				  LEO_STARLINK_USER_RX_ANTENNA_GAIN,
+      				  0.0
+      );
+    }
+  else if (constellation == "TelesatGateway")
+    {
+      SetConstellationAttributes (LEO_TELESAT_GATEWAY_EIRP,
+      				  LEO_TELESAT_GATEWAY_ELEVATION_ANGLE,
+      				  LEO_TELESAT_GATEWAY_FSPL,
+      				  LEO_TELESAT_GATEWAY_ATMOSPHERIC_LOSS,
+      				  LEO_TELESAT_GATEWAY_LINK_MARGIN,
+      				  LEO_TELESAT_GATEWAY_DATA_RATE,
+      				  LEO_TELESAT_GATEWAY_RX_ANTENNA_GAIN,
+      				  0.0
+      );
+    }
+  else if (constellation == "TelesatUser")
+    {
+      SetConstellationAttributes (LEO_TELESAT_USER_EIRP,
+      				  LEO_TELESAT_USER_ELEVATION_ANGLE,
+      				  LEO_TELESAT_USER_FSPL,
+      				  LEO_TELESAT_USER_ATMOSPHERIC_LOSS,
+      				  LEO_TELESAT_USER_LINK_MARGIN,
+      				  LEO_TELESAT_USER_DATA_RATE,
+      				  LEO_TELESAT_USER_RX_ANTENNA_GAIN,
+      				  0.0
+      );
     }
   else
     {
@@ -72,10 +102,18 @@ LeoChannelHelper::SetConstellationAttributes (double eirp,
 					      double fspl,
 					      double atmosphericLoss,
 					      double linkMargin,
-					      double dataRate)
+					      double dataRate,
+					      double rxGain,
+					      double rxLoss)
 {
   m_gndDeviceFactory.Set ("TxPower", DoubleValue (eirp));
   m_satDeviceFactory.Set ("TxPower", DoubleValue (eirp));
+
+  m_gndDeviceFactory.Set ("RxGain", DoubleValue (rxGain));
+  m_gndDeviceFactory.Set ("RxLoss", DoubleValue (rxLoss));
+
+  m_satDeviceFactory.Set ("RxLoss", DoubleValue (rxGain));
+  m_satDeviceFactory.Set ("RxGain", DoubleValue (rxLoss));
 
   m_gndDeviceFactory.Set ("DataRate", DoubleValue (dataRate));
   m_satDeviceFactory.Set ("DataRate", DoubleValue (dataRate));

@@ -81,10 +81,12 @@ LeoPropagationLossModel::DoCalcRxPower (double txPowerDbm,
       return 0.0;
     }
 
-  double rxc = -m_atmosphericLoss - m_freeSpacePathLoss;
-  NS_LOG_DEBUG ("attenuation coefficient= " << rxc << " dB");
+  // txPowerDbm includes tx antenna gain and losses
+  // receiver loss and gain added at net device
+  // P_{RX} = P_{TX} + G_{TX} - L_{TX} - L_{FS} - L_M + G_{RX} - L_{RX}
+  double rxc = txPowerDbm - m_atmosphericLoss - m_freeSpacePathLoss - m_linkMargin;
 
-  return txPowerDbm + rxc;
+  return rxc;
 }
 
 int64_t

@@ -73,7 +73,7 @@ public:
   virtual bool TransmitStart (Ptr<const Packet> p, uint32_t devId, Address dst, Time txTime) = 0;
 
   Ptr<PropagationLossModel> GetPropagationLoss () const;
-  void SetPropagationLoss (PropagationLossModel model);
+  void SetPropagationLoss (Ptr<PropagationLossModel> model);
 
 protected:
   TracedCallback<Ptr<const Packet>,     // Packet being transmitted
