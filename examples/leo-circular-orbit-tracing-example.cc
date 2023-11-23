@@ -22,11 +22,11 @@ int main(int argc, char *argv[])
   CommandLine cmd;
   std::string orbitFile;
   std::string traceFile;
-  Time duration;
+  double duration;
   cmd.AddValue("orbitFile", "CSV file with orbit parameters", orbitFile);
   cmd.AddValue("traceFile", "CSV file to store mobility trace in", traceFile);
   cmd.AddValue("precision", "ns3::LeoCircularOrbitMobilityModel::Precision");
-  cmd.AddValue("duration", "Duration of the simulation", duration);
+  cmd.AddValue("duration", "Duration of the simulation in seconds", duration);
   cmd.Parse (argc, argv);
 
   LeoOrbitNodeHelper orbit;
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 
   std::cout << "Time,Satellite,x,y,z,Speed" << std::endl;
 
-  Simulator::Stop (duration);
+  Simulator::Stop (Seconds (duration));
   Simulator::Run ();
   Simulator::Destroy ();
 

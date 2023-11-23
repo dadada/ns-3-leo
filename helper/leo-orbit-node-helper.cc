@@ -46,15 +46,14 @@ LeoOrbitNodeHelper::Install (const std::string &orbitFile)
     {
       MobilityHelper mobility;
       mobility.SetPositionAllocator ("ns3::LeoCircularOrbitPostionAllocator",
-                                     "NumOrbits", IntegerValue (orbit.inc),
+                                     "NumOrbits", IntegerValue (orbit.planes),
                                      "NumSatellites", IntegerValue (orbit.sats));
       mobility.SetMobilityModel ("ns3::LeoCircularOrbitMobilityModel",
   			     	 "Altitude", DoubleValue (orbit.alt),
   			     	 "Inclination", DoubleValue (orbit.inc));
 
       NodeContainer c;
-      Ptr<Node> node = m_nodeFactory.Create<Node> ();
-      c.Add (node);
+      c.Create (orbit.sats*orbit.planes);
       mobility.Install (c);
       nodes.Add (c);
       NS_LOG_DEBUG ("Added orbit plane");
