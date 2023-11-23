@@ -46,8 +46,9 @@ LeoPropagationLossModel::~LeoPropagationLossModel ()
 double
 LeoPropagationLossModel::GetAngle (Ptr<MobilityModel> a, Ptr<MobilityModel> b)
 {
-  Vector3D pa = a->GetPosition ();
+  Vector3D pa = a->GetPosition () - b->GetPosition ();
   Vector3D pb = b->GetPosition ();
+  pb = Vector3D (-pb.x, -pb.y, -pb.z);
 
   double prod = abs ((pa.x * pb.x) + (pa.y * pb.y) + (pa.z * pb.z));
   double norm = pb.GetLength () * pa.GetLength ();

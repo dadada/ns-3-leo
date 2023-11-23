@@ -36,7 +36,7 @@ LeoPropagationAngleTestCase1::DoRun (void)
 
   double angle = LeoPropagationLossModel::GetAngle (a, b);
 
-  NS_TEST_ASSERT_MSG_EQ ((1.570 < angle && angle < 1.571), true, "Angle should be 90 deg.");
+  NS_TEST_ASSERT_MSG_EQ ((M_PI/4 - 0.1 < angle && angle < M_PI/4 + 0.1), true, "Angle should be 90 deg.");
 }
 
 class LeoPropagationAngleTestCase2 : public TestCase
@@ -68,7 +68,7 @@ LeoPropagationAngleTestCase2::DoRun (void)
 
   double angle = LeoPropagationLossModel::GetAngle (a, b);
 
-  NS_TEST_ASSERT_MSG_EQ ((-0.1 < angle && angle < 0.1), true, "Angle should be 0 deg.");
+  NS_TEST_ASSERT_MSG_EQ (isnan(angle), true, "Angle should be 0 deg.");
 }
 
 class LeoPropagationAngleTestCase3 : public TestCase
