@@ -73,28 +73,12 @@ LeoMockChannel::TransmitStart (Ptr<const Packet> p,
       return false;
     }
 
-  if (dst == srcDev->GetBroadcast () || dst == srcDev->GetMulticast (Ipv4Address ())) // mcast group ignored
+  // TODO deliver only to devices in the same beam
+  for (DeviceIndex::iterator it = dests->begin (); it != dests->end(); it ++)
     {
-      for (DeviceIndex::iterator it = dests->begin (); it != dests->end(); it ++)
-      	{
-      	  Deliver (p, srcDev, it->second, txTime);
-      	}
-      return true;
+      Deliver (p, srcDev, it->second, txTime);
     }
-  else
-    {
-      DeviceIndex::iterator it = dests->find (dst);
-      if  (it == dests->end ())
-      	{
-      	  NS_LOG_ERROR ("unable to find destination interface: " << dst);
-      	  return false;
-      	}
-      else
-      	{
-      	  // TODO deliver only to devices in the same beam
-      	  return Deliver (p, srcDev, it->second, txTime);
-      	}
-    }
+  return true;
 }
 
 int32_t
