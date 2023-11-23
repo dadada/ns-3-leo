@@ -150,7 +150,7 @@ public:
    *
    * \param p Ptr to the received packet.
    */
-  void Receive (Ptr<Packet> p);
+  void Receive (Ptr<Packet> p, Ptr<IslNetDevice> senderDevice);
 
   // The remaining methods are documented in ns3::NetDevice*
 
@@ -205,7 +205,7 @@ protected:
    *
    * \param p Packet received
    */
-  void DoMpiReceive (Ptr<Packet> p);
+  void DoMpiReceive (Ptr<Packet> p, Ptr<IslNetDevice> sender);
 
   virtual void DoInitialize (void);
   virtual void NotifyNewAggregate (void);
@@ -242,7 +242,7 @@ private:
    * \returns the address of the remote device connected to this device
    * through the point to point channel.
    */
-  Address GetRemote (void) const;
+  Address GetRemote (Ptr<IslNetDevice> senderDevice) const;
 
   /**
    * Adds the necessary headers and trailers to a packet of data in order to

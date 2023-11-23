@@ -127,7 +127,8 @@ bool IslChannel::Deliver (
         delay,
         &IslNetDevice::Receive,
         dst,
-        p->Copy ());
+        p->Copy (),
+        src);
 
     // Call the tx anim callback on the net device
     m_txrxIsl (p, src, dst, txTime, delay);

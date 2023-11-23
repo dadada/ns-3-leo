@@ -21,11 +21,10 @@ main (int argc, char *argv[])
   Time::SetResolution (Time::NS);
   LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
   LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
-  LogComponentEnable ("UdpClient", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("IslChannel", LOG_LEVEL_LOGIC);
+  LogComponentEnable ("UdpClient", LOG_LEVEL_INFO);
 
   NodeContainer nodes;
-  nodes.Create (2);
+  nodes.Create (300);
 
   IslHelper isl;
   isl.SetDeviceAttribute ("DataRate", StringValue ("5Gbps"));
@@ -45,19 +44,22 @@ main (int argc, char *argv[])
 
   UdpEchoServerHelper echoServer (9);
 
-  ApplicationContainer serverApps = echoServer.Install (nodes.Get (1));
-  serverApps.Start (Seconds (1.0));
-  serverApps.Stop (Seconds (10.0));
+  for (uint32_t i = 1; i < nodes.GetN (); i++)
+  {
+    ApplicationContainer serverApps = echoServer.Install (nodes.Get (i));
+    serverApps.Start (Seconds (1.0));
+    serverApps.Stop (Seconds (10.0));
 
-  Address destAddress = interfaces.GetAddress (1, 0);
-  UdpEchoClientHelper echoClient (destAddress, 9);
-  echoClient.SetAttribute ("MaxPackets", UintegerValue (10));
-  echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
-  echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
+    Address destAddress = interfaces.GetAddress (i, 0);
+    UdpEchoClientHelper echoClient (destAddress, 9);
+    echoClient.SetAttribute ("MaxPackets", UintegerValue (10));
+    echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
+    echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
 
-  ApplicationContainer clientApps = echoClient.Install (nodes.Get (0));
-  clientApps.Start (Seconds (2.0));
-  clientApps.Stop (Seconds (10.0));
+    ApplicationContainer clientApps = echoClient.Install (nodes.Get (0));
+    clientApps.Start (Seconds (2.0));
+    clientApps.Stop (Seconds (10.0));
+  }
 
   Simulator::Run ();
   Simulator::Destroy ();

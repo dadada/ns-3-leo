@@ -11,4 +11,3 @@ namespace ns3 {
 }
 
 #endif /* LEO_HELPER_H */
-

@@ -368,7 +368,7 @@ IslNetDevice::SetReceiveErrorModel (Ptr<ErrorModel> em)
 }
 
 void
-IslNetDevice::Receive (Ptr<Packet> packet)
+IslNetDevice::Receive (Ptr<Packet> packet, Ptr<IslNetDevice> senderDevice)
 {
   NS_LOG_FUNCTION (this << packet);
   uint16_t protocol = 0;
@@ -406,14 +406,15 @@ IslNetDevice::Receive (Ptr<Packet> packet)
       //
       ProcessHeader (packet, protocol);
 
+      Address remote = GetRemote (senderDevice);
       if (!m_promiscCallback.IsNull ())
         {
           m_macPromiscRxTrace (originalPacket);
-          m_promiscCallback (this, packet, protocol, GetRemote (), GetAddress (), NetDevice::PACKET_HOST);
+          m_promiscCallback (this, packet, protocol, remote, GetAddress (), NetDevice::PACKET_HOST);
         }
 
       m_macRxTrace (originalPacket);
-      m_rxCallback (this, packet, protocol, GetRemote ());
+      m_rxCallback (this, packet, protocol, remote);
     }
 }
 
@@ -653,28 +654,17 @@ IslNetDevice::SupportsSendFrom (void) const
 }
 
 void
-IslNetDevice::DoMpiReceive (Ptr<Packet> p)
+IslNetDevice::DoMpiReceive (Ptr<Packet> p, Ptr<IslNetDevice> senderDevice)
 {
   NS_LOG_FUNCTION (this << p);
-  Receive (p);
+  Receive (p, senderDevice);
 }
 
 Address
-IslNetDevice::GetRemote (void) const
+IslNetDevice::GetRemote (Ptr<IslNetDevice> senderDevice) const
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_channel->GetNDevices () == 2);
-  for (std::size_t i = 0; i < m_channel->GetNDevices (); ++i)
-    {
-      Ptr<NetDevice> tmp = m_channel->GetDevice (i);
-      if (tmp != this)
-        {
-          return tmp->GetAddress ();
-        }
-    }
-  NS_ASSERT (false);
-  // quiet compiler.
-  return Address ();
+  return senderDevice->GetAddress ();
 }
 
 bool
