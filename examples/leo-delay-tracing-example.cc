@@ -40,7 +40,6 @@ int main (int argc, char *argv[])
   cmd.AddValue("groundFile", "CSV file with ground station locations", groundFile);
   cmd.AddValue("precision", "ns3::LeoCircularOrbitMobilityModel::Precision");
   cmd.AddValue("duration", "Duration of the simulation", duration);
-  // TODO LeoLatLong
   cmd.AddValue("source", "Traffic source", source);
   cmd.AddValue("destination", "Traffic destination", destination);
   cmd.AddValue("islRate", "Throughput of the ISL link", islRate);

@@ -29,10 +29,10 @@ public:
 
   /**
    *
-   * \param wpFile path to waypoint file
+   * \param wpFile path to latitude longitude file
    * \returns a node container containing nodes using the specified attributes
    */
-  NodeContainer Install (const std::string &wpFile);
+  NodeContainer Install (const std::string &file);
 
   /**
    *

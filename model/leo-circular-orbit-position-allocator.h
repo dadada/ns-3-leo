@@ -1,7 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
-#ifndef LEO_CIRCULAR_ORBIT_HELPER_H
-#define LEO_CIRCULAR_ORBIT_HELPER_H
+#ifndef LEO_CIRCULAR_ORBIT_POSITION_ALLOCATOR_H
+#define LEO_CIRCULAR_ORBIT_POSITION_ALLOCATOR_H
 
 #include "ns3/position-allocator.h"
 

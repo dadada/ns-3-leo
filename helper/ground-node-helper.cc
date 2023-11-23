@@ -30,24 +30,25 @@ LeoGndNodeHelper::SetAttribute (string name, const AttributeValue &value)
 }
 
 NodeContainer
-LeoGndNodeHelper::Install (const std::string &wpFile)
+LeoGndNodeHelper::Install (const std::string &file)
 {
-  NS_LOG_FUNCTION (wpFile);
+  NS_LOG_FUNCTION (this << file);
 
   NodeContainer nodes;
-  ifstream waypoints;
-  waypoints.open (wpFile, ifstream::in);
-  Vector pos;
-  while ((waypoints >> pos))
+  ifstream stream;
+  stream.open (file, ifstream::in);
+  LeoLatLong loc;
+  while ((stream >> loc))
     {
       Ptr<ConstantPositionMobilityModel> mob = CreateObject<ConstantPositionMobilityModel> ();
+      Vector pos = GetEarthPosition (loc);
       mob->SetPosition (pos);
       Ptr<Node> node = m_gndNodeFactory.Create<Node> ();
       node->AggregateObject (mob);
       nodes.Add (node);
       NS_LOG_INFO ("Added ground node at " << pos);
     }
-  waypoints.close ();
+  stream.close ();
 
   NS_LOG_INFO ("Added " << nodes.GetN () << " ground nodes");
 
