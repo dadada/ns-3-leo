@@ -24,6 +24,7 @@
 
 #include "ns3/log.h"
 #include "ns3/mobility-model.h"
+#include "math.h"
 
 #include "isl-propagation-loss-model.h"
 
@@ -52,6 +53,31 @@ IslPropagationLossModel::~IslPropagationLossModel ()
 {
 }
 
+
+const double
+IslPropagationLossModel::EARTH_RAD = 6.3781E6;
+
+bool
+IslPropagationLossModel::GetLos (Ptr<MobilityModel> a, Ptr<MobilityModel> b)
+{
+  // origin of LOS
+  Vector3D o = a->GetPosition ();
+  double ol = o.GetLength ();
+
+  // second point of LOS
+  Vector3D bp = b->GetPosition ();
+  double bl = bp.GetLength ();
+
+  // unit vector
+  Vector3D u = Vector3D ((o.x-bp.x)/bl, (o.y-bp.y)/bl, (o.z-bp.z)/bl);
+
+  // center point of sphere is 0
+  double uo = (u.x*o.x) + (u.y*o.y) + (u.z*o.z);
+  double delta = (uo*uo) - (ol*ol - (EARTH_RAD*EARTH_RAD));
+
+  return delta < 0;
+}
+
 double
 IslPropagationLossModel::DoCalcRxPower (double txPowerDbm,
                                         Ptr<MobilityModel> a,
@@ -62,7 +88,7 @@ IslPropagationLossModel::DoCalcRxPower (double txPowerDbm,
   // curvature + distance)
 
   // primitivec cut-of at 1000 km
-  if (a->GetDistanceFrom (b) > 1000000.0)
+  if (!GetLos (a, b))
     {
       return 0;
     }

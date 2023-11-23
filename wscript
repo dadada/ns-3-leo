@@ -28,16 +28,17 @@ def build(bld):
 
     module_test = bld.create_ns3_module_test_library('leo')
     module_test.source = [
-        'test/leo-test-suite.cc',
-        'test/leo-propagation-test-suite.cc',
-        'test/isl-test-suite.cc',
+        'test/ground-node-helper-test-suite.cc',
         'test/isl-mock-channel-test-suite.cc',
-        'test/leo-mock-channel-test-suite.cc',
+        'test/isl-propagation-test-suite.cc',
+        'test/isl-test-suite.cc',
         'test/leo-input-fstream-container-test-suite.cc',
         'test/leo-mobility-test-suite.cc',
+        'test/leo-mock-channel-test-suite.cc',
+        'test/leo-propagation-test-suite.cc',
+        'test/leo-test-suite.cc',
         'test/satellite-node-helper-test-suite.cc',
-        'test/ground-node-helper-test-suite.cc',
-        ]
+    ]
 
     headers = bld(features='ns3header')
     headers.module = 'leo'

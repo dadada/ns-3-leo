@@ -33,9 +33,22 @@ namespace ns3 {
 class IslPropagationLossModel : public PropagationLossModel
 {
 public:
+  static const double EARTH_RAD;
+
   static TypeId GetTypeId (void);
   IslPropagationLossModel ();
   virtual ~IslPropagationLossModel ();
+
+  /**
+   * true if there is at least one intersection of ISL line-of-sight with earth
+   * (LOS is blocked by earth)
+   *
+   * Assumes earth is sperical.
+   *
+   * \param a first node
+   * \param b second node
+   */
+  static bool GetLos (Ptr<MobilityModel> a, Ptr<MobilityModel> b);
 private:
   /**
    * Returns the Rx Power taking into account only the particular
