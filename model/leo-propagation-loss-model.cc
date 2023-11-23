@@ -71,11 +71,13 @@ LeoPropagationLossModel::GetAngle (Ptr<MobilityModel> a, Ptr<MobilityModel> b)
     {
       pa = x - y;
       pb = y;
+      NS_LOG_DEBUG ("LEO ground -> space");
     }
   else
     {
       pa = y - x;
       pb = x;
+      NS_LOG_DEBUG ("LEO space -> ground");
     }
 
   double prod = (pa.x*-pb.x) + (pa.y*-pb.y) + (pa.z*-pb.z);
