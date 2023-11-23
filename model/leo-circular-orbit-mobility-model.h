@@ -40,12 +40,6 @@ public:
   double GetAltitude () const;
   void SetAltitude (double h);
 
-  double GetLatitude () const;
-  void SetLatitude (double lat);
-
-  double GetOffset () const;
-  void SetOffset (double off);
-
   double GetInclination () const;
   void SetInclination (double incl);
 

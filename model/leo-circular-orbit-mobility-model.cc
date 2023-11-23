@@ -32,23 +32,11 @@ LeoCircularOrbitMobilityModel::GetTypeId ()
                    MakeDoubleAccessor (&LeoCircularOrbitMobilityModel::SetInclination,
                    		       &LeoCircularOrbitMobilityModel::GetInclination),
                    MakeDoubleChecker<double> ())
-    .AddAttribute ("Latitude",
-                   "The latitude at which the orital plane intersects the equatorial plane in degrees",
-                   DoubleValue (0.0),
-                   MakeDoubleAccessor (&LeoCircularOrbitMobilityModel::SetLatitude,
-                   		       &LeoCircularOrbitMobilityModel::GetLatitude),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("Offset",
-                   "The relative offset of the satellite along the orbital plane from the equatorial plane in degrees",
-                   DoubleValue (0.0),
-                   MakeDoubleAccessor (&LeoCircularOrbitMobilityModel::SetOffset,
-                   		       &LeoCircularOrbitMobilityModel::GetOffset),
-                   MakeDoubleChecker<double> ())
     ;
   return tid;
 }
 
-LeoCircularOrbitMobilityModel::LeoCircularOrbitMobilityModel() : MobilityModel ()
+LeoCircularOrbitMobilityModel::LeoCircularOrbitMobilityModel() : MobilityModel (), m_latitude (0.0), m_offset (0.0)
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
@@ -105,15 +93,14 @@ double
 LeoCircularOrbitMobilityModel::GetProgress (Time t) const
 {
   // TODO use nanos or ms instead? does it give higher precision?
-  return 2 * M_PI * ((GetSpeed () * t.GetSeconds ()) / LEO_EARTH_RAD_M) + m_offset;
+  return (2 * M_PI * ((GetSpeed () * t.GetSeconds ()) / LEO_EARTH_RAD_M)) + m_offset;
 }
 
 Vector3D
 LeoCircularOrbitMobilityModel::RotatePlane (double a, const Vector3D &x) const
 {
-  Vector3D n = PlaneNorm ();
+  Vector3D n = m_plane;
 
-  // TODO optimize?
   return Product (DotProduct (n, x), n)
     + Product (cos (a), CrossProduct (CrossProduct (n, x), n))
     + Product (sin (a), CrossProduct (n, x));
@@ -132,7 +119,13 @@ LeoCircularOrbitMobilityModel::DoGetPosition (void) const
 void
 LeoCircularOrbitMobilityModel::DoSetPosition (const Vector &position)
 {
-  NS_ASSERT_MSG (false, "Can not set position of satellite on circular orbit");
+  // use first element of position vector as latitude, second for longitude
+  // this works nicely with MobilityHelper and GetPostion will still get the
+  // correct position, but be aware that it will not be the same as supplied to
+  // SetPostion
+  m_latitude = position.x;
+  m_offset = position.y;
+  m_plane = PlaneNorm ();
 }
 
 double LeoCircularOrbitMobilityModel::GetAltitude () const
@@ -144,27 +137,6 @@ void LeoCircularOrbitMobilityModel::SetAltitude (double h)
 {
   m_orbitHeight = LEO_EARTH_RAD_M + h;
   m_plane = PlaneNorm ();
-}
-
-double LeoCircularOrbitMobilityModel::GetLatitude () const
-{
-  return m_latitude / M_PI * 180.0;
-}
-
-void LeoCircularOrbitMobilityModel::SetLatitude (double lat)
-{
-  m_latitude = lat / 180 * M_PI;
-  m_plane = PlaneNorm ();
-}
-
-double LeoCircularOrbitMobilityModel::GetOffset () const
-{
-  return (m_offset / M_PI) * 180;
-}
-
-void LeoCircularOrbitMobilityModel::SetOffset (double off)
-{
-  m_offset = (off / 180) * M_PI;
 }
 
 double LeoCircularOrbitMobilityModel::GetInclination () const
