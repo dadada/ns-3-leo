@@ -60,14 +60,14 @@ public:
    * \param device Device to attach to the channel
    * \return Index of the device inside the devices list
    */
-  int32_t Attach (Ptr<MockNetDevice> device);
+  virtual int32_t Attach (Ptr<MockNetDevice> device);
 
   /**
    * \brief Detach a given netdevice from this channel
    * \param device pointer to the netdevice to detach from the channel
    * \return true on success, false on failure
    */
-  bool Detach (uint32_t deviceId);
+  virtual bool Detach (uint32_t deviceId);
 
   std::size_t GetNDevices (void) const;
   virtual bool TransmitStart (Ptr<const Packet> p, uint32_t devId, Address dst, Time txTime) = 0;
