@@ -136,7 +136,7 @@ int main (int argc, char *argv[])
 
   LeoOrbitNodeHelper orbit;
   NodeContainer satellites;
-  if (orbitFile.empty())
+  if (!orbitFile.empty())
     {
       satellites = orbit.Install (orbitFile);
     }
