@@ -36,7 +36,7 @@ private:
 class LeoMockChannelTransmitKnownTestCase : public TestCase
 {
 public:
-  LeoMockChannelTransmitKnownTestCase () : TestCase ("transmission from known source succeeds") {}
+  LeoMockChannelTransmitKnownTestCase () : TestCase ("transmission from ground to space succeeds") {}
   virtual ~LeoMockChannelTransmitKnownTestCase () {}
 private:
   virtual void DoRun (void)
@@ -73,7 +73,7 @@ private:
 class LeoMockChannelTransmitSpaceGroundTestCase : public TestCase
 {
 public:
-  LeoMockChannelTransmitSpaceGroundTestCase () : TestCase ("space to ground transmission succeeds") {}
+  LeoMockChannelTransmitSpaceGroundTestCase () : TestCase ("transmission from space to ground succeeds") {}
   virtual ~LeoMockChannelTransmitSpaceGroundTestCase () {}
 private:
   virtual void DoRun (void)
@@ -107,6 +107,80 @@ private:
   }
 };
 
+class LeoMockChannelTransmitSpaceSpaceTestCase : public TestCase
+{
+public:
+  LeoMockChannelTransmitSpaceSpaceTestCase () : TestCase ("transmission from space to space fails") {}
+  virtual ~LeoMockChannelTransmitSpaceSpaceTestCase () {}
+private:
+  virtual void DoRun (void)
+  {
+    Ptr<LeoMockChannel> channel = CreateObject<LeoMockChannel> ();
+    channel->SetAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
+    channel->SetAttribute ("PropagationLoss", StringValue ("ns3::LeoPropagationLossModel"));
+
+    Packet *packet = new Packet ();
+    Ptr<Packet> p = Ptr<Packet>(packet);
+
+    Ptr<Node> srcNode = CreateObject<Node> ();
+    Ptr<LeoMockNetDevice> srcDev = CreateObject<LeoMockNetDevice> ();
+    srcDev->SetNode (srcNode);
+    srcDev->SetDeviceType (LeoMockNetDevice::SAT);
+    srcDev->SetAddress (Mac48Address::Allocate ());
+    int32_t srcId = channel->Attach (srcDev);
+
+    Ptr<Node> dstNode = CreateObject<Node> ();
+    Ptr<LeoMockNetDevice> dstDev = CreateObject<LeoMockNetDevice> ();
+    dstDev->SetNode (dstNode);
+    dstDev->SetDeviceType (LeoMockNetDevice::SAT);
+    dstDev->SetAddress (Mac48Address::Allocate ());
+    channel->Attach (dstDev);
+
+    Address destAddr = dstDev->GetAddress ();
+    Time txTime;
+    bool result = channel->TransmitStart (p, srcId, destAddr, txTime);
+
+    NS_TEST_ASSERT_MSG_EQ (result, false, "space to space transmission succeeded");
+  }
+};
+
+class LeoMockChannelTransmitGroundGroundTestCase : public TestCase
+{
+public:
+  LeoMockChannelTransmitGroundGroundTestCase () : TestCase ("transmission from ground to ground fails") {}
+  virtual ~LeoMockChannelTransmitGroundGroundTestCase () {}
+private:
+  virtual void DoRun (void)
+  {
+    Ptr<LeoMockChannel> channel = CreateObject<LeoMockChannel> ();
+    channel->SetAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
+    channel->SetAttribute ("PropagationLoss", StringValue ("ns3::LeoPropagationLossModel"));
+
+    Packet *packet = new Packet ();
+    Ptr<Packet> p = Ptr<Packet>(packet);
+
+    Ptr<Node> srcNode = CreateObject<Node> ();
+    Ptr<LeoMockNetDevice> srcDev = CreateObject<LeoMockNetDevice> ();
+    srcDev->SetNode (srcNode);
+    srcDev->SetDeviceType (LeoMockNetDevice::GND);
+    srcDev->SetAddress (Mac48Address::Allocate ());
+    int32_t srcId = channel->Attach (srcDev);
+
+    Ptr<Node> dstNode = CreateObject<Node> ();
+    Ptr<LeoMockNetDevice> dstDev = CreateObject<LeoMockNetDevice> ();
+    dstDev->SetNode (dstNode);
+    dstDev->SetDeviceType (LeoMockNetDevice::GND);
+    dstDev->SetAddress (Mac48Address::Allocate ());
+    channel->Attach (dstDev);
+
+    Address destAddr = dstDev->GetAddress ();
+    Time txTime;
+    bool result = channel->TransmitStart (p, srcId, destAddr, txTime);
+
+    NS_TEST_ASSERT_MSG_EQ (result, false, "ground to ground transmission succeeded");
+  }
+};
+
 class LeoMockChannelTestSuite : public TestSuite
 {
 public:
@@ -119,6 +193,8 @@ LeoMockChannelTestSuite::LeoMockChannelTestSuite ()
   AddTestCase (new LeoMockChannelTransmitUnknownTestCase, TestCase::QUICK);
   AddTestCase (new LeoMockChannelTransmitKnownTestCase, TestCase::QUICK);
   AddTestCase (new LeoMockChannelTransmitSpaceGroundTestCase, TestCase::QUICK);
+  AddTestCase (new LeoMockChannelTransmitSpaceSpaceTestCase, TestCase::QUICK);
+  AddTestCase (new LeoMockChannelTransmitGroundGroundTestCase, TestCase::QUICK);
 }
 
 static LeoMockChannelTestSuite islMockChannelTestSuite;
