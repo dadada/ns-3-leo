@@ -42,7 +42,6 @@ IslMockChannelTransmitUnknownTestCase::DoRun (void)
   Time txTime;
   channel->SetAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
   channel->SetAttribute ("PropagationLoss", StringValue ("ns3::IslPropagationLossModel"));
-  dev->SetAttribute ("MobilityModel", StringValue ("ns3::WaypointMobilityModel"));
   bool result = channel->TransmitStart (p, srcId, destAddr, txTime);
 
   NS_TEST_ASSERT_MSG_EQ (result, false, "Unknown destination fails to deliver");
@@ -78,15 +77,17 @@ IslMockChannelTransmitKnownTestCase::DoRun (void)
   Ptr<Packet> p = Ptr<Packet>(packet);
 
   Ptr<Node> srcNode = CreateObject<Node> ();
+  Ptr<ConstantPositionMobilityModel> loc = CreateObject<ConstantPositionMobilityModel> ();
+  srcNode->AggregateObject (loc);
   Ptr<MockNetDevice> srcDev = CreateObject<MockNetDevice> ();
   srcDev->SetNode (srcNode);
-  srcDev->SetAttribute ("MobilityModel", StringValue ("ns3::WaypointMobilityModel"));
   int32_t srcId = channel->Attach (srcDev);
 
   Ptr<Node> dstNode = CreateObject<Node> ();
+  loc = CreateObject<ConstantPositionMobilityModel> ();
+  dstNode->AggregateObject (loc);
   Ptr<MockNetDevice> dstDev = CreateObject<MockNetDevice> ();
   dstDev->SetNode (dstNode);
-  dstDev->SetAttribute ("MobilityModel", StringValue ("ns3::WaypointMobilityModel"));
   channel->Attach (dstDev);
 
   Address destAddr = dstDev->GetAddress ();

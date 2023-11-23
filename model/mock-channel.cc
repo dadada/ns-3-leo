@@ -117,8 +117,8 @@ MockChannel::GetDelay (Ptr<const MockNetDevice> src, Ptr<const MockNetDevice> ds
 {
   NS_LOG_DEBUG ("Get delay from " << src << " to " << dst);
 
-  Ptr<MobilityModel> modSrc = src->GetMobilityModel ();
-  Ptr<MobilityModel> modDst = dst->GetMobilityModel ();
+  Ptr<MobilityModel> modSrc = src->GetNode ()->GetObject<MobilityModel> ();
+  Ptr<MobilityModel> modDst = dst->GetNode ()->GetObject<MobilityModel> ();
 
   Time propagationDelay = m_propagationDelay->GetDelay (modSrc, modDst);
 
@@ -163,7 +163,7 @@ MockChannel::Deliver (
   Time delay = GetDelay (src, dst, txTime);
 
   /* Check if there is LOS between the source and destination */
-  if (GetPropagationLoss ()->CalcRxPower(1, src->GetMobilityModel(), dst->GetMobilityModel()) > 0)
+  if (GetPropagationLoss ()->CalcRxPower(1, src->GetNode ()->GetObject<MobilityModel> (), dst->GetNode ()->GetObject<MobilityModel> ()) > 0)
   {
     Simulator::ScheduleWithContext (dst->GetNode ()->GetId (),
         delay,

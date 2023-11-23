@@ -78,11 +78,6 @@ MockNetDevice::GetTypeId (void)
                    PointerValue (),
                    MakePointerAccessor (&MockNetDevice::m_queue),
                    MakePointerChecker<Queue<Packet> > ())
-    .AddAttribute ("MobilityModel", "The mobility model of the device",
-                   PointerValue (),
-                   MakePointerAccessor (&MockNetDevice::SetMobilityModel,
-                     &MockNetDevice::GetMobilityModel),
-                   MakePointerChecker<MobilityModel> ())
     //
     // Trace sources at the "top" of the net device, where packets transition
     // to/from higher layers.
@@ -711,19 +706,6 @@ MockNetDevice::EtherToPpp (uint16_t proto)
     default: NS_ASSERT_MSG (false, "PPP Protocol number not defined!");
     }
   return 0;
-}
-
-Ptr<MobilityModel>
-MockNetDevice::GetMobilityModel (void) const
-{
-  return m_mobilityModel;
-}
-
-void
-MockNetDevice::SetMobilityModel (Ptr<MobilityModel> model)
-{
-  NS_LOG_FUNCTION (this);
-  m_mobilityModel = model;
 }
 
 bool

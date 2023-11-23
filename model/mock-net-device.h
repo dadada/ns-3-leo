@@ -195,8 +195,6 @@ public:
   virtual void SetPromiscReceiveCallback (PromiscReceiveCallback cb);
   virtual bool SupportsSendFrom (void) const;
 
-  Ptr<MobilityModel> GetMobilityModel (void) const;
-  void SetMobilityModel (Ptr<MobilityModel> model);
   void NotifyLinkDown (void);
 
 protected:
@@ -476,8 +474,6 @@ private:
   uint32_t m_channelDevId;
 
   Ptr<Packet> m_currentPkt; //!< Current packet processed
-
-  Ptr<MobilityModel> m_mobilityModel;
 
   /**
    * \brief PPP to Ethernet protocol number mapping

@@ -79,6 +79,8 @@ LeoMockChannelTransmitKnownTestCase::DoRun (void)
   Ptr<Packet> p = Ptr<Packet>(packet);
 
   Ptr<Node> srcNode = CreateObject<Node> ();
+  Ptr<ConstantPositionMobilityModel> loc = CreateObject<ConstantPositionMobilityModel> ();
+  srcNode->AggregateObject (loc);
   Ptr<LeoMockNetDevice> srcDev = CreateObject<LeoMockNetDevice> ();
   srcDev->SetNode (srcNode);
   srcDev->SetAttribute ("MobilityModel", StringValue ("ns3::ConstantPositionMobilityModel"));
@@ -86,6 +88,8 @@ LeoMockChannelTransmitKnownTestCase::DoRun (void)
   int32_t srcId = channel->Attach (srcDev);
 
   Ptr<Node> dstNode = CreateObject<Node> ();
+  loc = CreateObject<ConstantPositionMobilityModel> ();
+  dstNode->AggregateObject (loc);
   Ptr<LeoMockNetDevice> dstDev = CreateObject<LeoMockNetDevice> ();
   dstDev->SetNode (dstNode);
   dstDev->SetAttribute ("MobilityModel", StringValue ("ns3::WaypointMobilityModel"));
