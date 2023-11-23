@@ -1,9 +1,4 @@
 # -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 
 def build(bld):
-    obj = bld.create_ns3_program('leo-example', ['leo'])
-    obj.source = 'leo-example.cc'
-
-    obj = bld.create_ns3_program('isl-example', ['leo'])
-    obj.source = 'isl-example.cc'
-
+    pass

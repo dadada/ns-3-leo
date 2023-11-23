@@ -1,16 +1,18 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
-// Include a header file from your module to test.
-#include "ns3/leo.h"
+#include "ns3/core-module.h"
+#include "ns3/network-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/applications-module.h"
+#include "ns3/node-container.h"
+#include "ns3/core-module.h"
 
-// An essential include is test.h
+#include "ns3/leo-module.h"
+
 #include "ns3/test.h"
 
-// Do not put your test classes in namespace ns3.  You may find it useful
-// to use the using directive to access the ns3 namespace directly
 using namespace ns3;
 
-// This is an example TestCase.
 class LeoTestCase1 : public TestCase
 {
 public:
@@ -21,29 +23,62 @@ private:
   virtual void DoRun (void);
 };
 
-// Add some help text to this case to describe what it is intended to test
 LeoTestCase1::LeoTestCase1 ()
   : TestCase ("Leo test case (does nothing)")
 {
 }
 
-// This destructor does nothing but we include it as a reminder that
-// the test case should clean up after itself
 LeoTestCase1::~LeoTestCase1 ()
 {
+  Simulator::Destroy ();
 }
 
-//
-// This method is the pure virtual method from class TestCase that every
-// TestCase must implement
-//
 void
 LeoTestCase1::DoRun (void)
 {
-  // A wide variety of test macros are available in src/core/test.h
-  NS_TEST_ASSERT_MSG_EQ (true, true, "true doesn't equal true for some reason");
-  // Use this one for floating point comparisons
-  NS_TEST_ASSERT_MSG_EQ_TOL (0.01, 0.01, 0.001, "Numbers are not equal within tolerance");
+  Time::SetResolution (Time::NS);
+
+  NodeContainer satellites;
+  satellites.Create (100);
+  NodeContainer gateways;
+  gateways.Create (10);
+  NodeContainer terminals;
+  terminals.Create (20);
+
+  LeoHelper leo;
+  leo.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
+  leo.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
+  leo.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::IslPropagationLossModel"));
+  leo.SetDeviceAttribute ("MobilityModel", StringValue ("ns3::LeoMobilityModel"));
+
+  NetDeviceContainer allDevices = leo.Install (satellites, gateways, terminals);
+
+  // we want to ping terminals
+  UdpEchoServerHelper echoServer (9);
+  ApplicationContainer serverApps = echoServer.Install (terminals);
+
+  // TODO routing
+
+  // install a client on each of the terminals
+  ApplicationContainer clientApps;
+  for (uint32_t i = 1; i < terminals.GetN (); i++)
+    {
+      Address remote = terminals.Get (i)->GetObject<Ipv6> ()->GetAddress (1, 0).GetAddress ();
+      UdpEchoClientHelper echoClient (remote, 9);
+      echoClient.SetAttribute ("MaxPackets", UintegerValue (1));
+      echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
+      echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
+
+      clientApps.Add (echoClient.Install (terminals.Get (i-1)));
+    }
+
+  clientApps.Start (Seconds (2.0));
+  clientApps.Stop (Seconds (10.0));
+
+  serverApps.Start (Seconds (1.0));
+  serverApps.Stop (Seconds (10.0));
+
+  Simulator::Run ();
 }
 
 // The TestSuite class names the TestSuite, identifies what type of TestSuite,
@@ -57,12 +92,11 @@ public:
 };
 
 LeoTestSuite::LeoTestSuite ()
-  : TestSuite ("leo", UNIT)
+  : TestSuite ("leo", EXAMPLE)
 {
   // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
-  AddTestCase (new LeoTestCase1, TestCase::QUICK);
+  AddTestCase (new LeoTestCase1, TestCase::EXTENSIVE);
 }
 
 // Do not forget to allocate an instance of this TestSuite
 static LeoTestSuite leoTestSuite;
-

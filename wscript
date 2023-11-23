@@ -26,6 +26,7 @@ def build(bld):
     module_test = bld.create_ns3_module_test_library('leo')
     module_test.source = [
         'test/leo-test-suite.cc',
+        'test/isl-test-suite.cc',
         ]
 
     headers = bld(features='ns3header')

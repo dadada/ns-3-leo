@@ -7,22 +7,33 @@
 #include "ns3/node-container.h"
 
 #include "ns3/leo-module.h"
+#include "ns3/test.h"
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("IslExample");
-
-int
-main (int argc, char *argv[])
+class IslIcmpTestCase : public TestCase
 {
-  CommandLine cmd;
-  cmd.Parse (argc, argv);
+public:
+  IslIcmpTestCase ();
+  virtual ~IslIcmpTestCase ();
 
-  Time::SetResolution (Time::NS);
-  LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
-  LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
-  LogComponentEnable ("IslExample", LOG_LEVEL_DEBUG);
+private:
+  virtual void DoRun (void);
+};
 
+IslIcmpTestCase::IslIcmpTestCase ()
+  : TestCase ("Test connectivity using ICMP")
+{
+}
+
+IslIcmpTestCase::~IslIcmpTestCase ()
+{
+  Simulator::Destroy ();
+}
+
+void
+IslIcmpTestCase::DoRun (void)
+{
   NodeContainer nodes;
   nodes.Create (3);
 
@@ -69,7 +80,20 @@ main (int argc, char *argv[])
   serverApps.Stop (Seconds (10.0));
 
   Simulator::Run ();
-  Simulator::Destroy ();
-
-  return 0;
 }
+
+class IslTestSuite : public TestSuite
+{
+public:
+  IslTestSuite ();
+};
+
+IslTestSuite::IslTestSuite ()
+  : TestSuite ("isl", EXAMPLE)
+{
+  // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
+  AddTestCase (new IslIcmpTestCase, TestCase::EXTENSIVE);
+}
+
+// Do not forget to allocate an instance of this TestSuite
+static IslTestSuite leoTestSuite;
