@@ -79,7 +79,7 @@ LeoTestCase1::DoRun (void)
   islCh.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
   islCh.SetDeviceAttribute ("InterframeGap", TimeValue (Seconds (0.001)));
   //// TODO propagation loss from mobility model
-  islCh.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::RangePropagationLossModel"));
+  islCh.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::IslPropagationLossModel"));
   islNet = islCh.Install (satellites);
 
   LeoChannelHelper utCh;
@@ -91,7 +91,7 @@ LeoTestCase1::DoRun (void)
   utCh.SetSatDeviceAttribute ("InterframeGap", TimeValue (Seconds (0.001)));
   utCh.SetGndDeviceAttribute ("InterframeGap", TimeValue (Seconds (0.001)));
   // TODO propagation loss from mobility model
-  utCh.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::RangePropagationLossModel"));
+  utCh.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::LeoPropagationLossModel"));
   utCh.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
   utNet = utCh.Install (satellites, terminals);
 
@@ -116,7 +116,7 @@ LeoTestCase1::DoRun (void)
 
   // we want to ping terminals
   UdpEchoServerHelper echoServer (9);
-  ApplicationContainer serverApps = echoServer.Install (terminals);
+  ApplicationContainer serverApps = echoServer.Install (terminals.Get (1));
 
   // install a client on one of the terminals
   ApplicationContainer clientApps;

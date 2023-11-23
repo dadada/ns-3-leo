@@ -286,6 +286,10 @@ MockNetDevice::TransmitStart (Ptr<Packet> p, const Address &dest)
     {
       m_phyTxDropTrace (p);
     }
+  else
+    {
+      NS_LOG_INFO ("[node " << m_node->GetId () << "] send packet on " << m_ifIndex << " to " << dest);
+    }
   return result;
 }
 
@@ -416,6 +420,7 @@ MockNetDevice::Receive (Ptr<Packet> packet, Ptr<MockNetDevice> senderDevice)
         }
 
       if (packetType != PACKET_OTHERHOST) {
+      	  NS_LOG_INFO ("[node " << m_node->GetId () << "] received packet on " << m_ifIndex << " from " << remote << " for " << header.GetDestination ());
       	  m_macRxTrace (originalPacket);
       	  m_rxCallback (this, packet, protocol, remote);
       }

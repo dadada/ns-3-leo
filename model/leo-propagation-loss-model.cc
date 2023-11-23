@@ -37,6 +37,7 @@ LeoPropagationLossModel::DoCalcRxPower (double txPowerDbm,
   //Vector bPos = b->GetPosition ();
 
   // TODO perform line-earth intersection (ray tracing)
+  // TODO check angle between satellite and ground-station
 
   double rxc = 0;//-m_variable->GetValue ();
   //NS_LOG_DEBUG ("attenuation coefficient="<<rxc<<"Db");
