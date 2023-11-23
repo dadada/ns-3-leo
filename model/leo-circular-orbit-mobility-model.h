@@ -71,6 +71,16 @@ private:
   Vector3D m_plane;
 
   /**
+   * Current position
+   */
+  Vector3D m_position;
+
+  /**
+   * Time precision for positions
+   */
+  Time m_precision;
+
+  /**
    * \return the current position.
    */
   virtual Vector DoGetPosition (void) const;
@@ -94,6 +104,15 @@ private:
    * Advances a satellite by a degrees on the orbital plane
    */
   Vector3D RotatePlane (double a, const Vector3D &x) const;
+
+  /**
+   * Calculate the position at time
+   *
+   * \param t time
+   */
+  Vector CalcPosition (Time t) const;
+
+  Vector Update ();
 };
 
 }

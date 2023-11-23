@@ -1,5 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
+#include "math.h"
+
 #include "ns3/integer.h"
 #include "leo-circular-orbit-position-allocator.h"
 
@@ -25,12 +27,12 @@ LeoCircularOrbitAllocator::GetTypeId (void)
                    "The number of orbits",
                    IntegerValue (1),
                    MakeIntegerAccessor (&LeoCircularOrbitAllocator::m_numOrbits),
-                   MakeIntegerChecker<uint64_t> ())
+                   MakeIntegerChecker<uint16_t> ())
     .AddAttribute ("NumSatellites",
                    "The number of satellites per orbit",
                    IntegerValue (1),
                    MakeIntegerAccessor (&LeoCircularOrbitAllocator::m_numSatellites),
-                   MakeIntegerChecker<uint64_t> ())
+                   MakeIntegerChecker<uint16_t> ())
   ;
   return tid;
 }
@@ -44,9 +46,17 @@ LeoCircularOrbitAllocator::AssignStreams (int64_t stream)
 Vector
 LeoCircularOrbitAllocator::GetNext () const
 {
-  return Vector (180 * ((double) m_lastOrbit / (double) m_numOrbits),
-	  	 360.0 * ((double) m_lastSatellite / (double) m_numSatellites),
+  Vector next = Vector (M_PI * (m_lastOrbit / (double) m_numOrbits),
+	  	 2 * M_PI * (m_lastSatellite / (double) m_numSatellites),
 	  	 0);
+
+  m_lastSatellite = (m_lastSatellite + 1) % m_numSatellites;
+  if (m_lastSatellite >= m_numSatellites)
+    {
+      m_lastOrbit = (m_lastOrbit + 1) % m_numOrbits;
+    }
+
+  return next;
 }
 
 };

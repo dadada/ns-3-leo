@@ -19,6 +19,7 @@ LeoCircularOrbitMobilityModel::GetTypeId ()
   static TypeId tid = TypeId ("ns3::LeoCircularOrbitMobilityModel")
     .SetParent<MobilityModel> ()
     .SetGroupName ("Leo")
+    .AddConstructor<LeoCircularOrbitMobilityModel> ()
     .AddAttribute ("Altitude",
                    "A height from the earth's surface in meters",
                    DoubleValue (1000.0),
@@ -32,11 +33,16 @@ LeoCircularOrbitMobilityModel::GetTypeId ()
                    MakeDoubleAccessor (&LeoCircularOrbitMobilityModel::SetInclination,
                    		       &LeoCircularOrbitMobilityModel::GetInclination),
                    MakeDoubleChecker<double> ())
+    .AddAttribute ("Precision",
+                   "The time precision with which to compute position updates. 0 means arbitrary precision",
+                   TimeValue (Seconds (1)),
+                   MakeTimeAccessor (&LeoCircularOrbitMobilityModel::m_precision),
+                   MakeTimeChecker ())
     ;
   return tid;
 }
 
-LeoCircularOrbitMobilityModel::LeoCircularOrbitMobilityModel() : MobilityModel (), m_latitude (0.0), m_offset (0.0)
+LeoCircularOrbitMobilityModel::LeoCircularOrbitMobilityModel() : MobilityModel (), m_latitude (0.0), m_offset (0.0), m_position ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
@@ -107,13 +113,39 @@ LeoCircularOrbitMobilityModel::RotatePlane (double a, const Vector3D &x) const
 }
 
 Vector
-LeoCircularOrbitMobilityModel::DoGetPosition (void) const
+LeoCircularOrbitMobilityModel::CalcPosition (Time t) const
 {
   Vector3D x = Product (m_orbitHeight, Vector3D (cos (m_inclination) * cos (m_latitude),
   			       cos (m_inclination) * sin (m_latitude),
   			       sin (m_inclination)));
 
-  return RotatePlane (GetProgress (Simulator::Now ()), x);
+  return RotatePlane (GetProgress (t), x);
+}
+
+Vector LeoCircularOrbitMobilityModel::Update ()
+{
+  m_plane = PlaneNorm ();
+
+  m_position = CalcPosition (Simulator::Now ());
+  NotifyCourseChange ();
+
+  if (m_precision > Seconds (0))
+    {
+      Simulator::Schedule (m_precision, &LeoCircularOrbitMobilityModel::Update, this);
+    }
+
+  return m_position;
+}
+
+Vector
+LeoCircularOrbitMobilityModel::DoGetPosition (void) const
+{
+  if (m_precision == Time (0))
+    {
+      // Notice: NotifyCourseChange () will not be called
+      return CalcPosition (Simulator::Now ());
+    }
+  return m_position;
 }
 
 void
@@ -125,7 +157,7 @@ LeoCircularOrbitMobilityModel::DoSetPosition (const Vector &position)
   // SetPostion
   m_latitude = position.x;
   m_offset = position.y;
-  m_plane = PlaneNorm ();
+  Update ();
 }
 
 double LeoCircularOrbitMobilityModel::GetAltitude () const
@@ -136,7 +168,7 @@ double LeoCircularOrbitMobilityModel::GetAltitude () const
 void LeoCircularOrbitMobilityModel::SetAltitude (double h)
 {
   m_orbitHeight = LEO_EARTH_RAD_M + h;
-  m_plane = PlaneNorm ();
+  Update ();
 }
 
 double LeoCircularOrbitMobilityModel::GetInclination () const
@@ -148,7 +180,7 @@ void LeoCircularOrbitMobilityModel::SetInclination (double incl)
 {
   NS_ASSERT_MSG (incl != 0.0, "Plane must not be orthogonal to axis");
   m_inclination = (incl / 180) * M_PI;
-  m_plane = PlaneNorm ();
+  Update ();
 }
 
 };

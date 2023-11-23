@@ -2,7 +2,10 @@
 
 #include "ns3/core-module.h"
 #include "ns3/node-container.h"
+#include "ns3/mobility-helper.h"
 #include "ns3/test.h"
+#include "ns3/integer.h"
+#include "ns3/nstime.h"
 
 #include "../model/leo-circular-orbit-mobility-model.h"
 
@@ -60,6 +63,7 @@ private:
 
     Vector pos = mob->GetPosition ();
     Simulator::Schedule (Seconds (100.0), &LeoOrbitProgressTestCase::TestLengthPosition, this, LEO_EARTH_RAD_M, pos.x, mob);
+    Simulator::Stop (Seconds (101.0));
     Simulator::Run ();
     Simulator::Destroy ();
   }
@@ -107,6 +111,45 @@ private:
   }
 };
 
+class LeoOrbitTracingTestCase : public TestCase
+{
+public:
+  LeoOrbitTracingTestCase () : TestCase ("Test tracing of position changes") {}
+  virtual ~LeoOrbitTracingTestCase () {}
+  static void CourseChange (std::string context, Ptr<const MobilityModel> position)
+  {
+    Vector pos = position->GetPosition ();
+    std::cout << Simulator::Now () << ", pos=" << position << ", x=" << pos.x << ", y=" << pos.y
+      << ", z=" << pos.z << std::endl;
+  }
+private:
+  virtual void DoRun (void)
+  {
+    Ptr<LeoCircularOrbitMobilityModel> mob = CreateObject<LeoCircularOrbitMobilityModel> ();
+    mob->SetAttribute ("Altitude", DoubleValue (1000.0));
+    mob->SetAttribute ("Inclination", DoubleValue (20.0));
+    mob->SetAttribute ("Precision", TimeValue (Seconds (10)));
+
+    NodeContainer c;
+    c.Create (10000);
+
+    MobilityHelper mobility;
+    mobility.SetPositionAllocator ("ns3::LeoCircularOrbitPostionAllocator",
+                                   "NumOrbits", IntegerValue (100),
+                                   "NumSatellites", IntegerValue (100));
+    mobility.SetMobilityModel ("ns3::LeoCircularOrbitMobilityModel");
+    mobility.Install (c);
+
+    Config::Connect ("/NodeList/*/$ns3::MobilityModel/CourseChange",
+                     MakeCallback (&CourseChange));
+
+    Simulator::Stop (Seconds (100.0));
+    Simulator::Run ();
+    Simulator::Destroy ();
+  }
+};
+
+
 class LeoOrbitTestSuite : TestSuite
 {
 public:
@@ -116,6 +159,7 @@ public:
       AddTestCase (new LeoOrbitProgressTestCase, TestCase::QUICK);
       AddTestCase (new LeoOrbitLatitudeTestCase, TestCase::QUICK);
       AddTestCase (new LeoOrbitOffsetTestCase, TestCase::QUICK);
+      AddTestCase (new LeoOrbitTracingTestCase, TestCase::EXTENSIVE);
   }
 };
 
