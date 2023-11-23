@@ -37,7 +37,7 @@ namespace ns3 {
 
 template <typename Item> class Queue;
 class NetDeviceQueueInterface;
-class IslChannel;
+class MockChannel;
 class ErrorModel;
 
 /**
@@ -51,18 +51,18 @@ class ErrorModel;
 
 /**
  * \ingroup point-to-point
- * \class IslNetDevice
+ * \class MockNetDevice
  * \brief A Device for a Point to Point Network Link.
  *
- * This IslNetDevice class specializes the NetDevice abstract
- * base class.  Together with a IslChannel (and a peer
- * IslNetDevice), the class models, with some level of
+ * This MockNetDevice class specializes the NetDevice abstract
+ * base class.  Together with a MockChannel (and a peer
+ * MockNetDevice), the class models, with some level of
  * abstraction, a generic point-to-point or serial link.
  * Key parameters or objects that can be specified for this device
  * include a queue, data rate, and interframe transmission gap (the
- * propagation delay is set in the IslChannel).
+ * propagation delay is set in the MockChannel).
  */
-class IslNetDevice : public NetDevice
+class MockNetDevice : public NetDevice
 {
 public:
   /**
@@ -73,20 +73,20 @@ public:
   static TypeId GetTypeId (void);
 
   /**
-   * Construct a IslNetDevice
+   * Construct a MockNetDevice
    *
-   * This is the constructor for the IslNetDevice.  It takes as a
+   * This is the constructor for the MockNetDevice.  It takes as a
    * parameter a pointer to the Node to which this device is connected,
    * as well as an optional DataRate object.
    */
-  IslNetDevice ();
+  MockNetDevice ();
 
   /**
-   * Destroy a IslNetDevice
+   * Destroy a MockNetDevice
    *
-   * This is the destructor for the IslNetDevice.
+   * This is the destructor for the MockNetDevice.
    */
-  virtual ~IslNetDevice ();
+  virtual ~MockNetDevice ();
 
   /**
    * Set the Data Rate used for transmission of packets.  The data rate is
@@ -111,12 +111,12 @@ public:
    * \param ch Ptr to the channel to which this object is being attached.
    * \return true if the operation was successful (always true actually)
    */
-  bool Attach (Ptr<IslChannel> ch);
+  bool Attach (Ptr<MockChannel> ch);
 
   /**
-   * Attach a queue to the IslNetDevice.
+   * Attach a queue to the MockNetDevice.
    *
-   * The IslNetDevice "owns" a queue that implements a queueing
+   * The MockNetDevice "owns" a queue that implements a queueing
    * method such as DropTailQueue or RedQueue
    *
    * \param queue Ptr to the new queue.
@@ -131,9 +131,9 @@ public:
   Ptr<Queue<Packet> > GetQueue (void) const;
 
   /**
-   * Attach a receive ErrorModel to the IslNetDevice.
+   * Attach a receive ErrorModel to the MockNetDevice.
    *
-   * The IslNetDevice may optionally include an ErrorModel in
+   * The MockNetDevice may optionally include an ErrorModel in
    * the packet receive chain.
    *
    * \param em Ptr to the ErrorModel.
@@ -141,16 +141,16 @@ public:
   void SetReceiveErrorModel (Ptr<ErrorModel> em);
 
   /**
-   * Receive a packet from a connected IslChannel.
+   * Receive a packet from a connected MockChannel.
    *
-   * The IslNetDevice receives packets from its connected channel
+   * The MockNetDevice receives packets from its connected channel
    * and forwards them up the protocol stack.  This is the public method
    * used by the channel to indicate that the last bit of a packet has
    * arrived at the device.
    *
    * \param p Ptr to the received packet.
    */
-  void Receive (Ptr<Packet> p, Ptr<IslNetDevice> senderDevice);
+  void Receive (Ptr<Packet> p, Ptr<MockNetDevice> senderDevice);
 
   // The remaining methods are documented in ns3::NetDevice*
 
@@ -175,7 +175,7 @@ public:
   virtual bool IsMulticast (void) const;
   virtual Address GetMulticast (Ipv4Address multicastGroup) const;
 
-  virtual bool IsIsl (void) const;
+  virtual bool IsMock (void) const;
   virtual bool IsBridge (void) const;
 
   virtual bool IsPointToPoint() const;
@@ -205,7 +205,7 @@ protected:
    *
    * \param p Packet received
    */
-  void DoMpiReceive (Ptr<Packet> p, Ptr<IslNetDevice> sender);
+  void DoMpiReceive (Ptr<Packet> p, Ptr<MockNetDevice> sender);
 
   virtual void DoInitialize (void);
   virtual void NotifyNewAggregate (void);
@@ -220,7 +220,7 @@ private:
    * \param o Other NetDevice
    * \return New instance of the NetDevice
    */
-  IslNetDevice& operator = (const IslNetDevice &o);
+  MockNetDevice& operator = (const MockNetDevice &o);
 
   /**
    * \brief Copy constructor
@@ -229,7 +229,7 @@ private:
 
    * \param o Other NetDevice
    */
-  IslNetDevice (const IslNetDevice &o);
+  MockNetDevice (const MockNetDevice &o);
 
   /**
    * \brief Dispose of the object
@@ -242,7 +242,7 @@ private:
    * \returns the address of the remote device connected to this device
    * through the point to point channel.
    */
-  Address GetRemote (Ptr<IslNetDevice> senderDevice) const;
+  Address GetRemote (Ptr<MockNetDevice> senderDevice) const;
 
   /**
    * Adds the necessary headers and trailers to a packet of data in order to
@@ -266,13 +266,13 @@ private:
    * Start Sending a Packet Down the Wire.
    *
    * The TransmitStart method is the method that is used internally in the
-   * IslNetDevice to begin the process of sending a packet out on
+   * MockNetDevice to begin the process of sending a packet out on
    * the channel.  The corresponding method is called on the channel to let
    * it know that the physical device this class represents has virtually
    * started sending signals.  An event is scheduled for the time at which
    * the bits have been completely transmitted.
    *
-   * \see IslChannel::TransmitStart ()
+   * \see MockChannel::TransmitStart ()
    * \see TransmitComplete()
    * \param p a reference to the packet to send
    * \returns true if success, false on failure
@@ -320,14 +320,14 @@ private:
   Time           m_tInterframeGap;
 
   /**
-   * The IslChannel to which this IslNetDevice has been
+   * The MockChannel to which this MockNetDevice has been
    * attached.
    */
-  Ptr<IslChannel> m_channel;
+  Ptr<MockChannel> m_channel;
 
   /**
-   * The Queue which this IslNetDevice uses as a packet source.
-   * Management of this Queue has been delegated to the IslNetDevice
+   * The Queue which this MockNetDevice uses as a packet source.
+   * Management of this Queue has been delegated to the MockNetDevice
    * and it has the responsibility for deletion.
    * \see class DropTailQueue
    */

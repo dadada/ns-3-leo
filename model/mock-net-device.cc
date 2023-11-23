@@ -27,46 +27,46 @@
 #include "ns3/pointer.h"
 #include "ns3/net-device-queue-interface.h"
 #include "ns3/ppp-header.h"
-#include "isl-channel.h"
-#include "isl-net-device.h"
+#include "mock-channel.h"
+#include "mock-net-device.h"
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("IslNetDevice");
+NS_LOG_COMPONENT_DEFINE ("MockNetDevice");
 
-NS_OBJECT_ENSURE_REGISTERED (IslNetDevice);
+NS_OBJECT_ENSURE_REGISTERED (MockNetDevice);
 
 TypeId
-IslNetDevice::GetTypeId (void)
+MockNetDevice::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::IslNetDevice")
+  static TypeId tid = TypeId ("ns3::MockNetDevice")
     .SetParent<NetDevice> ()
     .SetGroupName ("Leo")
-    .AddConstructor<IslNetDevice> ()
+    .AddConstructor<MockNetDevice> ()
     .AddAttribute ("Mtu", "The MAC-level Maximum Transmission Unit",
                    UintegerValue (DEFAULT_MTU),
-                   MakeUintegerAccessor (&IslNetDevice::SetMtu,
-                                         &IslNetDevice::GetMtu),
+                   MakeUintegerAccessor (&MockNetDevice::SetMtu,
+                                         &MockNetDevice::GetMtu),
                    MakeUintegerChecker<uint16_t> ())
     .AddAttribute ("Address",
                    "The MAC address of this device.",
                    Mac48AddressValue (Mac48Address ("ff:ff:ff:ff:ff:ff")),
-                   MakeMac48AddressAccessor (&IslNetDevice::m_address),
+                   MakeMac48AddressAccessor (&MockNetDevice::m_address),
                    MakeMac48AddressChecker ())
     .AddAttribute ("DataRate",
                    "The default data rate for point to point links",
                    DataRateValue (DataRate ("32768b/s")),
-                   MakeDataRateAccessor (&IslNetDevice::m_bps),
+                   MakeDataRateAccessor (&MockNetDevice::m_bps),
                    MakeDataRateChecker ())
     .AddAttribute ("ReceiveErrorModel",
                    "The receiver error model used to simulate packet loss",
                    PointerValue (),
-                   MakePointerAccessor (&IslNetDevice::m_receiveErrorModel),
+                   MakePointerAccessor (&MockNetDevice::m_receiveErrorModel),
                    MakePointerChecker<ErrorModel> ())
     .AddAttribute ("InterframeGap",
                    "The time to wait between packet (frame) transmissions",
                    TimeValue (Seconds (0.0)),
-                   MakeTimeAccessor (&IslNetDevice::m_tInterframeGap),
+                   MakeTimeAccessor (&MockNetDevice::m_tInterframeGap),
                    MakeTimeChecker ())
 
     //
@@ -76,12 +76,12 @@ IslNetDevice::GetTypeId (void)
     .AddAttribute ("TxQueue",
                    "A queue to use as the transmit queue in the device.",
                    PointerValue (),
-                   MakePointerAccessor (&IslNetDevice::m_queue),
+                   MakePointerAccessor (&MockNetDevice::m_queue),
                    MakePointerChecker<Queue<Packet> > ())
     .AddAttribute ("MobilityModel", "The mobility model of the device",
                    PointerValue (),
-                   MakePointerAccessor (&IslNetDevice::SetMobilityModel,
-                     &IslNetDevice::GetMobilityModel),
+                   MakePointerAccessor (&MockNetDevice::SetMobilityModel,
+                     &MockNetDevice::GetMobilityModel),
                    MakePointerChecker<MobilityModel> ())
     //
     // Trace sources at the "top" of the net device, where packets transition
@@ -90,33 +90,33 @@ IslNetDevice::GetTypeId (void)
     .AddTraceSource ("MacTx",
                      "Trace source indicating a packet has arrived "
                      "for transmission by this device",
-                     MakeTraceSourceAccessor (&IslNetDevice::m_macTxTrace),
+                     MakeTraceSourceAccessor (&MockNetDevice::m_macTxTrace),
                      "ns3::Packet::TracedCallback")
     .AddTraceSource ("MacTxDrop",
                      "Trace source indicating a packet has been dropped "
                      "by the device before transmission",
-                     MakeTraceSourceAccessor (&IslNetDevice::m_macTxDropTrace),
+                     MakeTraceSourceAccessor (&MockNetDevice::m_macTxDropTrace),
                      "ns3::Packet::TracedCallback")
     .AddTraceSource ("MacPromiscRx",
                      "A packet has been received by this device, "
                      "has been passed up from the physical layer "
                      "and is being forwarded up the local protocol stack.  "
                      "This is a promiscuous trace,",
-                     MakeTraceSourceAccessor (&IslNetDevice::m_macPromiscRxTrace),
+                     MakeTraceSourceAccessor (&MockNetDevice::m_macPromiscRxTrace),
                      "ns3::Packet::TracedCallback")
     .AddTraceSource ("MacRx",
                      "A packet has been received by this device, "
                      "has been passed up from the physical layer "
                      "and is being forwarded up the local protocol stack.  "
                      "This is a non-promiscuous trace,",
-                     MakeTraceSourceAccessor (&IslNetDevice::m_macRxTrace),
+                     MakeTraceSourceAccessor (&MockNetDevice::m_macRxTrace),
                      "ns3::Packet::TracedCallback")
 #if 0
     // Not currently implemented for this device
     .AddTraceSource ("MacRxDrop",
                      "Trace source indicating a packet was dropped "
                      "before being forwarded up the stack",
-                     MakeTraceSourceAccessor (&IslNetDevice::m_macRxDropTrace),
+                     MakeTraceSourceAccessor (&MockNetDevice::m_macRxDropTrace),
                      "ns3::Packet::TracedCallback")
 #endif
     //
@@ -126,35 +126,35 @@ IslNetDevice::GetTypeId (void)
     .AddTraceSource ("PhyTxBegin",
                      "Trace source indicating a packet has begun "
                      "transmitting over the channel",
-                     MakeTraceSourceAccessor (&IslNetDevice::m_phyTxBeginTrace),
+                     MakeTraceSourceAccessor (&MockNetDevice::m_phyTxBeginTrace),
                      "ns3::Packet::TracedCallback")
     .AddTraceSource ("PhyTxEnd",
                      "Trace source indicating a packet has been "
                      "completely transmitted over the channel",
-                     MakeTraceSourceAccessor (&IslNetDevice::m_phyTxEndTrace),
+                     MakeTraceSourceAccessor (&MockNetDevice::m_phyTxEndTrace),
                      "ns3::Packet::TracedCallback")
     .AddTraceSource ("PhyTxDrop",
                      "Trace source indicating a packet has been "
                      "dropped by the device during transmission",
-                     MakeTraceSourceAccessor (&IslNetDevice::m_phyTxDropTrace),
+                     MakeTraceSourceAccessor (&MockNetDevice::m_phyTxDropTrace),
                      "ns3::Packet::TracedCallback")
 #if 0
     // Not currently implemented for this device
     .AddTraceSource ("PhyRxBegin",
                      "Trace source indicating a packet has begun "
                      "being received by the device",
-                     MakeTraceSourceAccessor (&IslNetDevice::m_phyRxBeginTrace),
+                     MakeTraceSourceAccessor (&MockNetDevice::m_phyRxBeginTrace),
                      "ns3::Packet::TracedCallback")
 #endif
     .AddTraceSource ("PhyRxEnd",
                      "Trace source indicating a packet has been "
                      "completely received by the device",
-                     MakeTraceSourceAccessor (&IslNetDevice::m_phyRxEndTrace),
+                     MakeTraceSourceAccessor (&MockNetDevice::m_phyRxEndTrace),
                      "ns3::Packet::TracedCallback")
     .AddTraceSource ("PhyRxDrop",
                      "Trace source indicating a packet has been "
                      "dropped by the device during reception",
-                     MakeTraceSourceAccessor (&IslNetDevice::m_phyRxDropTrace),
+                     MakeTraceSourceAccessor (&MockNetDevice::m_phyRxDropTrace),
                      "ns3::Packet::TracedCallback")
 
     //
@@ -165,18 +165,18 @@ IslNetDevice::GetTypeId (void)
     .AddTraceSource ("Sniffer",
                     "Trace source simulating a non-promiscuous packet sniffer "
                      "attached to the device",
-                     MakeTraceSourceAccessor (&IslNetDevice::m_snifferTrace),
+                     MakeTraceSourceAccessor (&MockNetDevice::m_snifferTrace),
                      "ns3::Packet::TracedCallback")
     .AddTraceSource ("PromiscSniffer",
                      "Trace source simulating a promiscuous packet sniffer "
                      "attached to the device",
-                     MakeTraceSourceAccessor (&IslNetDevice::m_promiscSnifferTrace),
+                     MakeTraceSourceAccessor (&MockNetDevice::m_promiscSnifferTrace),
                      "ns3::Packet::TracedCallback")
   ;
   return tid;
 }
 
-IslNetDevice::IslNetDevice ()
+MockNetDevice::MockNetDevice ()
   :
     m_txMachineState (READY),
     m_channel (0),
@@ -186,13 +186,13 @@ IslNetDevice::IslNetDevice ()
   NS_LOG_FUNCTION (this);
 }
 
-IslNetDevice::~IslNetDevice ()
+MockNetDevice::~MockNetDevice ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 void
-IslNetDevice::AddHeader (Ptr<Packet> p, uint16_t protocolNumber)
+MockNetDevice::AddHeader (Ptr<Packet> p, uint16_t protocolNumber)
 {
   NS_LOG_FUNCTION (this << p << protocolNumber);
   PppHeader ppp;
@@ -201,7 +201,7 @@ IslNetDevice::AddHeader (Ptr<Packet> p, uint16_t protocolNumber)
 }
 
 bool
-IslNetDevice::ProcessHeader (Ptr<Packet> p, uint16_t& param)
+MockNetDevice::ProcessHeader (Ptr<Packet> p, uint16_t& param)
 {
   NS_LOG_FUNCTION (this << p << param);
   PppHeader ppp;
@@ -211,7 +211,7 @@ IslNetDevice::ProcessHeader (Ptr<Packet> p, uint16_t& param)
 }
 
 void
-IslNetDevice::DoInitialize (void)
+MockNetDevice::DoInitialize (void)
 {
   if (m_queueInterface)
     {
@@ -228,7 +228,7 @@ IslNetDevice::DoInitialize (void)
 }
 
 void
-IslNetDevice::NotifyNewAggregate (void)
+MockNetDevice::NotifyNewAggregate (void)
 {
   NS_LOG_FUNCTION (this);
   if (m_queueInterface == 0)
@@ -245,7 +245,7 @@ IslNetDevice::NotifyNewAggregate (void)
 }
 
 void
-IslNetDevice::DoDispose ()
+MockNetDevice::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
   m_node = 0;
@@ -258,21 +258,21 @@ IslNetDevice::DoDispose ()
 }
 
 void
-IslNetDevice::SetDataRate (DataRate bps)
+MockNetDevice::SetDataRate (DataRate bps)
 {
   NS_LOG_FUNCTION (this);
   m_bps = bps;
 }
 
 void
-IslNetDevice::SetInterframeGap (Time t)
+MockNetDevice::SetInterframeGap (Time t)
 {
   NS_LOG_FUNCTION (this << t.GetSeconds ());
   m_tInterframeGap = t;
 }
 
 bool
-IslNetDevice::TransmitStart (Ptr<Packet> p, const Address &dest)
+MockNetDevice::TransmitStart (Ptr<Packet> p, const Address &dest)
 {
   NS_LOG_FUNCTION (this << p);
   NS_LOG_LOGIC ("UID is " << p->GetUid () << ")");
@@ -291,7 +291,7 @@ IslNetDevice::TransmitStart (Ptr<Packet> p, const Address &dest)
   Time txCompleteTime = txTime + m_tInterframeGap;
 
   NS_LOG_LOGIC ("Schedule TransmitCompleteEvent in " << txCompleteTime.GetSeconds () << "sec");
-  Simulator::Schedule (txCompleteTime, &IslNetDevice::TransmitComplete, this, dest);
+  Simulator::Schedule (txCompleteTime, &MockNetDevice::TransmitComplete, this, dest);
 
   bool result = m_channel->TransmitStart (p, m_channelDevId, dest, txTime);
   if (result == false)
@@ -302,7 +302,7 @@ IslNetDevice::TransmitStart (Ptr<Packet> p, const Address &dest)
 }
 
 void
-IslNetDevice::TransmitComplete (const Address &dest)
+MockNetDevice::TransmitComplete (const Address &dest)
 {
   NS_LOG_FUNCTION (this);
 
@@ -315,7 +315,7 @@ IslNetDevice::TransmitComplete (const Address &dest)
   NS_ASSERT_MSG (m_txMachineState == BUSY, "Must be BUSY if transmitting");
   m_txMachineState = READY;
 
-  NS_ASSERT_MSG (m_currentPkt != 0, "IslNetDevice::TransmitComplete(): m_currentPkt zero");
+  NS_ASSERT_MSG (m_currentPkt != 0, "MockNetDevice::TransmitComplete(): m_currentPkt zero");
 
   m_phyTxEndTrace (m_currentPkt);
   m_currentPkt = 0;
@@ -336,7 +336,7 @@ IslNetDevice::TransmitComplete (const Address &dest)
 }
 
 bool
-IslNetDevice::Attach (Ptr<IslChannel> ch)
+MockNetDevice::Attach (Ptr<MockChannel> ch)
 {
   NS_LOG_FUNCTION (this << &ch);
 
@@ -354,21 +354,21 @@ IslNetDevice::Attach (Ptr<IslChannel> ch)
 }
 
 void
-IslNetDevice::SetQueue (Ptr<Queue<Packet> > q)
+MockNetDevice::SetQueue (Ptr<Queue<Packet> > q)
 {
   NS_LOG_FUNCTION (this << q);
   m_queue = q;
 }
 
 void
-IslNetDevice::SetReceiveErrorModel (Ptr<ErrorModel> em)
+MockNetDevice::SetReceiveErrorModel (Ptr<ErrorModel> em)
 {
   NS_LOG_FUNCTION (this << em);
   m_receiveErrorModel = em;
 }
 
 void
-IslNetDevice::Receive (Ptr<Packet> packet, Ptr<IslNetDevice> senderDevice)
+MockNetDevice::Receive (Ptr<Packet> packet, Ptr<MockNetDevice> senderDevice)
 {
   NS_LOG_FUNCTION (this << packet);
   uint16_t protocol = 0;
@@ -419,14 +419,14 @@ IslNetDevice::Receive (Ptr<Packet> packet, Ptr<IslNetDevice> senderDevice)
 }
 
 Ptr<Queue<Packet> >
-IslNetDevice::GetQueue (void) const
+MockNetDevice::GetQueue (void) const
 {
   NS_LOG_FUNCTION (this);
   return m_queue;
 }
 
 void
-IslNetDevice::NotifyLinkUp (void)
+MockNetDevice::NotifyLinkUp (void)
 {
   NS_LOG_FUNCTION (this);
   m_linkUp = true;
@@ -434,7 +434,7 @@ IslNetDevice::NotifyLinkUp (void)
 }
 
 void
-IslNetDevice::NotifyLinkDown (void)
+MockNetDevice::NotifyLinkDown (void)
 {
   NS_LOG_FUNCTION (this);
   m_linkUp = false;
@@ -442,20 +442,20 @@ IslNetDevice::NotifyLinkDown (void)
 }
 
 void
-IslNetDevice::SetIfIndex (const uint32_t index)
+MockNetDevice::SetIfIndex (const uint32_t index)
 {
   NS_LOG_FUNCTION (this);
   m_ifIndex = index;
 }
 
 uint32_t
-IslNetDevice::GetIfIndex (void) const
+MockNetDevice::GetIfIndex (void) const
 {
   return m_ifIndex;
 }
 
 Ptr<Channel>
-IslNetDevice::GetChannel (void) const
+MockNetDevice::GetChannel (void) const
 {
   return m_channel;
 }
@@ -467,27 +467,27 @@ IslNetDevice::GetChannel (void) const
 // clients get and set the address, but simply ignore them.
 
 void
-IslNetDevice::SetAddress (Address address)
+MockNetDevice::SetAddress (Address address)
 {
   NS_LOG_FUNCTION (this << address);
   m_address = Mac48Address::ConvertFrom (address);
 }
 
 Address
-IslNetDevice::GetAddress (void) const
+MockNetDevice::GetAddress (void) const
 {
   return m_address;
 }
 
 bool
-IslNetDevice::IsLinkUp (void) const
+MockNetDevice::IsLinkUp (void) const
 {
   NS_LOG_FUNCTION (this);
   return m_linkUp;
 }
 
 void
-IslNetDevice::AddLinkChangeCallback (Callback<void> callback)
+MockNetDevice::AddLinkChangeCallback (Callback<void> callback)
 {
   NS_LOG_FUNCTION (this);
   m_linkChangeCallbacks.ConnectWithoutContext (callback);
@@ -498,7 +498,7 @@ IslNetDevice::AddLinkChangeCallback (Callback<void> callback)
 // all of the devices on the network.
 //
 bool
-IslNetDevice::IsBroadcast (void) const
+MockNetDevice::IsBroadcast (void) const
 {
   NS_LOG_FUNCTION (this);
   return true;
@@ -510,49 +510,49 @@ IslNetDevice::IsBroadcast (void) const
 // broadcast address, so we make up something reasonable.
 //
 Address
-IslNetDevice::GetBroadcast (void) const
+MockNetDevice::GetBroadcast (void) const
 {
   NS_LOG_FUNCTION (this);
   return Mac48Address ("ff:ff:ff:ff:ff:ff");
 }
 
 bool
-IslNetDevice::IsMulticast (void) const
+MockNetDevice::IsMulticast (void) const
 {
   NS_LOG_FUNCTION (this);
   return true;
 }
 
 Address
-IslNetDevice::GetMulticast (Ipv4Address multicastGroup) const
+MockNetDevice::GetMulticast (Ipv4Address multicastGroup) const
 {
   NS_LOG_FUNCTION (this);
   return Mac48Address ("01:00:5e:00:00:00");
 }
 
 Address
-IslNetDevice::GetMulticast (Ipv6Address addr) const
+MockNetDevice::GetMulticast (Ipv6Address addr) const
 {
   NS_LOG_FUNCTION (this << addr);
   return Mac48Address ("33:33:00:00:00:00");
 }
 
 bool
-IslNetDevice::IsIsl (void) const
+MockNetDevice::IsMock (void) const
 {
   NS_LOG_FUNCTION (this);
   return true;
 }
 
 bool
-IslNetDevice::IsBridge (void) const
+MockNetDevice::IsBridge (void) const
 {
   NS_LOG_FUNCTION (this);
   return false;
 }
 
 bool
-IslNetDevice::Send (
+MockNetDevice::Send (
   Ptr<Packet> packet,
   const Address &dest,
   uint16_t protocolNumber)
@@ -605,7 +605,7 @@ IslNetDevice::Send (
 }
 
 bool
-IslNetDevice::SendFrom (Ptr<Packet> packet,
+MockNetDevice::SendFrom (Ptr<Packet> packet,
                                  const Address &source,
                                  const Address &dest,
                                  uint16_t protocolNumber)
@@ -615,60 +615,60 @@ IslNetDevice::SendFrom (Ptr<Packet> packet,
 }
 
 Ptr<Node>
-IslNetDevice::GetNode (void) const
+MockNetDevice::GetNode (void) const
 {
   return m_node;
 }
 
 void
-IslNetDevice::SetNode (Ptr<Node> node)
+MockNetDevice::SetNode (Ptr<Node> node)
 {
   NS_LOG_FUNCTION (this);
   m_node = node;
 }
 
 bool
-IslNetDevice::NeedsArp (void) const
+MockNetDevice::NeedsArp (void) const
 {
   NS_LOG_FUNCTION (this);
   return true;
 }
 
 void
-IslNetDevice::SetReceiveCallback (NetDevice::ReceiveCallback cb)
+MockNetDevice::SetReceiveCallback (NetDevice::ReceiveCallback cb)
 {
   m_rxCallback = cb;
 }
 
 void
-IslNetDevice::SetPromiscReceiveCallback (NetDevice::PromiscReceiveCallback cb)
+MockNetDevice::SetPromiscReceiveCallback (NetDevice::PromiscReceiveCallback cb)
 {
   m_promiscCallback = cb;
 }
 
 bool
-IslNetDevice::SupportsSendFrom (void) const
+MockNetDevice::SupportsSendFrom (void) const
 {
   NS_LOG_FUNCTION (this);
   return false;
 }
 
 void
-IslNetDevice::DoMpiReceive (Ptr<Packet> p, Ptr<IslNetDevice> senderDevice)
+MockNetDevice::DoMpiReceive (Ptr<Packet> p, Ptr<MockNetDevice> senderDevice)
 {
   NS_LOG_FUNCTION (this << p);
   Receive (p, senderDevice);
 }
 
 Address
-IslNetDevice::GetRemote (Ptr<IslNetDevice> senderDevice) const
+MockNetDevice::GetRemote (Ptr<MockNetDevice> senderDevice) const
 {
   NS_LOG_FUNCTION (this);
   return senderDevice->GetAddress ();
 }
 
 bool
-IslNetDevice::SetMtu (uint16_t mtu)
+MockNetDevice::SetMtu (uint16_t mtu)
 {
   NS_LOG_FUNCTION (this << mtu);
   m_mtu = mtu;
@@ -676,14 +676,14 @@ IslNetDevice::SetMtu (uint16_t mtu)
 }
 
 uint16_t
-IslNetDevice::GetMtu (void) const
+MockNetDevice::GetMtu (void) const
 {
   NS_LOG_FUNCTION (this);
   return m_mtu;
 }
 
 uint16_t
-IslNetDevice::PppToEther (uint16_t proto)
+MockNetDevice::PppToEther (uint16_t proto)
 {
   NS_LOG_FUNCTION_NOARGS();
   switch(proto)
@@ -697,7 +697,7 @@ IslNetDevice::PppToEther (uint16_t proto)
 }
 
 uint16_t
-IslNetDevice::EtherToPpp (uint16_t proto)
+MockNetDevice::EtherToPpp (uint16_t proto)
 {
   NS_LOG_FUNCTION_NOARGS();
   switch(proto)
@@ -711,20 +711,20 @@ IslNetDevice::EtherToPpp (uint16_t proto)
 }
 
 Ptr<MobilityModel>
-IslNetDevice::GetMobilityModel (void) const
+MockNetDevice::GetMobilityModel (void) const
 {
   return m_mobilityModel;
 }
 
 void
-IslNetDevice::SetMobilityModel (Ptr<MobilityModel> model)
+MockNetDevice::SetMobilityModel (Ptr<MobilityModel> model)
 {
   NS_LOG_FUNCTION (this);
   m_mobilityModel = model;
 }
 
 bool
-IslNetDevice::IsPointToPoint() const
+MockNetDevice::IsPointToPoint() const
 {
   return true;
 }

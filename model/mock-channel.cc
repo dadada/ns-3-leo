@@ -21,37 +21,37 @@
 #include <ns3/simulator.h>
 #include <ns3/log.h>
 #include <ns3/pointer.h>
-#include "isl-channel.h"
+#include "mock-channel.h"
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("IslChannel");
+NS_LOG_COMPONENT_DEFINE ("MockChannel");
 
-NS_OBJECT_ENSURE_REGISTERED (IslChannel);
+NS_OBJECT_ENSURE_REGISTERED (MockChannel);
 
 TypeId
-IslChannel::GetTypeId (void)
+MockChannel::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::IslChannel")
+  static TypeId tid = TypeId ("ns3::MockChannel")
     .SetParent<Channel> ()
     .SetGroupName ("Leo")
-    .AddConstructor<IslChannel> ()
+    .AddConstructor<MockChannel> ()
     .AddAttribute ("PropagationDelay",
                    "A propagation delay model for the channel.",
                    PointerValue (),
-                   MakePointerAccessor (&IslChannel::m_propagationDelay),
+                   MakePointerAccessor (&MockChannel::m_propagationDelay),
                    MakePointerChecker<PropagationDelayModel> ())
     .AddAttribute ("PropagationLoss",
                    "A propagation loss model for the channel.",
                    PointerValue (),
-                   MakePointerAccessor (&IslChannel::m_propagationLoss),
+                   MakePointerAccessor (&MockChannel::m_propagationLoss),
                    MakePointerChecker<PropagationLossModel> ())
-    .AddTraceSource ("TxRxIslChannel",
+    .AddTraceSource ("TxRxMockChannel",
                      "Trace source indicating transmission of packet "
-                     "from the IslChannel, used by the Animation "
+                     "from the MockChannel, used by the Animation "
                      "interface.",
-                     MakeTraceSourceAccessor (&IslChannel::m_txrxIsl),
-                     "ns3::IslChannel::TxRxAnimationCallback")
+                     MakeTraceSourceAccessor (&MockChannel::m_txrxMock),
+                     "ns3::MockChannel::TxRxAnimationCallback")
   ;
   return tid;
 }
@@ -59,24 +59,24 @@ IslChannel::GetTypeId (void)
 //
 // By default, you get a channel that
 // has an "infitely" fast transmission speed and zero processing delay.
-IslChannel::IslChannel() : Channel (), m_link (0)
+MockChannel::MockChannel() : Channel (), m_link (0)
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
 
-IslChannel::~IslChannel()
+MockChannel::~MockChannel()
 {
 }
 
 bool
-IslChannel::Detach (uint32_t deviceId)
+MockChannel::Detach (uint32_t deviceId)
 {
   NS_LOG_FUNCTION (this << deviceId);
   if (deviceId < m_link.size ())
   {
     if (!m_link[deviceId]->IsLinkUp ())
     {
-      NS_LOG_WARN ("IslChannel::Detach(): Device is already detached (" << deviceId << ")");
+      NS_LOG_WARN ("MockChannel::Detach(): Device is already detached (" << deviceId << ")");
       return false;
     }
 
@@ -90,7 +90,7 @@ IslChannel::Detach (uint32_t deviceId)
 }
 
 int32_t
-IslChannel::Attach (Ptr<IslNetDevice> device)
+MockChannel::Attach (Ptr<MockNetDevice> device)
 {
   NS_LOG_FUNCTION (this << device);
   NS_ASSERT (device != 0);
@@ -99,23 +99,23 @@ IslChannel::Attach (Ptr<IslNetDevice> device)
 }
 
 std::size_t
-IslChannel::GetNDevices (void) const
+MockChannel::GetNDevices (void) const
 {
   NS_LOG_FUNCTION_NOARGS ();
   return m_link.size ();
 }
 
 Ptr<NetDevice>
-IslChannel::GetDevice (std::size_t i) const
+MockChannel::GetDevice (std::size_t i) const
 {
   NS_LOG_FUNCTION_NOARGS ();
   return m_link[i];
 }
 
-bool IslChannel::Deliver (
+bool MockChannel::Deliver (
     Ptr<const Packet> p,
-    Ptr<IslNetDevice> src,
-    Ptr<IslNetDevice> dst,
+    Ptr<MockNetDevice> src,
+    Ptr<MockNetDevice> dst,
     Time txTime)
 {
   Time delay = GetDelay (src, dst, txTime);
@@ -125,13 +125,13 @@ bool IslChannel::Deliver (
   {
     Simulator::ScheduleWithContext (dst->GetNode ()->GetId (),
         delay,
-        &IslNetDevice::Receive,
+        &MockNetDevice::Receive,
         dst,
         p->Copy (),
         src);
 
     // Call the tx anim callback on the net device
-    m_txrxIsl (p, src, dst, txTime, delay);
+    m_txrxMock (p, src, dst, txTime, delay);
     return true;
   }
   else
@@ -143,7 +143,7 @@ bool IslChannel::Deliver (
 }
 
 bool
-IslChannel::TransmitStart (
+MockChannel::TransmitStart (
     Ptr<const Packet> p,
     uint32_t srcId,
     Address destAddr,
@@ -152,8 +152,8 @@ IslChannel::TransmitStart (
   NS_LOG_FUNCTION (destAddr << this << p << srcId);
   NS_LOG_LOGIC ("UID is " << p->GetUid () << ")");
 
-  Ptr<IslNetDevice> src = m_link[srcId];
-  Ptr<IslNetDevice> dst = GetDevice (destAddr);
+  Ptr<MockNetDevice> src = m_link[srcId];
+  Ptr<MockNetDevice> dst = GetDevice (destAddr);
 
   if (dst == nullptr)
   {
@@ -171,7 +171,7 @@ IslChannel::TransmitStart (
 }
 
 Time
-IslChannel::GetDelay (Ptr<const IslNetDevice> src, Ptr<const IslNetDevice> dst, Time txTime) const
+MockChannel::GetDelay (Ptr<const MockNetDevice> src, Ptr<const MockNetDevice> dst, Time txTime) const
 {
   NS_LOG_DEBUG ("Get delay from " << src << " to " << dst);
 
@@ -184,10 +184,10 @@ IslChannel::GetDelay (Ptr<const IslNetDevice> src, Ptr<const IslNetDevice> dst, 
 }
 
 // TODO optimize
-Ptr<IslNetDevice>
-IslChannel::GetDevice (Address &addr) const
+Ptr<MockNetDevice>
+MockChannel::GetDevice (Address &addr) const
 {
-  for (Ptr<IslNetDevice> dev : m_link)
+  for (Ptr<MockNetDevice> dev : m_link)
   {
     if (dev->GetAddress () == addr)
     {

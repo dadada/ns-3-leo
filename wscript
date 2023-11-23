@@ -10,8 +10,8 @@ def build(bld):
     module = bld.create_ns3_module('leo', ['core','internet', 'propagation', 'stats', 'traffic', 'flow-monitor', 'applications'])
     module.source = [
         'model/leo.cc',
-        'model/isl-net-device.cc',
-        'model/isl-channel.cc',
+        'model/mock-net-device.cc',
+        'model/mock-channel.cc',
         'model/isl-propagation-loss-model.cc',
         'model/leo-mobility-model.cc',
         'helper/leo-helper.cc',
@@ -27,8 +27,8 @@ def build(bld):
     headers.module = 'leo'
     headers.source = [
         'model/leo.h',
-        'model/isl-net-device.h',
-        'model/isl-channel.h',
+        'model/mock-net-device.h',
+        'model/mock-channel.h',
         'model/isl-propagation-loss-model.h',
         'model/leo-mobility-model.h',
         'helper/leo-helper.h',

@@ -30,8 +30,8 @@
 #include "ns3/names.h"
 #include "ns3/trace-helper.h"
 
-#include "../model/isl-net-device.h"
-#include "../model/isl-channel.h"
+#include "../model/mock-net-device.h"
+#include "../model/mock-channel.h"
 #include "isl-helper.h"
 
 namespace ns3 {
@@ -41,8 +41,8 @@ NS_LOG_COMPONENT_DEFINE ("IslHelper");
 IslHelper::IslHelper ()
 {
   m_queueFactory.SetTypeId ("ns3::DropTailQueue<Packet>");
-  m_deviceFactory.SetTypeId ("ns3::IslNetDevice");
-  m_channelFactory.SetTypeId ("ns3::IslChannel");
+  m_deviceFactory.SetTypeId ("ns3::MockNetDevice");
+  m_channelFactory.SetTypeId ("ns3::MockChannel");
 }
 
 void
@@ -79,12 +79,12 @@ IslHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool promi
   //
   // All of the Pcap enable functions vector through here including the ones
   // that are wandering through all of devices on perhaps all of the nodes in
-  // the system.  We can only deal with devices of type IslNetDevice.
+  // the system.  We can only deal with devices of type MockNetDevice.
   //
-  Ptr<IslNetDevice> device = nd->GetObject<IslNetDevice> ();
+  Ptr<MockNetDevice> device = nd->GetObject<MockNetDevice> ();
   if (device == 0)
     {
-      NS_LOG_INFO ("IslHelper::EnablePcapInternal(): Device " << device << " not of type ns3::IslNetDevice");
+      NS_LOG_INFO ("IslHelper::EnablePcapInternal(): Device " << device << " not of type ns3::MockNetDevice");
       return;
     }
 
@@ -102,7 +102,7 @@ IslHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool promi
 
   Ptr<PcapFileWrapper> file = pcapHelper.CreateFile (filename, std::ios::out,
                                                      PcapHelper::DLT_PPP);
-  pcapHelper.HookDefaultSink<IslNetDevice> (device, "PromiscSniffer", file);
+  pcapHelper.HookDefaultSink<MockNetDevice> (device, "PromiscSniffer", file);
 }
 
 void
@@ -115,13 +115,13 @@ IslHelper::EnableAsciiInternal (
   //
   // All of the ascii enable functions vector through here including the ones
   // that are wandering through all of devices on perhaps all of the nodes in
-  // the system.  We can only deal with devices of type IslNetDevice.
+  // the system.  We can only deal with devices of type MockNetDevice.
   //
-  Ptr<IslNetDevice> device = nd->GetObject<IslNetDevice> ();
+  Ptr<MockNetDevice> device = nd->GetObject<MockNetDevice> ();
   if (device == 0)
     {
       NS_LOG_INFO ("IslHelper::EnableAsciiInternal(): Device " << device <<
-                   " not of type ns3::IslNetDevice");
+                   " not of type ns3::MockNetDevice");
       return;
     }
 
@@ -161,7 +161,7 @@ IslHelper::EnableAsciiInternal (
       //
       // The MacRx trace source provides our "r" event.
       //
-      asciiTraceHelper.HookDefaultReceiveSinkWithoutContext<IslNetDevice> (device, "MacRx", theStream);
+      asciiTraceHelper.HookDefaultReceiveSinkWithoutContext<MockNetDevice> (device, "MacRx", theStream);
 
       //
       // The "+", '-', and 'd' events are driven by trace sources actually in the
@@ -173,7 +173,7 @@ IslHelper::EnableAsciiInternal (
       asciiTraceHelper.HookDefaultDequeueSinkWithoutContext<Queue<Packet> > (queue, "Dequeue", theStream);
 
       // PhyRxDrop trace source for "d" event
-      asciiTraceHelper.HookDefaultDropSinkWithoutContext<IslNetDevice> (device, "PhyRxDrop", theStream);
+      asciiTraceHelper.HookDefaultDropSinkWithoutContext<MockNetDevice> (device, "PhyRxDrop", theStream);
 
       return;
     }
@@ -194,23 +194,23 @@ IslHelper::EnableAsciiInternal (
   uint32_t deviceid = nd->GetIfIndex ();
   std::ostringstream oss;
 
-  oss << "/NodeList/" << nd->GetNode ()->GetId () << "/DeviceList/" << deviceid << "/$ns3::IslNetDevice/MacRx";
+  oss << "/NodeList/" << nd->GetNode ()->GetId () << "/DeviceList/" << deviceid << "/$ns3::MockNetDevice/MacRx";
   Config::Connect (oss.str (), MakeBoundCallback (&AsciiTraceHelper::DefaultReceiveSinkWithContext, stream));
 
   oss.str ("");
-  oss << "/NodeList/" << nodeid << "/DeviceList/" << deviceid << "/$ns3::IslNetDevice/TxQueue/Enqueue";
+  oss << "/NodeList/" << nodeid << "/DeviceList/" << deviceid << "/$ns3::MockNetDevice/TxQueue/Enqueue";
   Config::Connect (oss.str (), MakeBoundCallback (&AsciiTraceHelper::DefaultEnqueueSinkWithContext, stream));
 
   oss.str ("");
-  oss << "/NodeList/" << nodeid << "/DeviceList/" << deviceid << "/$ns3::IslNetDevice/TxQueue/Dequeue";
+  oss << "/NodeList/" << nodeid << "/DeviceList/" << deviceid << "/$ns3::MockNetDevice/TxQueue/Dequeue";
   Config::Connect (oss.str (), MakeBoundCallback (&AsciiTraceHelper::DefaultDequeueSinkWithContext, stream));
 
   oss.str ("");
-  oss << "/NodeList/" << nodeid << "/DeviceList/" << deviceid << "/$ns3::IslNetDevice/TxQueue/Drop";
+  oss << "/NodeList/" << nodeid << "/DeviceList/" << deviceid << "/$ns3::MockNetDevice/TxQueue/Drop";
   Config::Connect (oss.str (), MakeBoundCallback (&AsciiTraceHelper::DefaultDropSinkWithContext, stream));
 
   oss.str ("");
-  oss << "/NodeList/" << nodeid << "/DeviceList/" << deviceid << "/$ns3::IslNetDevice/PhyRxDrop";
+  oss << "/NodeList/" << nodeid << "/DeviceList/" << deviceid << "/$ns3::MockNetDevice/PhyRxDrop";
   Config::Connect (oss.str (), MakeBoundCallback (&AsciiTraceHelper::DefaultDropSinkWithContext, stream));
 }
 
@@ -224,13 +224,13 @@ IslHelper::Install (NodeContainer c)
 NetDeviceContainer
 IslHelper::Install (std::vector<Ptr<Node> > &nodes)
 {
-  Ptr<IslChannel> channel = m_channelFactory.Create<IslChannel> ();
+  Ptr<MockChannel> channel = m_channelFactory.Create<MockChannel> ();
 
   NetDeviceContainer container;
 
   for (Ptr<Node> node: nodes)
   {
-    Ptr<IslNetDevice> dev = m_deviceFactory.Create<IslNetDevice> ();
+    Ptr<MockNetDevice> dev = m_deviceFactory.Create<MockNetDevice> ();
     dev->SetAddress (Mac48Address::Allocate ());
     node->AddDevice (dev);
     Ptr<Queue<Packet> > queue = m_queueFactory.Create<Queue<Packet> > ();

@@ -30,11 +30,11 @@
 #include "ns3/mobility-module.h"
 #include "ns3/propagation-delay-model.h"
 #include "ns3/propagation-loss-model.h"
-#include "isl-net-device.h"
+#include "mock-net-device.h"
 
 namespace ns3 {
 
-class IslNetDevice;
+class MockNetDevice;
 
 /**
  * \ingroup network
@@ -47,20 +47,20 @@ class IslNetDevice;
  * A perfect channel with varariable delay (time-of-flight).
  *
  */
-class IslChannel : public Channel
+class MockChannel : public Channel
 {
 public:
   static TypeId GetTypeId (void);
 
-  IslChannel ();
-  virtual ~IslChannel ();
+  MockChannel ();
+  virtual ~MockChannel ();
 
   /**
    * \brief Attach a device to the channel.
    * \param device Device to attach to the channel
    * \return Index of the device inside the devices list
    */
-  int32_t Attach (Ptr<IslNetDevice> device);
+  int32_t Attach (Ptr<MockNetDevice> device);
 
   /**
    * \brief Detach a given netdevice from this channel
@@ -77,18 +77,18 @@ protected:
    * \brief Get the delay associated with this channel
    * \returns Time delay
    */
-  Time GetDelay (Ptr<const IslNetDevice> first, Ptr<const IslNetDevice> second, Time txTime) const;
+  Time GetDelay (Ptr<const MockNetDevice> first, Ptr<const MockNetDevice> second, Time txTime) const;
 
 private:
 
-  Ptr<IslNetDevice> GetDevice (Address &addr) const;
+  Ptr<MockNetDevice> GetDevice (Address &addr) const;
 
   TracedCallback<Ptr<const Packet>,     // Packet being transmitted
                  Ptr<NetDevice>,  // Transmitting NetDevice
                  Ptr<NetDevice>,  // Receiving NetDevice
                  Time,                  // Amount of time to transmit the pkt
                  Time                   // Last bit receive time (relative to now)
-                 > m_txrxIsl;
+                 > m_txrxMock;
   /**
    * \brief Propagation delay model to be used with this channel
    */
@@ -97,10 +97,10 @@ private:
    * \brief Propagation loss model to be used with this channel
    */
   Ptr<PropagationLossModel> m_propagationLoss;
-  std::vector<Ptr<IslNetDevice> > m_link;
+  std::vector<Ptr<MockNetDevice> > m_link;
 
-  bool Deliver (Ptr<const Packet> p, Ptr<IslNetDevice> src, Ptr<IslNetDevice> dst, Time txTime);
-}; // class IslChannel
+  bool Deliver (Ptr<const Packet> p, Ptr<MockNetDevice> src, Ptr<MockNetDevice> dst, Time txTime);
+}; // class MockChannel
 
 } // namespace ns3
 
