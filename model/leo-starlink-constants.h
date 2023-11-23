@@ -19,18 +19,16 @@
 #ifndef LEO_STARLINK_CONSTANTS
 #define LEO_STARLINK_CONSTANTS
 
+/**
+ * \file
+ * \ingroup leo
+ * Definition of Starlink link constants
+ */
+
 namespace ns3 {
 
 /**
  * \ingroup leo
- * \defgroup constants Channel
- */
-/**
- * \ingroup constants
- * \defgroup starlink
- */
-/**
- * \ingroup starlink
  * \brief Constants for starlink network estimated from channel parameters
  *
  * Source http://systemarchitect.mit.edu/docs/delportillo18b.pdf

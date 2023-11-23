@@ -27,38 +27,46 @@
 #include "ns3/leo-input-fstream-container.h"
 
 /**
- * \brief Builds a node container with a waypoint mobility model
- *
- * Adds waypoints from file for each node.
- * The node satId must must correspond to the NORAD id from Celestrack.
+ * \file
+ * \ingroup leo
  */
 
 namespace ns3
 {
 
+/**
+ * \ingroup leo
+ * \brief Builds a node container with a waypoint mobility model
+ *
+ * Adds waypoints from file for each node.
+ * The node satId must must correspond to the NORAD id from Celestrack.
+ */
 class LeoSatNodeHelper
 {
 public:
+  /// constructor
   LeoSatNodeHelper ();
+  /// destructor
   virtual ~LeoSatNodeHelper ();
 
   /**
-   *
+   * \brief Install the nodes
    * \param nodeIds paths to satellite to waypoint files
    * \returns a node container containing nodes using the specified attributes
    */
   NodeContainer Install (std::vector<std::string> &wpFiles);
 
   /**
-   * Set an attribute for each node
-   *
+   * \brief Set an attribute for each node
    * \param name name of the attribute
    * \param value value of the attribute
    */
   void SetAttribute (std::string name, const AttributeValue &value);
 
 private:
+  /// Satellite nodes
   ObjectFactory m_satNodeFactory;
+  /// Stream of waypoints
   LeoWaypointInputFileStreamContainer m_fileStreamContainer;
 };
 

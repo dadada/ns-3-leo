@@ -25,12 +25,34 @@
 #include "ns3/applications-module.h"
 #include "ns3/node-container.h"
 
+/**
+ * \file
+ * \ingroup leo
+ * Declares ArpCacheHelper
+ */
+
 namespace ns3 {
 
+/**
+ * \ingroup leo
+ * \brief Prepares the ARP cache, so the addresses do not have to be queried
+ */
 class ArpCacheHelper
 {
 public:
+  /**
+   * \brief Install the addresses of the interfaces into the ARP caches of the devices
+   * \param devices devices
+   * \param interfaces interfaces
+   */
   void Install (NetDeviceContainer &devices, Ipv4InterfaceContainer &interfaces) const;
+
+  /**
+   * \brief Install the addresses of the interfaces into the ARP caches of the devices
+   * \param deviceSrc devices
+   * \param deviceDst devices
+   * \param interfaces interfaces
+   */
   void Install (NetDeviceContainer &devicesSrc, NetDeviceContainer &devicesDst, Ipv4InterfaceContainer &interfaces) const;
 };
 

@@ -24,6 +24,18 @@
 
 using namespace ns3;
 
+/**
+ * \ingroup leo
+ * \defgroup leo-test LEO module tests
+ */
+
+
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoPropagationRxNoLosTestCase : public TestCase
 {
 public:
@@ -44,6 +56,12 @@ private:
   }
 };
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoPropagationRxLosTestCase : public TestCase
 {
 public:
@@ -67,6 +85,12 @@ private:
   }
 };
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoPropagationBadAngleTestCase : public TestCase
 {
 public:
@@ -87,6 +111,12 @@ private:
   }
 };
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoPropagationLossTestCase : public TestCase
 {
 public:
@@ -109,6 +139,12 @@ private:
   }
 };
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoPropagationTestSuite : public TestSuite
 {
 public:

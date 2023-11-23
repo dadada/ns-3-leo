@@ -25,6 +25,13 @@
 #include "ns3/mobility-model.h"
 #include "ns3/nstime.h"
 
+/**
+ * \file
+ * \ingroup leo
+ *
+ * Declaration of LeoCircularOrbitMobilityModel
+ */
+
 #define LEO_EARTH_RAD_KM 6371.0090
 #define LEO_EARTH_GM_KM_E10 39.8600436
 
@@ -41,22 +48,42 @@ class LeoCircularOrbitMobilityModel : public MobilityModel
 {
 public:
   /**
-   * Register this type with the TypeId system.
+   * \brief Get the type ID.
    * \return the object TypeId
    */
   static TypeId GetTypeId (void);
+  /// constructor
   LeoCircularOrbitMobilityModel ();
+  /// destructor
   virtual ~LeoCircularOrbitMobilityModel ();
 
   /**
-   * km/s
+   * \brief Gets the speed of the node
+   * \return the speed in m/s
    */
   double GetSpeed () const;
 
+  /**
+   * \brief Gets the altitude
+   * \return the altitude
+   */
   double GetAltitude () const;
+  /**
+   * \brief Sets the altitude
+   * \param the altitude
+   */
   void SetAltitude (double h);
 
+  /**
+   * \brief Gets the inclination
+   * \return the inclination
+   */
   double GetInclination () const;
+
+  /**
+   * \brief Sets the inclination
+   * \param the inclination
+   */
   void SetInclination (double incl);
 
 private:
@@ -105,30 +132,46 @@ private:
   virtual Vector DoGetVelocity (void) const;
 
   /**
-   * Get the normal vector of the orbital plane
+   * \brief Get the normal vector of the orbital plane
    */
   Vector3D PlaneNorm () const;
 
+  /**
+   * \brief Gets the distance the satellite has progressed from its original
+   * position at time t in rad
+   *
+   * \param t a point in time
+   * \return distance in rad
+   */
   double GetProgress (Time t) const;
 
   /**
-   * Advances a satellite by a degrees on the orbital plane
+   * \brief Advances a satellite by a degrees inside the orbital plane
+   * \param a angle by which to rotate
+   * \param x vector to rotate
+   * \return rotated vector
    */
   Vector3D RotatePlane (double a, const Vector3D &x) const;
 
   /**
-   * Calculate the position at time
-   *
+   * \brief Calculate the position at time t
    * \param t time
+   * \return position at time t
    */
   Vector CalcPosition (Time t) const;
 
   /**
-   * Calc the latitude depending on simulation time inside ITRF coordinate
+   * \brief Calc the latitude depending on simulation time inside ITRF coordinate
    * system
+   *
+   * \return latitude
    */
   double CalcLatitude () const;
 
+  /**
+   * \brief Update the internal position of the mobility model
+   * \return position that will be returned upon next call to DoGetPosition
+   */
   Vector Update ();
 };
 

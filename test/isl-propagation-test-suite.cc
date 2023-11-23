@@ -25,6 +25,18 @@ using namespace ns3;
 
 #define EARTH_RAD 6.3781e6
 
+/**
+ * \ingroup leo
+ * \defgroup leo-test LEO module tests
+ */
+
+
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class IslPropagationAngleTestCase1 : public TestCase
 {
 public:
@@ -42,6 +54,12 @@ private:
   }
 };
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class IslPropagationAngleTestCase2 : public TestCase
 {
 public:
@@ -59,6 +77,12 @@ private:
   }
 };
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class IslPropagationTestSuite : public TestSuite
 {
 public:

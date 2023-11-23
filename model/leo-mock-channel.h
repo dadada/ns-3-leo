@@ -34,29 +34,42 @@
 #include "ns3/propagation-loss-model.h"
 #include "mock-channel.h"
 
+/**
+ * \file
+ * \ingroup leo
+ *
+ * Declaration of LeoMockChannl
+ */
+
 namespace ns3 {
 
 /**
  * \ingroup leo
- * \defgroup channel Channel
- */
-/**
- * \ingroup channel
- * \brief Mocked satellite-gateway, satellite-terminal channel types
+ * \brief Channel between satellite and gateway
  *
+ * Delivers packets to all attached devices on opposing site (satellite to
+ * gateway and vice-versa)
+ *
+ * Usually used together with LeoPropagationLossModel and LeoPropagationDelay.
  */
 class LeoMockChannel : public MockChannel
 {
 public:
+  /**
+   * \brief Get the type ID.
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
 
+  /// constructor
   LeoMockChannel ();
+  /// destructor
   virtual ~LeoMockChannel ();
 
   /**
    * \see MockChannel::TransmitStart
    *
-   * A packet is transmitted if the destination is reachable via the beam.
+   * \brief A packet is transmitted if the destination is reachable via the beam.
    */
   virtual bool TransmitStart (Ptr<const Packet> p, uint32_t devId, Address dst, Time txTime);
 
@@ -71,7 +84,11 @@ private:
    * type (no sat-sat or ground-ground).
    */
   typedef std::map<Address, Ptr<MockNetDevice> > DeviceIndex;
+
+  /// Devices that are on the ground (gateways)
   DeviceIndex m_groundDevices;
+
+  /// Devices that are in space (satellites)
   DeviceIndex m_satelliteDevices;
 }; // class MockChannel
 

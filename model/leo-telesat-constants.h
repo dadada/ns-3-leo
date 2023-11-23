@@ -19,18 +19,16 @@
 #ifndef LEO_TELESAT_CONSTANTS
 #define LEO_TELESAT_CONSTANTS
 
+/**
+ * \file
+ * \ingroup leo
+ * Definition of Telesat link constants
+ */
+
 namespace ns3 {
 
 /**
  * \ingroup leo
- * \defgroup constants Channel
- */
-/**
- * \ingroup constants
- * \defgroup telesat
- */
-/**
- * \ingroup starlink
  * \brief Constants for Telesat network estimated from channel parameters
  *
  * Source http://systemarchitect.mit.edu/docs/delportillo18b.pdf

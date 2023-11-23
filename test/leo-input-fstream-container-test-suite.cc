@@ -21,6 +21,18 @@
 
 using namespace ns3;
 
+/**
+ * \ingroup leo
+ * \defgroup leo-test LEO module tests
+ */
+
+
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoWaypointFileEmptyTestCase : public TestCase
 {
 public:
@@ -57,6 +69,12 @@ LeoWaypointFileEmptyTestCase::DoRun (void)
   NS_TEST_ASSERT_MSG_EQ ((i == 0), true, "Reading waypoints from empty");
 }
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoWaypointSomeEntriesTestCase : public TestCase
 {
 public:
@@ -93,6 +111,12 @@ LeoWaypointSomeEntriesTestCase::DoRun (void)
   NS_TEST_ASSERT_MSG_EQ ((i > 0), true, "Reading from non-empty stream succeeds");
 }
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoWaypointsTestSuite : public TestSuite
 {
 public:

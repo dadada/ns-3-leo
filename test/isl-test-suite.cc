@@ -30,6 +30,18 @@
 
 using namespace ns3;
 
+/**
+ * \ingroup leo
+ * \defgroup leo-test LEO module tests
+ */
+
+
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class IslIcmpTestCase : public TestCase
 {
 public:
@@ -109,6 +121,12 @@ IslIcmpTestCase::DoRun (void)
   Simulator::Destroy ();
 }
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class IslTestSuite : public TestSuite
 {
 public:

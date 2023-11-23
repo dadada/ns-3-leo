@@ -15,12 +15,10 @@ Model Description
 
 The source code for the module lives in the directory ``contrib/leo``.
 
-This module provides a mobility model for LEO satellites, propagation loss
-models for satellite to satellite and satellite to ground transmission. It
-also includes a simplistic model of the inter-satellite and satellite-ground
-channels and the associated network devices. It contains required helpers
-to build a LEO satellite network based on configurable parameters or import
-mobility data from TLE files.
+This module provides a mobility model for LEO satellites, propagation loss models for satellite to satellite and satellite to ground transmission.
+It also includes a simplistic model of the inter-satellite and satellite-ground channels and the associated network devices.
+It contains helpers to build a LEO satellite network based on configurable parameters or import mobility data from TLE files.
+
 
 References
 ==========

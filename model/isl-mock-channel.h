@@ -35,33 +35,51 @@
 #include "mock-net-device.h"
 #include "mock-channel.h"
 
+/**
+ * \file
+ * \ingroup leo
+ * IslMockChannel declaration
+ */
+
 namespace ns3 {
 
 class MockNetDevice;
 
 /**
- * \ingroup network
- * \defgroup channel Channel
- */
-/**
- * \ingroup channel
- * \brief Simplified inter-satellite channel
+ * \ingroup leo
+ * \brief Simplified model of an inter-satellite channel
  *
- * A perfect channel with varariable delay (time-of-flight).
+ * This channel distributes packets to all attached devies to which the sender has a line-of-sight.
+ * It is typically used in conjunction with the IslPropagationLossModel and ConstantSpeedPropagationDelay.
  *
  */
 class IslMockChannel : public MockChannel
 {
 public:
+  /**
+   * \brief Get the type ID.
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
 
+  /// constructor
   IslMockChannel ();
+  /// destructor
   virtual ~IslMockChannel ();
 
+  /**
+   * \brief Starts a transmission of a packet
+   * \return true iff the transmission was successful
+   * \param p the packet to transmit
+   * \param devId the id of the sender device as an index into the attached
+   * devices
+   * \param dst the destination address
+   * \param txTime the transmission delay of the packet
+   */
   bool TransmitStart (Ptr<const Packet> p, uint32_t devId, Address dst, Time txTime);
 
 private:
-  std::vector<Ptr<MockNetDevice> > m_link;
+  std::vector<Ptr<MockNetDevice> > m_link; ///< Attached devices
 
 
 }; // class MockChannel

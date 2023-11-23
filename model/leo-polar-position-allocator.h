@@ -23,31 +23,45 @@
 
 #define LEO_GND_RAD_EARTH 6.371e6
 
+/**
+ * \file
+ * \ingroup leo
+ *
+ * Declaration of LeoPolarPositionAllocator
+ */
+
 namespace ns3 {
 
 /**
- * \brief Allocate pairs of latitude and longitude.
+ * \ingroup leo
+ * \brief Allocator for pairs of latitude and longitude.
  */
 class LeoPolarPositionAllocator : public PositionAllocator
 {
 public:
   /**
-   * Register this type with the TypeId system.
+   * \brief Get the type ID.
    * \return the object TypeId
    */
   static TypeId GetTypeId ();
 
+  /// constructor
   LeoPolarPositionAllocator ();
+  /// desctructor
   virtual ~LeoPolarPositionAllocator ();
 
   virtual Vector GetNext (void) const;
   virtual int64_t AssignStreams (int64_t stream);
 
 private:
+  /// Number of latitudial positions
   uint32_t m_latNum;
+  /// Number of longitudinal positions
   uint32_t m_lonNum;
 
+  /// Current latitudinal position
   mutable uint32_t m_lat;
+  /// Current longitudinal position
   mutable uint32_t m_lon;
 };
 

@@ -33,6 +33,15 @@
 #include "ns3/mac48-address.h"
 #include "ns3/mobility-model.h"
 
+/**
+ * \file
+ * \ingroup leo
+ * Declares MockNetDevice
+ *
+ * Lots of stuff copied and adapted from PointToPointNetDevice and
+ * CsmaNetDevice
+ */
+
 namespace ns3 {
 
 template <typename Item> class Queue;
@@ -40,6 +49,10 @@ class NetDeviceQueueInterface;
 class MockChannel;
 class ErrorModel;
 
+/**
+ * \ingroup leo
+ * \brief Network device for use with MockChannel
+ */
 class MockNetDevice : public NetDevice
 {
 public:
@@ -492,4 +505,4 @@ private:
 
 } // namespace ns3
 
-#endif /* ISL_NET_DEVICE_H */
+#endif /* MOCK_NET_DEVICE_H */

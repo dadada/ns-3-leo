@@ -24,6 +24,18 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("LeoMobilityTestSuite");
 
+/**
+ * \ingroup leo
+ * \defgroup leo-test LEO module tests
+ */
+
+
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoMobilityWaypointTestCase : public TestCase
 {
 public:
@@ -57,6 +69,12 @@ LeoMobilityWaypointTestCase::DoRun (void)
   NS_TEST_ASSERT_MSG_EQ ((mobility->WaypointsLeft () > 2), true, "Reading waypoints from empty");
 }
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoMobilityTestSuite : public TestSuite
 {
 public:

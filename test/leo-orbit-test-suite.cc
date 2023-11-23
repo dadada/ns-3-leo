@@ -27,6 +27,18 @@
 
 using namespace ns3;
 
+/**
+ * \ingroup leo
+ * \defgroup leo-test LEO module tests
+ */
+
+
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoOrbitSpeedTestCase : public TestCase
 {
 public:
@@ -42,6 +54,12 @@ private:
   }
 };
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoOrbitPositionTestCase : public TestCase
 {
 public:
@@ -58,6 +76,12 @@ private:
   }
 };
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoOrbitProgressTestCase : public TestCase
 {
 public:
@@ -85,6 +109,12 @@ private:
   }
 };
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoOrbitLatitudeTestCase : public TestCase
 {
 public:
@@ -106,6 +136,12 @@ private:
   }
 };
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoOrbitOffsetTestCase : public TestCase
 {
 public:
@@ -127,6 +163,12 @@ private:
   }
 };
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoOrbitTracingTestCase : public TestCase
 {
 public:
@@ -178,6 +220,12 @@ void LeoOrbitTracingTestCase::CourseChange (std::string context, Ptr<const Mobil
   }
 
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoOrbitTestSuite : TestSuite
 {
 public:

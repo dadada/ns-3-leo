@@ -25,13 +25,30 @@
 #define LEO_PROP_EARTH_RAD 6.37101e6
 #define LEO_SPEED_OF_LIGHT_IN_AIR 299702458
 
+/**
+ * \file
+ * \ingroup leo
+ * Declaration of LeoPropagationLossModel
+ */
+
 namespace ns3 {
 
+/**
+ * \ingroup leo
+ * \brief Propagation loss model for transmissions between satellites and
+ * gateways
+ */
 class LeoPropagationLossModel : public PropagationLossModel
 {
 public:
+  /**
+   * \brief Get the type ID.
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+  /// constructor
   LeoPropagationLossModel ();
+  /// destructor
   virtual ~LeoPropagationLossModel ();
 
 private:
@@ -57,9 +74,7 @@ private:
   double m_linkMargin;
 
   /**
-   * Returns the Rx Power taking into account only the particular
-   * PropagationLossModel.
-   *
+   * \brief Calculate the Rx Power
    * \param txPowerDbm current transmission power (in dBm)
    * \param a the mobility model of the source
    * \param b the mobility model of the destination
@@ -68,15 +83,26 @@ private:
   virtual double DoCalcRxPower (double txPowerDbm,
                                 Ptr<MobilityModel> a,
                                 Ptr<MobilityModel> b) const;
-  /**
-   * Subclasses must implement this; those not using random variables
-   * can return zero
-   */
+
   virtual int64_t DoAssignStreams (int64_t stream);
 
+  /**
+   * \brief Set the elevation angle
+   * \param angle elevation
+   */
   void SetElevationAngle (double angle);
+
+  /**
+   * \brief Get the elevation angle
+   * \return elevation angle
+   */
   double GetElevationAngle () const;
 
+  /**
+   * \brief Get the maximum communication distance for satellite
+   * \param sat satellite
+   * \return distance
+   */
   double GetCutoffDistance (const Ptr<MobilityModel> sat) const;
 };
 

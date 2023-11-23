@@ -21,20 +21,47 @@
 
 #include <iostream>
 
+/**
+ * \file
+ * \ingroup leo
+ *
+ * Declaration of LeoLatLong
+ */
+
 namespace ns3 {
 
+/**
+ * \brief Wrapper around a pair of latitude and longitude
+ */
 class LeoLatLong
 {
 public:
+  /// constructor
   LeoLatLong ();
+  /// destructor
   LeoLatLong (double latitude, double longitude);
   virtual ~LeoLatLong();
 
+  /// Latitude
   double latitude;
+  /// Longitude
   double longitude;
 };
 
+/**
+ * \brief Serialize the LeoLatLong instance using a colon as a separator
+ * \param os stream to serialize into
+ * \param latLong to serialize
+ * \return returns the stream
+ */
 std::ostream &operator << (std::ostream &os, const LeoLatLong &latLong);
+
+/**
+ * \brief Deserialize the LeoLatLong instance using a colon as a separator
+ * \param is stream to deserialize from
+ * \param latLong to deserialize into
+ * \return returns the stream
+ */
 std::istream &operator >> (std::istream &is, LeoLatLong &latLong);
 
 };

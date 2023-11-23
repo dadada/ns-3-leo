@@ -21,37 +21,66 @@
 
 #include "mock-net-device.h"
 
+/**
+ * \file
+ * \ingroup leo
+ */
+
 namespace ns3
 {
-  /**
-   * \brief A mocked satellite-ground link communication device with a type
-   */
+/**
+ * \ingroup leo
+ * \brief A satellite-ground communication device with a type
+ */
 class LeoMockNetDevice : public MockNetDevice
 {
 public:
+  /**
+   * \brief Type of the device. Can either be on ground or in space.
+   */
   enum DeviceType
   {
+    /// Device is on the ground
     GND,
+    /// Device is in space
     SAT
   };
 
+  /**
+   * \brief Get the type ID.
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
 
+  /// constructor
   LeoMockNetDevice ();
 
+  /// destructor
   virtual ~LeoMockNetDevice ()
   {
   }
 
+  /**
+   * \brief Get the type of this device
+   * \return device type
+   */
   DeviceType GetDeviceType () const;
+
+  /**
+   * \brief Set the type of this device
+   * \return device type
+   */
   void SetDeviceType (DeviceType deviceType);
 
 protected:
   virtual double DoCalcRxPower (double rxPower) const;
 
 private:
+  /// Device type
   DeviceType m_deviceType;
+  /// Receiver loss
   double m_rxLoss;
+  /// Receiver gain
   double m_rxGain;
 };
 

@@ -27,6 +27,18 @@
 
 using namespace ns3;
 
+/**
+ * \ingroup leo
+ * \defgroup leo-test LEO module tests
+ */
+
+
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoMockChannelTransmitUnknownTestCase : public TestCase
 {
 public:
@@ -49,6 +61,12 @@ private:
   }
 };
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoMockChannelTransmitKnownTestCase : public TestCase
 {
 public:
@@ -86,6 +104,12 @@ private:
   }
 };
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoMockChannelTransmitSpaceGroundTestCase : public TestCase
 {
 public:
@@ -123,6 +147,12 @@ private:
   }
 };
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoMockChannelTransmitSpaceSpaceTestCase : public TestCase
 {
 public:
@@ -160,6 +190,12 @@ private:
   }
 };
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoMockChannelTransmitGroundGroundTestCase : public TestCase
 {
 public:
@@ -197,6 +233,12 @@ private:
   }
 };
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class LeoMockChannelTestSuite : public TestSuite
 {
 public:

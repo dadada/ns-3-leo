@@ -34,27 +34,39 @@
 #include "ns3/propagation-loss-model.h"
 #include "mock-net-device.h"
 
+/**
+ * \file
+ * \ingroup leo
+ * Declaration of class MockNetDevice
+ */
+
 namespace ns3 {
 
 class MockNetDevice;
 
 /**
- * \ingroup network
- * \defgroup channel Channel
- */
-/**
- * \ingroup channel
- * \brief Mocked channel
- *
+ * \ingroup leo
+ * \brief Base class for LeoMockChannel and IslMockChannel
  */
 class MockChannel : public Channel
 {
 public:
+  /**
+   * \brief Get the type ID.
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
 
+  /// constructor
   MockChannel ();
+  /// destructor
   virtual ~MockChannel ();
 
+  /**
+   * \brief Get device at index i
+   * \param i index
+   * \return pointer to device
+   */
   Ptr<NetDevice> GetDevice (std::size_t i) const;
 
   /**
@@ -71,13 +83,41 @@ public:
    */
   virtual bool Detach (uint32_t deviceId);
 
+  /**
+   * \brief Get number of devices in channel
+   * \return number of devices
+   */
   std::size_t GetNDevices (void) const;
+
+  /**
+   * \brief Start to transmit a packet
+   *
+   * Subclasses must implement this.
+   */
   virtual bool TransmitStart (Ptr<const Packet> p, uint32_t devId, Address dst, Time txTime) = 0;
 
+  /**
+   * \brief Get the propagation loss model
+   * \return propagation loss in dBm
+   */
   Ptr<PropagationLossModel> GetPropagationLoss (void) const;
+
+  /**
+   * \brief Set the propagation loss model
+   * \param model propagation loss
+   */
   void SetPropagationLoss (Ptr<PropagationLossModel> model);
 
+  /**
+   * \brief Get the propagation delay model
+   * \return propagation delay
+   */
   Ptr<PropagationDelayModel> GetPropagationDelay (void) const;
+
+  /**
+   * \brief Set the propagation delay model
+   * \param delay propagation delay
+   */
   void SetPropagationDelay (Ptr<PropagationDelayModel> delay);
 
 protected:
@@ -90,25 +130,39 @@ protected:
 
   /**
    * \brief Get the propagation delay associated with this channel
+   * \param first mobility model
+   * \param second mobility model
+   * \param txTime time of the transmission
    * \returns Propagation time delay
    */
   Time GetPropagationDelay (Ptr<MobilityModel> first, Ptr<MobilityModel> second, Time txTime) const;
 
+  /**
+   * \brief Get a device by it's address
+   * \param addr address of the device
+   * \return pointer to the device if it is attached to the channel, null otherwise
+   */
   Ptr<MockNetDevice> GetDevice (Address &addr) const;
 
+  /**
+   * \brief Deliver a packet to a destination
+   * \param p packet
+   * \param src source of a packet
+   * \param dst destination of a packet
+   * \param txTime transmission time of the packet
+   * \return true iff the transmission has been successful
+   */
   bool Deliver ( Ptr<const Packet> p, Ptr<MockNetDevice> src, Ptr<MockNetDevice> dst, Time txTime);
 
 private:
 
+  /// All devices that are attached to the channel
   std::vector<Ptr<MockNetDevice> > m_link;
 
-  /**
-   * \brief Propagation delay model to be used with this channel
-   */
+  /// Propagation delay model to be used with this channel
   Ptr<PropagationDelayModel> m_propagationDelay;
-  /**
-   * \brief Propagation loss model to be used with this channel
-   */
+
+  /// Propagation loss model to be used with this channel
   Ptr<PropagationLossModel> m_propagationLoss;
 
 }; // class MockChannel

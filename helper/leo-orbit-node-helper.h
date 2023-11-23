@@ -28,19 +28,27 @@
 #include "ns3/leo-orbit.h"
 
 /**
- * \brief Builds a node container of nodes with LEO positions using a list of
- * orbit definitions.
- *
- * Adds orbits with from a file for each node.
+ * \file
+ * \ingroup leo
  */
 
 namespace ns3
 {
 
+/**
+ * \ingroup leo
+ * \brief Builds a node container of nodes with LEO positions using a list of
+ * orbit definitions.
+ *
+ * Adds orbits with from a file for each node.
+ */
 class LeoOrbitNodeHelper
 {
 public:
+  /// constructor
   LeoOrbitNodeHelper ();
+
+  /// destructor
   virtual ~LeoOrbitNodeHelper ();
 
   /**
@@ -73,6 +81,7 @@ public:
   void SetAttribute (std::string name, const AttributeValue &value);
 
 private:
+  /// Factory for nodes
   ObjectFactory m_nodeFactory;
 };
 

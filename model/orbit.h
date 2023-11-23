@@ -21,12 +21,27 @@
 
 #include "ns3/uinteger.h"
 
+/**
+ * \file
+ * \ingroup leo
+ * Declares Orbit
+ */
+
+/**
+ * \ingroup leo
+ * \brief Orbit
+ */
 class Orbit {
 public:
+  /// constructor
   Orbit (double a, double i, double p, double s) : alt (a), inc (i), planes (p), sats (s) {}
+  /// Altitude
   double alt;
+  /// Inclination
   double inc;
+  /// Number of planes
   uint16_t planes;
+  /// Number of satellites in plane
   uint16_t sats;
 };
 

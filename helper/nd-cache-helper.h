@@ -25,12 +25,34 @@
 #ifndef NDS_CACHE_HELPER_
 #define NDS_CACHE_HELPER_
 
+/**
+ * \file
+ * \ingroup leo
+ * Declares NdCacheHelper
+ */
+
 namespace ns3 {
 
+/**
+ * \ingroup leo
+ * \brief Neighbor Cache helper fills the neighbor cache
+ */
 class NdCacheHelper
 {
 public:
+  /**
+   * \brief Fill the cache of devices with addresses
+   * \param devices devices
+   * \param interfaces interfaces that have addresses
+   */
   void Install (NetDeviceContainer &devices, Ipv6InterfaceContainer &interfaces) const;
+
+  /**
+   * \brief Fill the cache of devices with addresses
+   * \param devicesSrc devices
+   * \param devicesDst devices
+   * \param interfaces interfaces that have addresses
+   */
   void Install (NetDeviceContainer &devicesSrc, NetDeviceContainer &devicesDst, Ipv6InterfaceContainer &interfaces) const;
 };
 

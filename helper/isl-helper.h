@@ -27,17 +27,20 @@
 
 #include <ns3/trace-helper.h>
 
+/**
+ * \file
+ * \ingroup leo
+ * Declares IslNetDevice
+ */
+
 namespace ns3 {
 
 class NetDevice;
 class Node;
 
 /**
+ * \ingroup leo
  * \brief Build a set of IslNetDevice objects
- *
- * Normally we eschew multiple inheritance, however, the classes
- * PcapUserHelperForDevice and AsciiTraceUserHelperForDevice are
- * "mixins".
  */
 class IslHelper : public PcapHelperForDevice,
 	                   public AsciiTraceHelperForDevice
@@ -158,7 +161,6 @@ public:
     bool explicitFilename);
 
 private:
-
   ObjectFactory m_queueFactory;         //!< Queue Factory
   ObjectFactory m_channelFactory;       //!< Channel Factory
   ObjectFactory m_deviceFactory;        //!< Device Factory

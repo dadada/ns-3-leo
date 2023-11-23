@@ -28,6 +28,18 @@
 
 using namespace ns3;
 
+/**
+ * \ingroup leo
+ * \defgroup leo-test LEO module tests
+ */
+
+
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class EmptySatNodeHelperTestCase : public TestCase
 {
 public:
@@ -60,6 +72,12 @@ EmptySatNodeHelperTestCase::DoRun (void)
 
 // ------------------------------------------------------------------------- //
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class SingleSatNodeHelperTestCase : public TestCase
 {
 public:
@@ -96,6 +114,12 @@ SingleSatNodeHelperTestCase::DoRun (void)
   NS_ASSERT_MSG (mob != Ptr<MobilityModel> (), "Mobility model is valid");
 }
 
+/**
+ * \ingroup leo-test
+ * \ingroup tests
+ *
+ * \brief Unit tests
+ */
 class SatNodeHelperTestSuite : public TestSuite
 {
 public:

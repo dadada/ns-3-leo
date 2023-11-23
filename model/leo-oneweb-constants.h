@@ -19,18 +19,17 @@
 #ifndef LEO_ONEWEB_CONSTANTS
 #define LEO_ONEWEB_CONSTANTS
 
+/**
+ * \file
+ * \ingroup leo
+ *
+ * Declaration of constants
+ */
+
 namespace ns3 {
 
 /**
  * \ingroup leo
- * \defgroup constants Channel
- */
-/**
- * \ingroup constants
- * \defgroup oneweb
- */
-/**
- * \ingroup oneweb
  * \brief Constants for oneweb network estimated from channel parameters
  *
  * Source http://systemarchitect.mit.edu/docs/delportillo18b.pdf

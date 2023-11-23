@@ -22,25 +22,44 @@
 #include <ns3/object.h>
 #include <ns3/propagation-loss-model.h>
 
+/**
+ * \file
+ * \ingroup leo
+ *
+ * Declaration of IslPropagationLossModel
+ */
+
 #define LEO_EARTH_RAD 6.371009e6
 
 namespace ns3 {
 
+/**
+ * \ingroup leo
+ * \brief An approximate model for the propagation loss between any two low
+ * earth orbit satellites using the line-of-sight
+ *
+ */
 class IslPropagationLossModel : public PropagationLossModel
 {
 public:
+  /**
+   * \brief Get the type ID.
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+  /// constructor
   IslPropagationLossModel ();
+  /// destructor
   virtual ~IslPropagationLossModel ();
 
   /**
-   * true if there is at least one intersection of ISL line-of-sight with earth
-   * (LOS is blocked by earth)
+   * \brief Check if there is a direc line-of-sight between the two points
    *
-   * Assumes earth is sperical.
+   * Assumes earth is spherical.
    *
-   * \param a first node
-   * \param b second node
+   * \param a first point
+   * \param b second point
+   * \return true iff there is a line-of-sight between the points
    */
   static bool GetLos (Ptr<MobilityModel> a, Ptr<MobilityModel> b);
 private:
@@ -56,10 +75,7 @@ private:
   virtual double DoCalcRxPower (double txPowerDbm,
                                 Ptr<MobilityModel> a,
                                 Ptr<MobilityModel> b) const;
-  /**
-   * Subclasses must implement this; those not using random variables
-   * can return zero
-   */
+
   virtual int64_t DoAssignStreams (int64_t stream);
 };
 
