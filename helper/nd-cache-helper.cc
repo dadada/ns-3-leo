@@ -16,8 +16,8 @@ NdCacheHelper::Install (NetDeviceContainer &devices, Ipv6InterfaceContainer &int
     {
       Ptr<NetDevice> dev = devices.Get (i);
       Ptr<Node> node = dev->GetNode ();
-      uint32_t ifIndex = dev->GetIfIndex ();
       Ptr<Ipv6L3Protocol> ipv6 = node->GetObject<Ipv6L3Protocol> ();
+      int32_t ifIndex = ipv6->GetInterfaceForDevice (dev);
       Ptr<Ipv6Interface> interface = ipv6->GetInterface (ifIndex);
       Ptr<NdiscCache> cache = interface->GetNdiscCache ();
       for (uint32_t j = 0; j < devices.GetN (); j++)

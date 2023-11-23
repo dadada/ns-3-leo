@@ -43,7 +43,7 @@ main (int argc, char *argv[])
   Ipv6InterfaceContainer interfaces = address.Assign (devices);
 
   NdCacheHelper nsHelper;
-  nsHelper.Install (nodes, interfaces);
+  nsHelper.Install (devices, interfaces);
 
   UdpEchoServerHelper echoServer (9);
   ApplicationContainer serverApps = echoServer.Install (nodes);
