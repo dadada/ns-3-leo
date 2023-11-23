@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 import logging as log
-import argparse
+import fileinput
 
+from sys import argv
 from skyfield.api import Topos, load
 
 log.basicConfig(level=log.DEBUG)
@@ -27,12 +28,14 @@ class Vector:
         return "%f:%f:%f" % (self.x, self.y, self.z)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Get the position of a position on earth')
-    parser.add_argument('latitude', type=float)
-    parser.add_argument('longitude', type=float)
-    args = parser.parse_args()
+    if len(argv) > 1:
+        f = fileinput.input(argv[1])
+    else:
+        f = fileinput.input()
 
-    location = Topos(args.latitude, args.latitude)
-    d = location.itrf_xyz().m
-    print(Vector(d[0], d[1], d[2]))
+    for line in f:
+        lat, lng = line.split(',')
+        location = Topos(float(lat), float(lng))
+        d = location.itrf_xyz().m
+        print(Vector(d[0], d[1], d[2]))
 
