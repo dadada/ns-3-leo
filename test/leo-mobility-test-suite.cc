@@ -2,8 +2,11 @@
 
 #include "ns3/leo-module.h"
 #include "ns3/test.h"
+#include "ns3/log.h"
 
 using namespace ns3;
+
+NS_LOG_COMPONENT_DEFINE ("LeoMobilityTestSuite");
 
 class LeoMobilityWaypointTestCase : public TestCase
 {
@@ -25,7 +28,7 @@ LeoMobilityWaypointTestCase::DoRun (void)
 {
   Ptr<LeoWaypointInputFileStreamContainer> container = CreateObject<LeoWaypointInputFileStreamContainer> ();
   container->SetAttribute("File", StringValue ("contrib/leo/data/waypoints.txt"));
-  container->SetAttribute("LastTime", TimeValue (Time (1)));
+  container->SetAttribute("LastTime", TimeValue (Time (0)));
 
   Ptr<WaypointMobilityModel> mobility = CreateObject<WaypointMobilityModel> ();
   Waypoint wp;
@@ -33,8 +36,9 @@ LeoMobilityWaypointTestCase::DoRun (void)
     {
       mobility->AddWaypoint (wp);
     }
+  NS_LOG_INFO ("Model has " << mobility->WaypointsLeft () << " waypoints left");
 
-  NS_TEST_ASSERT_MSG_EQ ((mobility->WaypointsLeft () > 0), true, "Reading waypoints from empty");
+  NS_TEST_ASSERT_MSG_EQ ((mobility->WaypointsLeft () > 2), true, "Reading waypoints from empty");
 }
 
 class LeoMobilityTestSuite : public TestSuite

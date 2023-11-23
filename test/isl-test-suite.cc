@@ -41,10 +41,10 @@ IslIcmpTestCase::DoRun (void)
   std::vector<std::string> satWps =
     {
       // TODO use different waypoints
-      "contrib/leo/data/test/waypoints.txt",
-      "contrib/leo/data/test/waypoints.txt",
-      "contrib/leo/data/test/waypoints.txt",
-      "contrib/leo/data/test/waypoints.txt",
+      "contrib/leo/data/starlink/45391.waypoints",
+      "contrib/leo/data/starlink/45392.waypoints",
+      "contrib/leo/data/starlink/45393.waypoints",
+      "contrib/leo/data/starlink/45394.waypoints",
     };
 
   LeoSatNodeHelper satHelper;
@@ -76,7 +76,7 @@ IslIcmpTestCase::DoRun (void)
   ApplicationContainer clientApps;
   for (uint32_t i = 0; i < satellites.GetN (); i ++)
     {
-      UdpEchoClientHelper echoClient (islIp.GetAddress ((i+1) % satellites.GetN (), 0), 9);
+      UdpEchoClientHelper echoClient (islIp.GetAddress ((i+3) % satellites.GetN (), 0), 9);
       echoClient.SetAttribute ("MaxPackets", UintegerValue (10));
       echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
       echoClient.SetAttribute ("PacketSize", UintegerValue (1024));

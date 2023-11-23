@@ -14,7 +14,21 @@ public:
   static TypeId GetTypeId (void);
   LeoPropagationLossModel ();
   virtual ~LeoPropagationLossModel ();
+
+  static double GetAngle (Ptr<MobilityModel> a, Ptr<MobilityModel> b);
+
 private:
+
+  /**
+   * Cutoff distance for signal
+   */
+  double m_cutoffDistance;
+
+  /**
+   * Cutoff angle for signal
+   */
+  double m_cutoffAngle;
+
   /**
    * Returns the Rx Power taking into account only the particular
    * PropagationLossModel.

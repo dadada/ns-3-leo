@@ -1,7 +1,10 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
+#include <math.h>
+
 #include "ns3/log.h"
 #include "ns3/mobility-model.h"
+#include "ns3/double.h"
 
 #include "leo-propagation-loss-model.h"
 
@@ -18,6 +21,16 @@ LeoPropagationLossModel::GetTypeId (void)
     .SetParent<PropagationLossModel> ()
     .SetGroupName ("Leo")
     .AddConstructor<LeoPropagationLossModel> ()
+    .AddAttribute ("MaxDistance",
+                   "Cut-off distance for signal propagation",
+                   DoubleValue (1000000.0),
+                   MakeDoubleAccessor (&LeoPropagationLossModel::m_cutoffDistance),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("MaxAngle",
+                   "Cut-off angle for signal propagation",
+                   DoubleValue (20.0),
+                   MakeDoubleAccessor (&LeoPropagationLossModel::m_cutoffAngle),
+                   MakeDoubleChecker<double> ())
   ;
   return tid;
 }
@@ -31,17 +44,24 @@ LeoPropagationLossModel::~LeoPropagationLossModel ()
 }
 
 double
-LeoPropagationLossModel::DoCalcRxPower (double txPowerDbm,
-                                           Ptr<MobilityModel> a,
-                                           Ptr<MobilityModel> b) const
+LeoPropagationLossModel::GetAngle (Ptr<MobilityModel> a, Ptr<MobilityModel> b)
 {
-  //Vector aPos = a->GetPosition ();
-  //Vector bPos = b->GetPosition ();
+  Vector3D pa = a->GetPosition ();
+  Vector3D pb = b->GetPosition ();
 
-  // TODO perform line-earth intersection (ray tracing)
-  // TODO check angle between satellite and ground-station
-  // primitivec cut-of at 1000 km
-  if (a->GetDistanceFrom (b) > 1000000.0)
+  double prod = abs ((pa.x * pb.x) + (pa.y * pb.y) + (pa.z * pb.z));
+  double norm = pb.GetLength () * pa.GetLength ();
+
+  return acos (prod / norm);
+}
+
+double
+LeoPropagationLossModel::DoCalcRxPower (double txPowerDbm,
+                                        Ptr<MobilityModel> a,
+                                        Ptr<MobilityModel> b) const
+{
+  // TODO create attributes for max distance and angle
+  if (a->GetDistanceFrom (b) > m_cutoffDistance && GetAngle (a, b) > m_cutoffAngle)
     {
       return 0;
     }
