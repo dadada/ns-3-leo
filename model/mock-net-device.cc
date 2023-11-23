@@ -556,10 +556,9 @@ MockNetDevice::IsBridge (void) const
 }
 
 bool
-MockNetDevice::Send (
-  Ptr<Packet> packet,
-  const Address &dest,
-  uint16_t protocolNumber)
+MockNetDevice::Send (Ptr<Packet> packet,
+  		     const Address &dest,
+  		     uint16_t protocolNumber)
 {
   NS_LOG_FUNCTION (this << packet << dest << protocolNumber);
   NS_LOG_LOGIC ("p=" << packet << ", dest=" << &dest);

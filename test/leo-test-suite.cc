@@ -127,6 +127,7 @@ LeoTestCase1::DoRun (void)
   clientApps.Stop (Seconds (9.0));
   serverApps.Stop (Seconds (10));
 
+  Simulator::Stop (Seconds (12));
   Simulator::Run ();
   Simulator::Destroy ();
 }
