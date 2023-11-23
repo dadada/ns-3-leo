@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 
   outfile << "Time,Satellite,x,y,z,Speed" << std::endl;
 
-  Simulator::Stop (Hours (24));
+  Simulator::Stop (Hours (1));
   Simulator::Run ();
   Simulator::Destroy ();
 }

@@ -61,6 +61,12 @@ private:
    * can return zero
    */
   virtual int64_t DoAssignStreams (int64_t stream);
+
+  void SetElevationAngle (double angle);
+  double GetElevationAngle () const;
+
+  void SetCutoffDistance (double d);
+  double GetCutoffDistance () const;
 };
 
 }

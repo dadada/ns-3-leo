@@ -179,11 +179,6 @@ MockChannel::Deliver (
 
   if (srcMob != 0 && dstMob != 0)
     {
-      // performance optimization
-      if (srcMob->GetDistanceFrom (dstMob) > 3.0e6)
-      	{
-      	  return false;
-      	}
       Ptr<PropagationLossModel> pLoss = GetPropagationLoss ();
       if (pLoss != 0)
     	{

@@ -33,12 +33,11 @@ public:
 int main (int argc, char *argv[])
 {
   std::vector<Orbit> orbits = {
-      Orbit (1.150, 53.0, 32, 50),
-      Orbit (1.110, 53.8, 32, 50),
-      Orbit (1.130, 74.0,  8, 50),
-      Orbit (1.275, 81, 5, 75),
-      Orbit (1.325, 70, 6, 75),
-
+      Orbit (1150, 53.0, 32, 50),
+      Orbit (1110, 53.8, 32, 50),
+      Orbit (1130, 74.0,  8, 50),
+      Orbit (1275, 81, 5, 75),
+      Orbit (1325, 70, 6, 75),
   };
   NodeContainer satellites;
   for (Orbit orb: orbits)
@@ -64,8 +63,7 @@ int main (int argc, char *argv[])
   NetDeviceContainer islNet, utNet;
 
   IslHelper islCh;
-  islCh.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
-  islCh.SetDeviceAttribute ("ReceiveErrorModel", StringValue ("ns3::BurstErrorModel"));
+  islCh.SetDeviceAttribute ("DataRate", StringValue ("1Gbps"));
   islCh.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
   islCh.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::IslPropagationLossModel"));
   islNet = islCh.Install (satellites);
@@ -76,15 +74,15 @@ int main (int argc, char *argv[])
 
   // Install internet stack on nodes
   AodvHelper aodv;
-  aodv.Set ("HelloInterval", TimeValue (Seconds (10)));
+  aodv.Set ("HelloInterval", TimeValue (Seconds (1)));
   aodv.Set ("TtlStart", UintegerValue (10));
   aodv.Set ("TtlIncrement", UintegerValue (10));
-  aodv.Set ("TtlThreshold", UintegerValue (1000));
+  aodv.Set ("TtlThreshold", UintegerValue (100));
   aodv.Set ("RreqRetries", UintegerValue (100));
-  aodv.Set ("RreqRateLimit", UintegerValue (100));
-  aodv.Set ("RerrRateLimit", UintegerValue (100));
-  aodv.Set ("ActiveRouteTimeout", TimeValue (Seconds (10)));
-  aodv.Set ("NextHopWait", TimeValue (MilliSeconds (100)));
+  aodv.Set ("RreqRateLimit", UintegerValue (10));
+  aodv.Set ("RerrRateLimit", UintegerValue (10));
+  aodv.Set ("ActiveRouteTimeout", TimeValue (Minutes (1)));
+  aodv.Set ("NextHopWait", TimeValue (MilliSeconds (200)));
   aodv.Set ("NetDiameter", UintegerValue (1000));
   aodv.Set ("PathDiscoveryTime", TimeValue (Seconds (1)));
 
@@ -107,9 +105,10 @@ int main (int argc, char *argv[])
   // install a client on one of the terminals
   ApplicationContainer clientApps;
   Address remote = stations.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();//utIp.GetAddress (1, 0);
+  std::cout << "REMOTE=" << Ipv4Address::ConvertFrom (remote);
   UdpClientHelper echoClient (remote, 9);
   echoClient.SetAttribute ("MaxPackets", UintegerValue (360));
-  echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
+  echoClient.SetAttribute ("Interval", TimeValue (Seconds (10.0)));
   echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
   clientApps.Add (echoClient.Install (stations.Get (3)));
 

@@ -23,13 +23,15 @@ LeoPropagationLossModel::GetTypeId (void)
     .AddConstructor<LeoPropagationLossModel> ()
     .AddAttribute ("MaxDistance",
                    "Cut-off distance for signal propagation",
-                   DoubleValue (1000000.0),
-                   MakeDoubleAccessor (&LeoPropagationLossModel::m_cutoffDistance),
+                   DoubleValue (3000),
+                   MakeDoubleAccessor (&LeoPropagationLossModel::SetCutoffDistance,
+				       &LeoPropagationLossModel::GetCutoffDistance),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("ElevationAngle",
                    "Cut-off angle for signal propagation",
                    DoubleValue (M_PI / 9),
-                   MakeDoubleAccessor (&LeoPropagationLossModel::m_elevationAngle),
+                   MakeDoubleAccessor (&LeoPropagationLossModel::SetElevationAngle,
+				       &LeoPropagationLossModel::GetElevationAngle),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("AtmosphericLoss",
                    "Atmospheric loss due to attenuation in dB",
@@ -71,21 +73,56 @@ LeoPropagationLossModel::GetAngle (Ptr<MobilityModel> a, Ptr<MobilityModel> b)
   return acos (prod / norm);
 }
 
+void
+LeoPropagationLossModel::SetElevationAngle (double angle)
+{
+  m_elevationAngle = angle * (M_PI/180.0);
+}
+
+double
+LeoPropagationLossModel::GetElevationAngle () const
+{
+  return m_elevationAngle * (180.0/M_PI);
+}
+
+void
+LeoPropagationLossModel::SetCutoffDistance (double d)
+{
+  m_cutoffDistance = d * 1000.0;
+}
+
+double
+LeoPropagationLossModel::GetCutoffDistance () const
+{
+  return m_cutoffDistance / 1000.0;
+}
+
 double
 LeoPropagationLossModel::DoCalcRxPower (double txPowerDbm,
                                         Ptr<MobilityModel> a,
                                         Ptr<MobilityModel> b) const
 {
-  if (a->GetDistanceFrom (b) > m_cutoffDistance || GetAngle (a, b) > m_elevationAngle / 2.0)
+  double distance = a->GetDistanceFrom (b);
+  double angle = GetAngle (a, b);
+  double rxc = txPowerDbm - m_atmosphericLoss - m_freeSpacePathLoss - m_linkMargin;
+
+  NS_LOG_DEBUG ("LEO propagation: a=" << a->GetPosition () << " b=" << b->GetPosition () << " m_cutOff="<<m_cutoffDistance<<" m_angle="<<m_elevationAngle<<" dist=" << distance << "angle=" << angle << "rxc=" << rxc);
+
+  if (distance > m_cutoffDistance)
     {
+      NS_LOG_DEBUG ("LEO DROP DISTANCE: " << distance);
+      return -1000.0;
+    }
+
+  if (angle > m_elevationAngle / 2.0)
+    {
+      NS_LOG_DEBUG ("LEO DROP ANGLE: " << angle <<"; " << distance);
       return -1000.0;
     }
 
   // txPowerDbm includes tx antenna gain and losses
   // receiver loss and gain added at net device
   // P_{RX} = P_{TX} + G_{TX} - L_{TX} - L_{FS} - L_M + G_{RX} - L_{RX}
-  double rxc = txPowerDbm - m_atmosphericLoss - m_freeSpacePathLoss - m_linkMargin;
-  NS_LOG_DEBUG("rxc="<<rxc);
 
   return rxc;
 }

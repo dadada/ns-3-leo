@@ -26,6 +26,6 @@ numsamples=ARG4
 do for [j=0:numsamples-1] {
 	splot [-pi:pi][-pi/2:pi/2] EARTH*cos(u)*cos(v), EARTH*sin(u)*cos(v), EARTH*sin(v), \
 	      ground using 1:2:3 lt rgb "green", \
-	      sats using 3:4:5:2 every ::(j*numsats)::((j+1)*numsats) lt rgb "blue"
+	      sats using 3:4:5:2 every ::(j*numsats)::((j+1)*numsats)
 	      
 }
