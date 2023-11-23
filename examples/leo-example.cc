@@ -54,11 +54,14 @@ main (int argc, char *argv[])
   UdpEchoServerHelper echoServer (9);
   ApplicationContainer serverApps = echoServer.Install (terminals);
 
+  // TODO routing
+
   // install a client on each of the terminals
   ApplicationContainer clientApps;
   for (uint32_t i = 1; i < terminals.GetN (); i++)
     {
-      UdpEchoClientHelper echoClient (terminals.Get (i)->GetDevice (0)->GetAddress (), 9);
+      Address remote = terminals.Get (i)->GetObject<Ipv6> ()->GetAddress (0, 0).GetAddress ();
+      UdpEchoClientHelper echoClient (remote, 9);
       echoClient.SetAttribute ("MaxPackets", UintegerValue (10));
       echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
       echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
