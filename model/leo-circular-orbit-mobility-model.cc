@@ -25,6 +25,7 @@ LeoCircularOrbitMobilityModel::GetTypeId ()
                    MakeDoubleAccessor (&LeoCircularOrbitMobilityModel::SetAltitude,
                    		       &LeoCircularOrbitMobilityModel::GetAltitude),
                    MakeDoubleChecker<double> ())
+    // TODO check value limits
     .AddAttribute ("Inclination",
                    "The inclination of the orbital plane in degrees",
                    DoubleValue (10.0),
@@ -33,7 +34,7 @@ LeoCircularOrbitMobilityModel::GetTypeId ()
                    MakeDoubleChecker<double> ())
     .AddAttribute ("Latitude",
                    "The latitude at which the orital plane intersects the equatorial plane in degrees",
-                   DoubleValue (10.0),
+                   DoubleValue (0.0),
                    MakeDoubleAccessor (&LeoCircularOrbitMobilityModel::SetLatitude,
                    		       &LeoCircularOrbitMobilityModel::GetLatitude),
                    MakeDoubleChecker<double> ())
