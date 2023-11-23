@@ -11,7 +11,8 @@ Low Earth Orbit Mobility
    ############# Paragraph (no number)
 
 This a maintained version of https://gitlab.ibr.cs.tu-bs.de/tschuber/ns-3-leo .
-It was originally published as part of `ns-3-leo: Evaluation Tool for Satellite Swarm Communication Protocols <https://ieeexplore.ieee.org/document/9693958>`_.
+It was originally developed as a student master project and published as part of `ns-3-leo: Evaluation Tool for Satellite Swarm Communication Protocols <https://ieeexplore.ieee.org/document/9693958>`_.
+You may also want to check out `Hypatia <https://github.com/snkas/hypatia>`_ which provides similar functionality, but is more mature software.
 
 Model Description
 *****************
