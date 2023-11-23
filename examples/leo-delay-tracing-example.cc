@@ -44,7 +44,7 @@ int main (int argc, char *argv[])
   uint32_t lonGws = 20;
   double interval;
   double duration;
-  bool islEnable = false;
+  bool islEnabled = false;
   bool traceDrops = false;
   bool traceTxRx = false;
   std::string routingProto = "aodv";
@@ -61,7 +61,7 @@ int main (int argc, char *argv[])
   cmd.AddValue("ttlThresh", "ns3::aodv::RoutingProtocol::TtlThreshold");
   cmd.AddValue("netDiameter", "ns3::aodv::RoutingProtocol::NetDiameter");
   cmd.AddValue("routeTimeout", "ns3::aodv::RoutingProtocol::ActiveRouteTimeout");
-  cmd.AddValue("islEnable", "Enable inter-satellite links", islEnable);
+  cmd.AddValue("islEnabled", "Enable inter-satellite links", islEnabled);
   cmd.AddValue("traceDrops", "Enable tracing of PHY and MAC drops", traceDrops);
   cmd.AddValue("traceTxRx", "Enable tracing of PHY and MAC transmits", traceTxRx);
   cmd.AddValue("latGws", "Latitudal rows of gateways", latGws);
@@ -100,7 +100,8 @@ int main (int argc, char *argv[])
   else
     {
       AodvHelper aodv;
-      //aodv.Set ("EnableHello", BooleanValue (false));
+      aodv.Set ("EnableHello", BooleanValue (false));
+      //aodv.Set ("RreqLimit", UintegerValue (2));
 
       stack.SetRoutingHelper (aodv);
     }
@@ -114,7 +115,7 @@ int main (int argc, char *argv[])
   ipv4.SetBase ("10.1.0.0", "255.255.0.0");
   ipv4.Assign (utNet);
 
-  if (islEnable)
+  if (islEnabled)
     {
       std::cerr << "ISL enabled" << std::endl;
       IslHelper islCh;
