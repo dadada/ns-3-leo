@@ -92,6 +92,7 @@ Vector3D
 LeoCircularOrbitMobilityModel::PlaneNorm () const
 {
   int sign = 1;
+  // ensure correct gradient (not against earth rotation)
   if (m_inclination < M_PI/4)
     {
       sign = -1;

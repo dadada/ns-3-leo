@@ -171,8 +171,8 @@ MockChannel::Deliver (
   NS_LOG_FUNCTION (this << p << src->GetAddress () << dst->GetAddress () << txTime);
   Time delay = txTime;
 
-  Ptr<MobilityModel> srcMob = src->GetObject<MobilityModel> ();
-  Ptr<MobilityModel> dstMob = dst->GetObject<MobilityModel> ();
+  Ptr<MobilityModel> srcMob = src->GetNode ()->GetObject<MobilityModel> ();
+  Ptr<MobilityModel> dstMob = dst->GetNode ()->GetObject<MobilityModel> ();
 
   double txPower = src->GetTxPower ();
   double rxPower = txPower;
@@ -190,6 +190,10 @@ MockChannel::Deliver (
     	    }
     	}
       delay += GetPropagationDelay (srcMob, dstMob, txTime);
+    }
+  else
+    {
+      return false;
     }
 
   Simulator::ScheduleWithContext (dst->GetNode ()->GetId (),

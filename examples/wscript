@@ -4,7 +4,10 @@ def build(bld):
     if not bld.env['ENABLE_EXAMPLES']:
         return;
 
-    obj = bld.create_ns3_program('leo-circular-orbit-trace',
+    obj = bld.create_ns3_program('leo-circular-orbit',
                                  ['core', 'leo', 'mobility'])
     obj.source = 'leo-circular-orbit-tracing-example.cc'
 
+    obj = bld.create_ns3_program('leo-delay',
+                                 ['core', 'leo', 'mobility', 'aodv'])
+    obj.source = 'leo-delay-tracing-example.cc'

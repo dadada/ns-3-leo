@@ -33,7 +33,7 @@ namespace ns3 {
 class IslPropagationLossModel : public PropagationLossModel
 {
 public:
-  static const double EARTH_RAD;
+  static const double EARTH_RAD_E6;
 
   static TypeId GetTypeId (void);
   IslPropagationLossModel ();

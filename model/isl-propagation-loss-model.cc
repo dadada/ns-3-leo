@@ -55,25 +55,29 @@ IslPropagationLossModel::~IslPropagationLossModel ()
 
 
 const double
-IslPropagationLossModel::EARTH_RAD = 6.3781E6;
+IslPropagationLossModel::EARTH_RAD_E6 = 6.371;
 
 bool
 IslPropagationLossModel::GetLos (Ptr<MobilityModel> a, Ptr<MobilityModel> b)
 {
   // origin of LOS
   Vector3D o = a->GetPosition ();
+  o = Vector3D (o.x / 1e6, o.y / 1e6, o.z / 1e6);
   double ol = o.GetLength ();
 
   // second point of LOS
   Vector3D bp = b->GetPosition ();
-  double bl = bp.GetLength ();
+  bp = Vector3D (bp.x / 1e6, bp.y / 1e6, bp.z / 1e6);
 
   // unit vector
-  Vector3D u = Vector3D ((o.x-bp.x)/bl, (o.y-bp.y)/bl, (o.z-bp.z)/bl);
+  Vector3D u = Vector3D (o.x-bp.x, o.y-bp.y, o.z-bp.z);
+  u = Vector3D (u.x / u.GetLength (), u.y / u.GetLength (), u.z / u.GetLength ());
 
   // center point of sphere is 0
   double uo = (u.x*o.x) + (u.y*o.y) + (u.z*o.z);
-  double delta = (uo*uo) - (ol*ol - (EARTH_RAD*EARTH_RAD));
+  double delta = (uo*uo) - (ol*ol - (EARTH_RAD_E6*EARTH_RAD_E6));
+
+  //NS_LOG_DEBUG ("a_pos="<<o<<";b_pos"<<bp<<";delta="<<delta);
 
   return delta < 0;
 }
@@ -83,15 +87,14 @@ IslPropagationLossModel::DoCalcRxPower (double txPowerDbm,
                                         Ptr<MobilityModel> a,
                                         Ptr<MobilityModel> b) const
 {
-  // primitivec cut-of at 1000 km
   if (!GetLos (a, b))
     {
       return 0.0;
     }
 
-  double rxc = 0.0;//-m_variable->GetValue ();
-  NS_LOG_DEBUG ("attenuation coefficient="<<rxc<<"Db");
-  return txPowerDbm + rxc;
+  NS_LOG_INFO ("LOS;"<<a->GetPosition ()<<";"<<b->GetPosition ());
+
+  return txPowerDbm;
 }
 
 int64_t

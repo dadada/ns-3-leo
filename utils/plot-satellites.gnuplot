@@ -8,6 +8,7 @@ unset ytics
 unset ztics
 unset border
 unset key
+set hidden3d
 set view equal xyz
 
 # number of nodes per time slot

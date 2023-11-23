@@ -26,12 +26,12 @@ LeoMockNetDevice::GetTypeId (void)
                    MakeEnumChecker (
                      DeviceType::GND, "ns3::LeoMockNetDevice::NetDeviceType::GND",
                      DeviceType::SAT, "ns3::LeoMockNetDevice::NetDeviceType::SAT"))
-    .AddAttribute ("ReceiverGain",
+    .AddAttribute ("RxGain",
                    "Receiver gain in dBm",
                    DoubleValue (0.0),
                    MakeDoubleAccessor (&LeoMockNetDevice::m_rxGain),
                    MakeDoubleChecker<double> ())
-    .AddAttribute ("ReceiverLoss",
+    .AddAttribute ("RxLoss",
                    "Receiver loss in dBm",
                    DoubleValue (0.0),
                    MakeDoubleAccessor (&LeoMockNetDevice::m_rxLoss),

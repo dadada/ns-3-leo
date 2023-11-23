@@ -8,6 +8,7 @@
 #include "ns3/names.h"
 #include "ns3/assert.h"
 #include "ns3/string.h"
+#include "ns3/data-rate.h"
 
 #include "../model/leo-mock-channel.h"
 #include "../model/leo-mock-net-device.h"
@@ -119,11 +120,11 @@ LeoChannelHelper::SetConstellationAttributes (double eirp,
   m_satDeviceFactory.Set ("RxLoss", DoubleValue (rxGain));
   m_satDeviceFactory.Set ("RxGain", DoubleValue (rxLoss));
 
-  m_gndDeviceFactory.Set ("DataRate", DoubleValue (dataRate));
-  m_satDeviceFactory.Set ("DataRate", DoubleValue (dataRate));
+  m_gndDeviceFactory.Set ("DataRate", DataRateValue (DataRate (dataRate)));
+  m_satDeviceFactory.Set ("DataRate", DataRateValue (DataRate (dataRate)));
 
   m_propagationLossFactory.Set ("ElevationAngle", DoubleValue (elevationAngle));
-  m_propagationLossFactory.Set ("FreeSpaceLoss", DoubleValue (fspl));
+  m_propagationLossFactory.Set ("FreeSpacePathLoss", DoubleValue (fspl));
   m_propagationLossFactory.Set ("AtmosphericLoss", DoubleValue (atmosphericLoss));
   m_propagationLossFactory.Set ("LinkMargin", DoubleValue (linkMargin));
 }

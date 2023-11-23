@@ -26,13 +26,15 @@ IslPropagationAngleTestCase1::~IslPropagationAngleTestCase1 ()
 {
 }
 
+#define EARTH_RAD 6.3781e6
+
 void
 IslPropagationAngleTestCase1::DoRun (void)
 {
   Ptr<ConstantPositionMobilityModel> a = CreateObject<ConstantPositionMobilityModel> ();
-  a->SetPosition (Vector3D (IslPropagationLossModel::EARTH_RAD + 1000.0, 10, 0));
+  a->SetPosition (Vector3D (EARTH_RAD + 1.0e6, 10, 0));
   Ptr<ConstantPositionMobilityModel> b = CreateObject<ConstantPositionMobilityModel> ();
-  b->SetPosition (Vector3D (IslPropagationLossModel::EARTH_RAD + 1000.0, 0, 0));
+  b->SetPosition (Vector3D (EARTH_RAD + 1.0e6, 0, 0));
 
   NS_TEST_ASSERT_MSG_EQ (IslPropagationLossModel::GetLos (a, b), true, "LOS of neighboring satellites");
 }
@@ -60,9 +62,9 @@ void
 IslPropagationAngleTestCase2::DoRun (void)
 {
   Ptr<ConstantPositionMobilityModel> a = CreateObject<ConstantPositionMobilityModel> ();
-  a->SetPosition (Vector3D (IslPropagationLossModel::EARTH_RAD + 1000.0, 0, 0));
+  a->SetPosition (Vector3D (EARTH_RAD + 1.0e6, 0, 0));
   Ptr<ConstantPositionMobilityModel> b = CreateObject<ConstantPositionMobilityModel> ();
-  b->SetPosition (Vector3D (- (IslPropagationLossModel::EARTH_RAD + 1000.0), 0, 0));
+  b->SetPosition (Vector3D (- (EARTH_RAD + 1.0e6), 0, 0));
 
   NS_TEST_ASSERT_MSG_EQ (IslPropagationLossModel::GetLos (a, b), false, "LOS of opposing");
 }
