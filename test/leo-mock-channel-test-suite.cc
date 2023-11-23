@@ -88,7 +88,7 @@ LeoMockChannelTransmitKnownTestCase::DoRun (void)
   Ptr<Node> dstNode = CreateObject<Node> ();
   Ptr<LeoMockNetDevice> dstDev = CreateObject<LeoMockNetDevice> ();
   dstDev->SetNode (dstNode);
-  dstDev->SetAttribute ("MobilityModel", StringValue ("ns3::LeoMobilityModel"));
+  dstDev->SetAttribute ("MobilityModel", StringValue ("ns3::WaypointMobilityModel"));
   dstDev->SetDeviceType (LeoMockNetDevice::SAT);
   channel->Attach (dstDev);
 
@@ -131,7 +131,7 @@ LeoMockChannelTransmitSpaceGroundTestCase::DoRun (void)
   Ptr<Node> srcNode = CreateObject<Node> ();
   Ptr<LeoMockNetDevice> srcDev = CreateObject<LeoMockNetDevice> ();
   srcDev->SetNode (srcNode);
-  srcDev->SetAttribute ("MobilityModel", StringValue ("ns3::LeoMobilityModel"));
+  srcDev->SetAttribute ("MobilityModel", StringValue ("ns3::WaypointMobilityModel"));
   srcDev->SetDeviceType (LeoMockNetDevice::SAT);
   int32_t srcId = channel->Attach (srcDev);
 
@@ -181,14 +181,14 @@ LeoMockChannelTransmitSpaceSpaceTestCase::DoRun (void)
   Ptr<Node> srcNode = CreateObject<Node> ();
   Ptr<LeoMockNetDevice> srcDev = CreateObject<LeoMockNetDevice> ();
   srcDev->SetNode (srcNode);
-  srcDev->SetAttribute ("MobilityModel", StringValue ("ns3::LeoMobilityModel"));
+  srcDev->SetAttribute ("MobilityModel", StringValue ("ns3::WaypointMobilityModel"));
   srcDev->SetDeviceType (LeoMockNetDevice::SAT);
   int32_t srcId = channel->Attach (srcDev);
 
   Ptr<Node> dstNode = CreateObject<Node> ();
   Ptr<LeoMockNetDevice> dstDev = CreateObject<LeoMockNetDevice> ();
   dstDev->SetNode (dstNode);
-  dstDev->SetAttribute ("MobilityModel", StringValue ("ns3::LeoMobilityModel"));
+  dstDev->SetAttribute ("MobilityModel", StringValue ("ns3::WaypointMobilityModel"));
   dstDev->SetDeviceType (LeoMockNetDevice::SAT);
   channel->Attach (dstDev);
 

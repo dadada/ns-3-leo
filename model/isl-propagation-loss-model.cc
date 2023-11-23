@@ -22,6 +22,8 @@
  *                Pavel Boyko <boyko@iitp.ru> for matrix
  */
 
+#include "ns3/log.h"
+
 #include "isl-propagation-loss-model.h"
 
 namespace ns3 {

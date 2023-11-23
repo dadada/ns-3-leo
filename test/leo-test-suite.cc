@@ -48,7 +48,7 @@ LeoTestCase1::DoRun (void)
   LeoHelper leo;
   leo.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
   leo.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
-  leo.SetDeviceAttribute ("MobilityModel", StringValue ("ns3::LeoMobilityModel"));
+  leo.SetDeviceAttribute ("MobilityModel", StringValue ("ns3::WaypointMobilityModel"));
 
   NetDeviceContainer allDevices = leo.Install (satellites, gateways, terminals);
 

@@ -41,7 +41,7 @@ IslIcmpTestCase::DoRun (void)
   isl.SetDeviceAttribute ("DataRate", StringValue ("5Gbps"));
   isl.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
   isl.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::IslPropagationLossModel"));
-  isl.SetDeviceAttribute ("MobilityModel", StringValue ("ns3::LeoMobilityModel"));
+  isl.SetDeviceAttribute ("MobilityModel", StringValue ("ns3::WaypointMobilityModel"));
 
   NetDeviceContainer devices;
   devices = isl.Install (nodes);

@@ -3,7 +3,6 @@
 #ifndef LEO_PROPAGATION_LOSS_MODEL_H
 #define LEO_PROPAGATION_LOSS_MODEL_H
 
-#include "leo-mobility-model.h"
 #include <ns3/object.h>
 #include <ns3/propagation-loss-model.h>
 

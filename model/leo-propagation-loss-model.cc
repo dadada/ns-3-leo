@@ -1,5 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
+#include "ns3/log.h"
 #include "leo-propagation-loss-model.h"
 
 namespace ns3 {
@@ -38,7 +39,7 @@ LeoPropagationLossModel::DoCalcRxPower (double txPowerDbm,
   // TODO perform line-earth intersection (ray tracing)
 
   double rxc = 0;//-m_variable->GetValue ();
-  NS_LOG_DEBUG ("attenuation coefficient="<<rxc<<"Db");
+  //NS_LOG_DEBUG ("attenuation coefficient="<<rxc<<"Db");
   return txPowerDbm + rxc;
 }
 
