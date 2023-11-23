@@ -153,8 +153,8 @@ int main (int argc, char *argv[])
       //aodv.Set ("RreqRetries", UintegerValue (1000));
       //aodv.Set ("RerrRateLimit", UintegerValue (1000));
       //aodv.Set ("RreqRateLimit", UintegerValue (10));
-      //aodv.Set ("TtlThreshold", UintegerValue (10));
-      //aodv.Set ("NetDiameter", UintegerValue (50));
+      aodv.Set ("TtlThreshold", UintegerValue (20));
+      aodv.Set ("NetDiameter", UintegerValue (50));
       stack.SetRoutingHelper (aodv);
     }
 
