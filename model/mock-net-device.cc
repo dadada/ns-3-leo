@@ -370,7 +370,10 @@ MockNetDevice::SetReceiveErrorModel (Ptr<ErrorModel> em)
 void
 MockNetDevice::Receive (Ptr<Packet> packet, Ptr<MockNetDevice> senderDevice)
 {
-  NS_LOG_FUNCTION (this << packet);
+  NS_LOG_FUNCTION (this << packet << senderDevice);
+
+  NS_LOG_DEBUG (GetAddress () << " receiving packet from " << senderDevice->GetAddress ());
+
   uint16_t protocol = 0;
 
   if (m_receiveErrorModel && m_receiveErrorModel->IsCorrupt (packet) )

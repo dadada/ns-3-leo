@@ -118,6 +118,7 @@ bool MockChannel::Deliver (
     Ptr<MockNetDevice> dst,
     Time txTime)
 {
+  NS_LOG_FUNCTION (this << p << src->GetAddress () << dst->GetAddress () << txTime);
   Time delay = GetDelay (src, dst, txTime);
 
   /* Check if there is LOS between the source and destination */
@@ -149,7 +150,7 @@ MockChannel::TransmitStart (
     Address destAddr,
     Time txTime)
 {
-  NS_LOG_FUNCTION (destAddr << this << p << srcId);
+  NS_LOG_FUNCTION (this << p << srcId << destAddr << txTime);
   NS_LOG_LOGIC ("UID is " << p->GetUid () << ")");
 
   Ptr<MockNetDevice> src = m_link[srcId];

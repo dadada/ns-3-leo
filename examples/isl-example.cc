@@ -24,7 +24,7 @@ main (int argc, char *argv[])
   LogComponentEnable ("UdpClient", LOG_LEVEL_INFO);
 
   NodeContainer nodes;
-  nodes.Create (300);
+  nodes.Create (3);
 
   IslHelper isl;
   isl.SetDeviceAttribute ("DataRate", StringValue ("5Gbps"));
@@ -43,23 +43,27 @@ main (int argc, char *argv[])
   Ipv6InterfaceContainer interfaces = address.Assign (devices);
 
   UdpEchoServerHelper echoServer (9);
+  ApplicationContainer serverApps = echoServer.Install (nodes);
+
+  ApplicationContainer clientApps;
+  UdpEchoClientHelper echoClient (devices.Get (0)->GetAddress (), 9);
+  echoClient.SetAttribute ("MaxPackets", UintegerValue (10));
+  echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
+  echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
 
   for (uint32_t i = 1; i < nodes.GetN (); i++)
   {
-    ApplicationContainer serverApps = echoServer.Install (nodes.Get (i));
-    serverApps.Start (Seconds (1.0));
-    serverApps.Stop (Seconds (10.0));
-
     Address destAddress = interfaces.GetAddress (i, 0);
-    UdpEchoClientHelper echoClient (destAddress, 9);
-    echoClient.SetAttribute ("MaxPackets", UintegerValue (10));
-    echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
-    echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
+    echoClient.SetAttribute ("RemoteAddress", AddressValue (destAddress));
 
-    ApplicationContainer clientApps = echoClient.Install (nodes.Get (0));
-    clientApps.Start (Seconds (2.0));
-    clientApps.Stop (Seconds (10.0));
+    clientApps.Add (echoClient.Install (nodes.Get (i-1)));
   }
+
+  clientApps.Start (Seconds (2.0));
+  clientApps.Stop (Seconds (10.0));
+
+  serverApps.Start (Seconds (1.0));
+  serverApps.Stop (Seconds (10.0));
 
   Simulator::Run ();
   Simulator::Destroy ();
