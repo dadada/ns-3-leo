@@ -339,7 +339,7 @@ LeoChannelHelper::Install (std::vector<Ptr<Node> > &satellites, std::vector<Ptr<
 
   Ptr<LeoMockChannel> channel = m_channelFactory.Create<LeoMockChannel> ();
   channel->SetPropagationLoss (m_propagationLossFactory.Create<LeoPropagationLossModel> ());
-  channel->SetPropagationDelay (m_propagationLossFactory.Create<ConstantSpeedPropagationDelayModel> ());
+  channel->SetPropagationDelay (m_propagationDelayFactory.Create<ConstantSpeedPropagationDelayModel> ());
 
   NetDeviceContainer container;
 

@@ -74,7 +74,7 @@ int main (int argc, char *argv[])
   CommandLine cmd;
   std::string orbitFile;
   std::string traceFile;
-  LeoLatLong source (51.84, 10.28);
+  LeoLatLong source (51.399, 10.536);
   LeoLatLong destination (40.76, -73.96);
   std::string islRate = "2Gbps";
   std::string constellation = "TelesatGateway";
@@ -83,9 +83,9 @@ int main (int argc, char *argv[])
   double interval = 1;
   double duration = 100;
   bool islEnabled = true;
-  bool traceDrops = true;
-  bool traceTxRx = true;
-  bool traceFwd = true;
+  bool traceDrops = false;
+  bool traceTxRx = false;
+  bool traceFwd = false;
   std::string routingProto = "aodv";
   cmd.AddValue("orbitFile", "CSV file with orbit parameters", orbitFile);
   cmd.AddValue("traceFile", "CSV file to store mobility trace in", traceFile);
@@ -153,8 +153,8 @@ int main (int argc, char *argv[])
       //aodv.Set ("RreqRetries", UintegerValue (1000));
       //aodv.Set ("RerrRateLimit", UintegerValue (1000));
       //aodv.Set ("RreqRateLimit", UintegerValue (10));
-      aodv.Set ("TtlThreshold", UintegerValue (25));
-      aodv.Set ("NetDiameter", UintegerValue (50));
+      //aodv.Set ("TtlThreshold", UintegerValue (10));
+      //aodv.Set ("NetDiameter", UintegerValue (50));
       stack.SetRoutingHelper (aodv);
     }
 
