@@ -80,11 +80,12 @@ int main (int argc, char *argv[])
 
   // we want to ping terminals
   UdpEchoServerHelper echoServer (9);
-  ApplicationContainer serverApps = echoServer.Install (stations.Get (1));
+  ApplicationContainer serverApps = echoServer.Install (stations);
 
   // install a client on one of the terminals
   ApplicationContainer clientApps;
-  Address remote = utIp.GetAddress (3, 0);
+  Address remote = stations.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();//utIp.GetAddress (1, 0);
+  std::cerr << remote << std::endl;
   UdpEchoClientHelper echoClient (remote, 9);
   echoClient.SetAttribute ("MaxPackets", UintegerValue (10));
   echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
