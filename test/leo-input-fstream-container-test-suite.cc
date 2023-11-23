@@ -5,27 +5,27 @@
 
 using namespace ns3;
 
-class LeoFileInputTestCase : public TestCase
+class LeoWaypointFileEmptyTestCase : public TestCase
 {
 public:
-  LeoFileInputTestCase ();
-  virtual ~LeoFileInputTestCase ();
+  LeoWaypointFileEmptyTestCase ();
+  virtual ~LeoWaypointFileEmptyTestCase ();
 
 private:
   virtual void DoRun (void);
 };
 
-LeoFileInputTestCase::LeoFileInputTestCase ()
+LeoWaypointFileEmptyTestCase::LeoWaypointFileEmptyTestCase ()
   : TestCase ("Test reading from empty file")
 {
 }
 
-LeoFileInputTestCase::~LeoFileInputTestCase ()
+LeoWaypointFileEmptyTestCase::~LeoWaypointFileEmptyTestCase ()
 {
 }
 
 void
-LeoFileInputTestCase::DoRun (void)
+LeoWaypointFileEmptyTestCase::DoRun (void)
 {
   Ptr<LeoWaypointInputFileStreamContainer> container = CreateObject<LeoWaypointInputFileStreamContainer> ();
   container->SetAttribute("File", StringValue ("contrib/leo/data/empty"));
@@ -47,7 +47,7 @@ LeoWaypointsTestSuite::LeoWaypointsTestSuite ()
   : TestSuite ("leo-waypoints", UNIT)
 {
   // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
-  AddTestCase (new LeoFileInputTestCase, TestCase::QUICK);
+  AddTestCase (new LeoWaypointFileEmptyTestCase, TestCase::QUICK);
 }
 
 // Do not forget to allocate an instance of this TestSuite
