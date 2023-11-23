@@ -1,5 +1,7 @@
 #include <fstream>
 
+#include "math.h"
+
 #include "ns3/log.h"
 #include "ns3/config.h"
 #include "ns3/waypoint.h"
@@ -46,6 +48,41 @@ LeoGndNodeHelper::Install (const std::string &wpFile)
       NS_LOG_INFO ("Added ground node at " << pos);
     }
   waypoints.close ();
+
+  NS_LOG_INFO ("Added " << nodes.GetN () << " ground nodes");
+
+  return nodes;
+}
+
+Vector3D
+LeoGndNodeHelper::GetEarthPosition (const LeoLatLong &loc)
+{
+  double lat = loc.latitude * (M_PI / 90);
+  double lon = loc.longitude * (M_PI / 180);
+  Vector3D pos = Vector3D (LEO_GND_RAD_EARTH * sin (lat) * cos (lon),
+  			   LEO_GND_RAD_EARTH * sin (lat) * sin (lon),
+  			   LEO_GND_RAD_EARTH * cos (lat));
+  return pos;
+}
+
+NodeContainer
+LeoGndNodeHelper::Install (const LeoLatLong &location1,
+  	 		   const LeoLatLong &location2)
+{
+  NS_LOG_FUNCTION (this << location1 << location2);
+
+  NodeContainer nodes;
+
+  for (const LeoLatLong loc : { location1, location2 })
+    {
+      Vector pos = GetEarthPosition (loc);
+      Ptr<ConstantPositionMobilityModel> mob = CreateObject<ConstantPositionMobilityModel> ();
+      mob->SetPosition (pos);
+      Ptr<Node> node = m_gndNodeFactory.Create<Node> ();
+      node->AggregateObject (mob);
+      nodes.Add (node);
+      NS_LOG_INFO ("Added ground node at " << pos);
+    }
 
   NS_LOG_INFO ("Added " << nodes.GetN () << " ground nodes");
 

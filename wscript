@@ -22,6 +22,7 @@ def build(bld):
         'model/leo-mock-channel.cc',
         'model/leo-mock-net-device.cc',
         'model/leo-orbit.cc',
+        'model/leo-lat-long.cc',
         'model/leo-propagation-loss-model.cc',
         'model/mock-net-device.cc',
         'model/mock-channel.cc',
@@ -63,6 +64,8 @@ def build(bld):
         'model/leo-mock-channel.h',
         'model/leo-mock-net-device.h',
         'model/leo-oneweb-constants.h',
+        'model/leo-orbit.h',
+        'model/leo-lat-long.h',
         'model/leo-propagation-loss-model.h',
 	'model/leo-starlink-constants.h',
 	'model/leo-telesat-constants.h',
@@ -70,7 +73,6 @@ def build(bld):
         'model/mock-channel.h',
         'model/isl-mock-channel.h',
         'model/isl-propagation-loss-model.h',
-        'model/leo-orbit.h',
         'utils/leo-input-fstream-container.h',
         ]
 

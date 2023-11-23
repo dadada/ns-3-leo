@@ -155,8 +155,8 @@ given as pairs of longitude and latitude.
   --orbitsFile=orbits.csv \
   --groundFile=ground-stations.csv \
   --traceFile=delay-trace.csv \
-  --source=54.4,77.1 \
-  --destination=-10.0,25.8 \
+  --source=54.4:77.1 \
+  --destination=-10.0:25.8 \
   --islRate=1Gbps \
   --constellation="StarlinkGateway" \
   --duration=10.0 \
