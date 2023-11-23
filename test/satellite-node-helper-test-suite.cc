@@ -87,7 +87,7 @@ public:
 };
 
 SatNodeHelperTestSuite::SatNodeHelperTestSuite ()
-  : TestSuite ("sat-node-helper", UNIT)
+  : TestSuite ("leo-sat-node-helper", UNIT)
 {
   // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
   AddTestCase (new EmptySatNodeHelperTestCase, TestCase::QUICK);

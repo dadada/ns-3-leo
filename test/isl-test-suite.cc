@@ -100,7 +100,7 @@ public:
 };
 
 IslTestSuite::IslTestSuite ()
-  : TestSuite ("isl", EXAMPLE)
+  : TestSuite ("leo-isl", EXAMPLE)
 {
   // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
   AddTestCase (new IslIcmpTestCase, TestCase::EXTENSIVE);

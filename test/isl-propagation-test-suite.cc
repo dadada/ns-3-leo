@@ -74,7 +74,7 @@ public:
 };
 
 IslPropagationTestSuite::IslPropagationTestSuite ()
-  : TestSuite ("isl-propagation", UNIT)
+  : TestSuite ("leo-isl-propagation", UNIT)
 {
   // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
   AddTestCase (new IslPropagationAngleTestCase1, TestCase::QUICK);

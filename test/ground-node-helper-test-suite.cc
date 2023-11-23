@@ -83,7 +83,7 @@ public:
 };
 
 GndNodeHelperTestSuite::GndNodeHelperTestSuite ()
-  : TestSuite ("gnd-node-helper", UNIT)
+  : TestSuite ("leo-gnd-node-helper", UNIT)
 {
   // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
   AddTestCase (new EmptyGndNodeHelperTestCase, TestCase::QUICK);

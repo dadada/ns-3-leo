@@ -104,7 +104,7 @@ public:
 };
 
 IslMockChannelTestSuite::IslMockChannelTestSuite ()
-  : TestSuite ("isl-mock-channel", UNIT)
+  : TestSuite ("leo-isl-mock-channel", UNIT)
 {
   // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
   AddTestCase (new IslMockChannelTransmitUnknownTestCase, TestCase::QUICK);

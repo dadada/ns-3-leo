@@ -7,7 +7,7 @@
 #     conf.check_nonfatal(header_name='stdint.h', define_name='HAVE_STDINT_H')
 
 def build(bld):
-    module = bld.create_ns3_module('leo', ['core','internet', 'propagation', 'stats', 'traffic', 'flow-monitor', 'applications'])
+    module = bld.create_ns3_module('leo', ['core','internet', 'propagation', 'stats', 'traffic', 'flow-monitor', 'applications', 'netanim'])
     module.source = [
         'helper/arp-cache-helper.cc',
         'helper/isl-helper.cc',
@@ -32,6 +32,7 @@ def build(bld):
         'test/isl-mock-channel-test-suite.cc',
         'test/isl-propagation-test-suite.cc',
         'test/isl-test-suite.cc',
+        'test/leo-anim-test-suite.cc',
         'test/leo-input-fstream-container-test-suite.cc',
         'test/leo-mobility-test-suite.cc',
         'test/leo-mock-channel-test-suite.cc',
