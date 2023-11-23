@@ -22,7 +22,7 @@ private:
 };
 
 IslMockChannelTransmitUnknownTestCase::IslMockChannelTransmitUnknownTestCase ()
-  : TestCase ("Test channel transmission")
+  : TestCase ("Test transmission to unkown destination")
 {
 }
 
@@ -40,9 +40,60 @@ IslMockChannelTransmitUnknownTestCase::DoRun (void)
   int32_t srcId = channel->Attach (dev);
   Address destAddr;
   Time txTime;
+  channel->SetAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
+  channel->SetAttribute ("PropagationLoss", StringValue ("ns3::IslPropagationLossModel"));
+  dev->SetAttribute ("MobilityModel", StringValue ("ns3::LeoMobilityModel"));
   bool result = channel->TransmitStart (p, srcId, destAddr, txTime);
 
   NS_TEST_ASSERT_MSG_EQ (result, false, "Unknown destination fails to deliver");
+}
+
+class IslMockChannelTransmitKnownTestCase : public TestCase
+{
+public:
+  IslMockChannelTransmitKnownTestCase ();
+  virtual ~IslMockChannelTransmitKnownTestCase ();
+
+private:
+  virtual void DoRun (void);
+};
+
+IslMockChannelTransmitKnownTestCase::IslMockChannelTransmitKnownTestCase ()
+  : TestCase ("Test transmission to known destination")
+{
+}
+
+IslMockChannelTransmitKnownTestCase::~IslMockChannelTransmitKnownTestCase ()
+{
+}
+
+void
+IslMockChannelTransmitKnownTestCase::DoRun (void)
+{
+  Ptr<IslMockChannel> channel = CreateObject<IslMockChannel> ();
+  channel->SetAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
+  channel->SetAttribute ("PropagationLoss", StringValue ("ns3::IslPropagationLossModel"));
+
+  Packet *packet = new Packet ();
+  Ptr<Packet> p = Ptr<Packet>(packet);
+
+  Ptr<Node> srcNode = CreateObject<Node> ();
+  Ptr<MockNetDevice> srcDev = CreateObject<MockNetDevice> ();
+  srcDev->SetNode (srcNode);
+  srcDev->SetAttribute ("MobilityModel", StringValue ("ns3::LeoMobilityModel"));
+  int32_t srcId = channel->Attach (srcDev);
+
+  Ptr<Node> dstNode = CreateObject<Node> ();
+  Ptr<MockNetDevice> dstDev = CreateObject<MockNetDevice> ();
+  dstDev->SetNode (dstNode);
+  dstDev->SetAttribute ("MobilityModel", StringValue ("ns3::LeoMobilityModel"));
+  channel->Attach (dstDev);
+
+  Address destAddr = dstDev->GetAddress ();
+  Time txTime;
+  bool result = channel->TransmitStart (p, srcId, destAddr, txTime);
+
+  NS_TEST_ASSERT_MSG_EQ (result, true, "Known destination delivers");
 }
 
 class IslMockChannelTestSuite : public TestSuite
@@ -56,6 +107,7 @@ IslMockChannelTestSuite::IslMockChannelTestSuite ()
 {
   // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
   AddTestCase (new IslMockChannelTransmitUnknownTestCase, TestCase::QUICK);
+  AddTestCase (new IslMockChannelTransmitKnownTestCase, TestCase::QUICK);
 }
 
 // Do not forget to allocate an instance of this TestSuite
