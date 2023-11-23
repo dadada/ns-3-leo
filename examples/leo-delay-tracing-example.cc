@@ -92,7 +92,7 @@ int main (int argc, char *argv[])
   cmd.AddValue("islEnable", "Enable inter-satellite links", islEnable);
   cmd.AddValue("traceDrops", "Enable tracing of PHY and MAC drops", traceDrops);
   cmd.AddValue("latGws", "Latitudal rows of gateways", latGws);
-  cmd.AddValue("latGws", "Longitudinal rows of gateways", lonGws);
+  cmd.AddValue("lonGws", "Longitudinal rows of gateways", lonGws);
   cmd.Parse (argc, argv);
 
   std::streambuf *coutbuf = std::cout.rdbuf();
@@ -128,8 +128,9 @@ int main (int argc, char *argv[])
       // Install internet stack on nodes
       AodvHelper aodv;
       aodv.Set ("EnableHello", BooleanValue (false));
-      aodv.Set ("RreqRateLimit", UintegerValue (1));
-      aodv.Set ("RerrRateLimit", UintegerValue (1));
+      aodv.Set ("NetDiameter", UintegerValue (1000));
+      aodv.Set ("RreqRateLimit", UintegerValue (10));
+      aodv.Set ("RerrRateLimit", UintegerValue (10));
 
       stack.SetRoutingHelper (aodv);
     }
@@ -143,6 +144,7 @@ int main (int argc, char *argv[])
 
   if (islEnable)
     {
+      std::cerr << "ISL enabled" << std::endl;
       IslHelper islCh;
       NetDeviceContainer islNet = islCh.Install (satellites);
       ipv4.SetBase ("10.2.0.0", "255.255.0.0");
