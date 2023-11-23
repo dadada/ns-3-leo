@@ -68,11 +68,7 @@ IslMockChannel::TransmitStart (
   if (dst == nullptr)
   {
     NS_LOG_LOGIC ("destination address " << destAddr << " unknown on channel");
-    for (uint32_t i = 0; i < GetNDevices (); i++)
-    {
-      Deliver (p, src, DynamicCast<MockNetDevice> (GetDevice (i)), txTime);
-    }
-    return true;
+    return false;
   }
   else
   {

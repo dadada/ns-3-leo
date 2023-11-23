@@ -49,67 +49,31 @@ LeoMockChannel::TransmitStart (Ptr<const Packet> p,
       return false;
     }
 
-  // Hack for NDP and ARP caches
-  // TODO check if NDP or ARP address
-  bool isBroadcast = (m_groundDevices.find (dst) == m_groundDevices.end ()
-                      && m_satelliteDevices.find (dst) == m_satelliteDevices.end ());
-
   bool fromGround = m_groundDevices.find (srcDev->GetAddress ()) != m_groundDevices.end ();
 
-  if (isBroadcast)
+  if (fromGround)
     {
-      NS_LOG_DEBUG (">>>broadcast for " << srcDev->GetAddress () << " -> " << dst);
-      // Broadcast hack for ARP and neighbor cache
-      // TODO remove if found a way to fill neighbor cache / ARP by hand
-      if (fromGround)
+      // Satellites can always directly be addresses
+      // Assume beams are narrow enough to not also receive the signal at other
+      // satellites for performance reasons.
+      DeviceIndex::iterator it = m_satelliteDevices.find (dst);
+      if (it == m_satelliteDevices.end ())
         {
-          for (DeviceIndex::iterator it = m_satelliteDevices.begin ();
-               it != m_satelliteDevices.end ();
-               it++)
-            {
-              // TODO deliver only to devices in the same beam
-              NS_LOG_DEBUG ("from ground " << srcDev->GetAddress () << " -> " << it->second->GetAddress ());
-              Deliver (p, srcDev, it->second, txTime);
-            }
+          NS_LOG_ERROR ("unable to find satellite with address " << dst);
+          return false;
         }
-      else
-        {
-          for (DeviceIndex::iterator it = m_groundDevices.begin ();
-               it != m_groundDevices.end ();
-               it++)
-            {
-              // TODO deliver only to devices in the same beam
-              NS_LOG_DEBUG ("from space " << srcDev->GetAddress () << " -> " << it->second->GetAddress ());
-              Deliver (p, srcDev, it->second, txTime);
-            }
-        }
+      NS_LOG_DEBUG ("BOOOOM " << srcDev->GetAddress () << " -> " << dst);
+      return Deliver (p, srcDev, it->second, txTime);
     }
   else
+    // space to ground delivers to everything within the beam
     {
-      if (fromGround)
+      for (DeviceIndex::iterator it = m_groundDevices.begin ();
+           it != m_groundDevices.end ();
+           it++)
         {
-          // Satellites can always directly be addresses
-          // Assume beams are narrow enough to not also receive the signal at other
-          // satellites for performance reasons.
-          DeviceIndex::iterator it = m_satelliteDevices.find (dst);
-          if (it == m_satelliteDevices.end ())
-            {
-              NS_LOG_ERROR ("unable to find satellite with address " << dst);
-              return false;
-            }
-          NS_LOG_DEBUG ("BOOOOM " << srcDev->GetAddress () << " -> " << dst);
-          return Deliver (p, srcDev, it->second, txTime);
-        }
-      else
-        // space to ground delivers to everything within the beam
-        {
-          for (DeviceIndex::iterator it = m_groundDevices.begin ();
-               it != m_groundDevices.end ();
-               it++)
-            {
-              // TODO deliver only to devices in the same beam
-              Deliver (p, srcDev, it->second, txTime);
-            }
+          // TODO deliver only to devices in the same beam
+          Deliver (p, srcDev, it->second, txTime);
         }
     }
 
