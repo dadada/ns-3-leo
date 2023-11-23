@@ -759,10 +759,10 @@ MockNetDevice::SupportsSendFrom (void) const
 }
 
 void
-MockNetDevice::DoMpiReceive (Ptr<Packet> p, Ptr<MockNetDevice> senderDevice)
+MockNetDevice::DoMpiReceive (Ptr<Packet> p, Ptr<MockNetDevice> senderDevice, double txPower)
 {
   NS_LOG_FUNCTION (this << p);
-  Receive (p, senderDevice);
+  Receive (p, senderDevice, txPower);
 }
 
 Address

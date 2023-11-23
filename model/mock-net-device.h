@@ -203,7 +203,7 @@ protected:
    *
    * \param p Packet received
    */
-  void DoMpiReceive (Ptr<Packet> p, Ptr<MockNetDevice> sender);
+  void DoMpiReceive (Ptr<Packet> p, Ptr<MockNetDevice> sender, double txPower);
 
   virtual void DoInitialize (void);
   virtual void NotifyNewAggregate (void);

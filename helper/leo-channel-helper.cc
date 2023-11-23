@@ -13,6 +13,7 @@
 #include "../model/leo-mock-net-device.h"
 #include "../model/leo-starlink-constants.h"
 #include "../model/leo-telesat-constants.h"
+#include "../model/leo-propagation-loss-model.h"
 
 namespace ns3
 {
@@ -330,7 +331,7 @@ LeoChannelHelper::Install (std::vector<Ptr<Node> > &satellites, std::vector<Ptr<
   NS_LOG_FUNCTION (this);
 
   Ptr<LeoMockChannel> channel = m_channelFactory.Create<LeoMockChannel> ();
-  channel->SetPropagationLoss (m_propagationLossFactory.Create ());
+  channel->SetPropagationLoss (m_propagationLossFactory.Create<LeoPropagationLossModel> ());
 
   NetDeviceContainer container;
 
