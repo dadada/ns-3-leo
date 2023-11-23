@@ -46,7 +46,7 @@ LeoCircularOrbitAllocator::AssignStreams (int64_t stream)
 Vector
 LeoCircularOrbitAllocator::GetNext () const
 {
-  Vector next = Vector (M_PI * (m_lastOrbit / (double) m_numOrbits),
+  Vector next = Vector (2 * M_PI * (m_lastOrbit / (double) m_numOrbits),
 	  	 2 * M_PI * (m_lastSatellite / (double) m_numSatellites),
 	  	 0);
 

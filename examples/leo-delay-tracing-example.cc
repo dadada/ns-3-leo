@@ -21,28 +21,45 @@ EchoRx (std::string context, Ptr<const Packet> packet)
   std::cout << context << "," << seqTs.GetSeq () << "," << seqTs.GetTs () << "," << Simulator::Now () - seqTs.GetTs () << std::endl;
 }
 
+class Orbit {
+public:
+  Orbit (double a, double i, double p, double s) : alt (a), inc (i), planes (p), sats (s) {}
+  double alt;
+  double inc;
+  uint16_t planes;
+  uint16_t sats;
+};
+
 int main (int argc, char *argv[])
 {
+  std::vector<Orbit> orbits = {
+      Orbit (1.150, 53.0, 32, 50),
+      Orbit (1.110, 53.8, 32, 50),
+      Orbit (1.130, 74.0,  8, 50),
+      Orbit (1.275, 81, 5, 75),
+      Orbit (1.325, 70, 6, 75),
+
+  };
   NodeContainer satellites;
-  for (double incl: { 70.0, 100.0 })
+  for (Orbit orb: orbits)
     {
       NodeContainer c;
-      c.Create (10*10);
+      c.Create (orb.sats*orb.planes);
 
       MobilityHelper mobility;
       mobility.SetPositionAllocator ("ns3::LeoCircularOrbitPostionAllocator",
-                                     "NumOrbits", IntegerValue (10),
-                                     "NumSatellites", IntegerValue (10));
+                                     "NumOrbits", IntegerValue (orb.planes),
+                                     "NumSatellites", IntegerValue (orb.sats));
       mobility.SetMobilityModel ("ns3::LeoCircularOrbitMobilityModel",
-  			     	 "Altitude", DoubleValue (1200.0),
-  			     	 "Inclination", DoubleValue (incl),
+  			     	 "Altitude", DoubleValue (orb.alt),
+  			     	 "Inclination", DoubleValue (orb.inc),
   			     	 "Precision", TimeValue (Minutes (1)));
       mobility.Install (c);
       satellites.Add (c);
     }
 
   LeoGndNodeHelper ground;
-  NodeContainer stations = ground.Install ("contrib/leo/data/ground-stations/airports-60.waypoints");
+  NodeContainer stations = ground.Install ("contrib/leo/data/ground-stations/usa.waypoints");
 
   NetDeviceContainer islNet, utNet;
 
@@ -70,6 +87,7 @@ int main (int argc, char *argv[])
   aodv.Set ("NextHopWait", TimeValue (MilliSeconds (100)));
   aodv.Set ("NetDiameter", UintegerValue (1000));
   aodv.Set ("PathDiscoveryTime", TimeValue (Seconds (1)));
+
   InternetStackHelper stack;
   stack.SetRoutingHelper (aodv);
   stack.Install (satellites);
@@ -91,7 +109,7 @@ int main (int argc, char *argv[])
   Address remote = stations.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();//utIp.GetAddress (1, 0);
   UdpClientHelper echoClient (remote, 9);
   echoClient.SetAttribute ("MaxPackets", UintegerValue (360));
-  echoClient.SetAttribute ("Interval", TimeValue (Minutes (1.0)));
+  echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
   echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
   clientApps.Add (echoClient.Install (stations.Get (3)));
 

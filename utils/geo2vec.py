@@ -14,6 +14,11 @@ Converts pairs of format `name longitute latitude` to `ns3::Vector` format in IT
 See `ns3::Vector::operator >>`
 """
 
+def isogeo():
+    for i in range(-60,60,5):
+        for j in range(-180,180,5):
+            yield "foo,%f,%f" % (i, j)
+
 """
 Stores the vector data
 """
@@ -29,7 +34,10 @@ class Vector:
 
 if __name__ == "__main__":
     if len(argv) > 1:
-        f = fileinput.input(argv[1])
+        if argv[1] == "-r":
+            f = isogeo()
+        else:
+            f = fileinput.input(argv[1])
     else:
         f = fileinput.input()
 
