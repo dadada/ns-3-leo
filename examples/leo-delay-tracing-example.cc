@@ -66,6 +66,16 @@ int main (int argc, char *argv[])
 
   // Install internet stack on nodes
   AodvHelper aodv;
+  aodv.Set ("HelloInterval", TimeValue (Seconds (10)));
+  aodv.Set ("TtlStart", UintegerValue (100));
+  aodv.Set ("TtlIncrement", UintegerValue (100));
+  aodv.Set ("TtlThreshold", UintegerValue (1000));
+  aodv.Set ("RreqRetries", UintegerValue (100));
+  aodv.Set ("RerrRateLimit", UintegerValue (1000));
+  aodv.Set ("RreqRateLimit", UintegerValue (1000));
+  aodv.Set ("NextHopWait", TimeValue (MilliSeconds (100)));
+  aodv.Set ("NetDiameter", UintegerValue (1000));
+  aodv.Set ("PathDiscoveryTime", TimeValue (Seconds (100)));
   InternetStackHelper stack;
   stack.SetRoutingHelper (aodv);
   stack.Install (satellites);
@@ -85,12 +95,14 @@ int main (int argc, char *argv[])
   // install a client on one of the terminals
   ApplicationContainer clientApps;
   Address remote = stations.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();//utIp.GetAddress (1, 0);
-  std::cerr << remote << std::endl;
+  std::cerr << "REMOTE: node=" <<stations.Get (1)->GetId ()<<"addr="<<remote << std::endl;
   UdpEchoClientHelper echoClient (remote, 9);
-  echoClient.SetAttribute ("MaxPackets", UintegerValue (10));
-  echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
+  echoClient.SetAttribute ("MaxPackets", UintegerValue (100));
+  echoClient.SetAttribute ("Interval", TimeValue (Minutes (1.0)));
   echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
   clientApps.Add (echoClient.Install (stations.Get (0)));
+  Address local = stations.Get (0)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();//utIp.GetAddress (1, 0);
+  std::cerr << "LOCAL: node=" <<stations.Get (0)->GetId ()<<"addr="<<local << std::endl;
 
   Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::UdpEchoServer/Rx",
   		   MakeCallback (&EchoServerRx));
@@ -102,7 +114,7 @@ int main (int argc, char *argv[])
   serverApps.Start (Seconds (1));
   clientApps.Start (Seconds (2));
 
-  Simulator::Stop (Seconds (10));
+  Simulator::Stop (Minutes (10));
   Simulator::Run ();
   Simulator::Destroy ();
 
