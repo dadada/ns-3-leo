@@ -32,12 +32,7 @@ if __name__ == "__main__":
     parser.add_argument('longitude', type=float)
     args = parser.parse_args()
 
-    planets = load('de421.bsp')
-    earth = planets['earth']
-    boston = Topos(args.latitude, args.latitude)
-    ts = load.timescale(builtin=True)
-    t = ts.now()
-    topo = boston.at(t)
-    d = topo.itrf_xyz().m
+    location = Topos(args.latitude, args.latitude)
+    d = location.itrf_xyz().m
     print(Vector(d[0], d[1], d[2]))
 
