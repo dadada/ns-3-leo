@@ -1,0 +1,72 @@
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+#ifndef LEO_CANNEL_HELPER_H
+#define LEO_CANNEL_HELPER_H
+
+#include <string>
+
+#include <ns3/object-factory.h>
+#include <ns3/net-device-container.h>
+#include <ns3/node-container.h>
+
+#include <ns3/trace-helper.h>
+
+namespace ns3 {
+
+/**
+ * \brief Build a channel for transmissions between ns3::LeoMockNetDevice s
+ */
+class LeoChannelHelper : public PcapHelperForDevice,
+	                 public AsciiTraceHelperForDevice
+{
+public:
+  LeoChannelHelper ();
+  virtual ~LeoChannelHelper ()
+    {};
+
+  NetDeviceContainer Install (NodeContainer &satellites, NodeContainer &stations);
+  NetDeviceContainer Install (std::vector<Ptr<Node> > &satellites, std::vector<Ptr<Node> > &stations);
+  NetDeviceContainer Install (std::vector<std::string> &satellites, std::vector<std::string> &stations);
+
+  void SetGndQueue (std::string type,
+                    std::string n1 = "", const AttributeValue &v1 = EmptyAttributeValue (),
+                    std::string n2 = "", const AttributeValue &v2 = EmptyAttributeValue (),
+                    std::string n3 = "", const AttributeValue &v3 = EmptyAttributeValue (),
+                    std::string n4 = "", const AttributeValue &v4 = EmptyAttributeValue ());
+
+  void SetSatQueue (std::string type,
+                    std::string n1 = "", const AttributeValue &v1 = EmptyAttributeValue (),
+                    std::string n2 = "", const AttributeValue &v2 = EmptyAttributeValue (),
+                    std::string n3 = "", const AttributeValue &v3 = EmptyAttributeValue (),
+                    std::string n4 = "", const AttributeValue &v4 = EmptyAttributeValue ());
+
+  void SetGndDeviceAttribute (std::string name, const AttributeValue &value);
+  void SetSatDeviceAttribute (std::string name, const AttributeValue &value);
+  void SetChannelAttribute (std::string name, const AttributeValue &value);
+
+  virtual void EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool promiscuous, bool explicitFilename);
+  virtual void EnableAsciiInternal (Ptr<OutputStreamWrapper> stream,
+  				    std::string prefix,
+  				    Ptr<NetDevice> nd,
+  				    bool explicitFilename);
+
+private:
+  ObjectFactory m_satQueueFactory;
+  ObjectFactory m_gndDeviceFactory;
+
+  ObjectFactory m_satDeviceFactory;
+  ObjectFactory m_gndQueueFactory;
+
+  ObjectFactory m_channelFactory;
+
+  void SetQueue (ObjectFactory &factory,
+	   	 std::string type,
+           	 std::string n1, const AttributeValue &v1,
+           	 std::string n2, const AttributeValue &v2,
+           	 std::string n3, const AttributeValue &v3,
+           	 std::string n4, const AttributeValue &v4);
+
+};
+
+};
+
+#endif /* LEO_CHANNEL_HELPER_H */

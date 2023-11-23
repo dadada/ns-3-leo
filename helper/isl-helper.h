@@ -128,7 +128,6 @@ public:
    */
   NetDeviceContainer Install (std::vector<std::string> &nodes);
 
-private:
   /**
    * \brief Enable pcap output the indicated net device.
    *
@@ -158,6 +157,8 @@ private:
     std::string prefix,
     Ptr<NetDevice> nd,
     bool explicitFilename);
+
+private:
 
   ObjectFactory m_queueFactory;         //!< Queue Factory
   ObjectFactory m_channelFactory;       //!< Channel Factory
