@@ -89,7 +89,7 @@ IslPropagationLossModel::DoCalcRxPower (double txPowerDbm,
 {
   if (!GetLos (a, b))
     {
-      return 0.0;
+      return -1000.0;
     }
 
   NS_LOG_INFO ("LOS;"<<a->GetPosition ()<<";"<<b->GetPosition ());

@@ -67,8 +67,8 @@ IslMockChannel::TransmitStart (
       NS_LOG_ERROR ("Source device unknown");
       return false;
     }
-  Ptr<MockNetDevice> src = DynamicCast<MockNetDevice> (GetDevice (srcId));
-  Ptr<MockNetDevice> dst = DynamicCast<MockNetDevice> (GetDevice (destAddr));
+  Ptr<MockNetDevice> src = StaticCast<MockNetDevice> (GetDevice (srcId));
+  Ptr<MockNetDevice> dst = StaticCast<MockNetDevice> (GetDevice (destAddr));
 
   if (dst == nullptr)
   {
@@ -78,7 +78,7 @@ IslMockChannel::TransmitStart (
         for (size_t i = 0; i < GetNDevices (); i ++)
           {
             if (i == srcId) continue;
-            dst = DynamicCast<MockNetDevice> (GetDevice (i));
+            dst = StaticCast<MockNetDevice> (GetDevice (i));
             Deliver (p, src, dst, txTime);
           }
         return true;

@@ -179,21 +179,22 @@ MockChannel::Deliver (
 
   if (srcMob != 0 && dstMob != 0)
     {
+      // performance optimization
+      if (srcMob->GetDistanceFrom (dstMob) > 3.0e6)
+      	{
+      	  return false;
+      	}
       Ptr<PropagationLossModel> pLoss = GetPropagationLoss ();
       if (pLoss != 0)
     	{
       	  // check if signal reaches destination
       	  rxPower = pLoss->CalcRxPower (txPower, srcMob, dstMob);
-      	  if (rxPower == 0.0)
+      	  if (rxPower == -1000.0)
     	    {
       	      return false;
     	    }
     	}
       delay += GetPropagationDelay (srcMob, dstMob, txTime);
-    }
-  else
-    {
-      return false;
     }
 
   Simulator::ScheduleWithContext (dst->GetNode ()->GetId (),

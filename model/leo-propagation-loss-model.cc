@@ -23,7 +23,7 @@ LeoPropagationLossModel::GetTypeId (void)
     .AddConstructor<LeoPropagationLossModel> ()
     .AddAttribute ("MaxDistance",
                    "Cut-off distance for signal propagation",
-                   DoubleValue (100000.0),
+                   DoubleValue (1000000.0),
                    MakeDoubleAccessor (&LeoPropagationLossModel::m_cutoffDistance),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("ElevationAngle",
@@ -78,13 +78,14 @@ LeoPropagationLossModel::DoCalcRxPower (double txPowerDbm,
 {
   if (a->GetDistanceFrom (b) > m_cutoffDistance || GetAngle (a, b) > m_elevationAngle / 2.0)
     {
-      return 0.0;
+      return -1000.0;
     }
 
   // txPowerDbm includes tx antenna gain and losses
   // receiver loss and gain added at net device
   // P_{RX} = P_{TX} + G_{TX} - L_{TX} - L_{FS} - L_M + G_{RX} - L_{RX}
   double rxc = txPowerDbm - m_atmosphericLoss - m_freeSpacePathLoss - m_linkMargin;
+  NS_LOG_DEBUG("rxc="<<rxc);
 
   return rxc;
 }

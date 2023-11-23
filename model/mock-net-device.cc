@@ -72,7 +72,7 @@ MockNetDevice::GetTypeId (void)
                    MakeTimeChecker ())
     .AddAttribute ("RxThreshold",
                    "Receive threshold in dBm",
-                   DoubleValue (0.0),
+                   DoubleValue (-1000.0),
                    MakeDoubleAccessor (&MockNetDevice::m_rxThreshold),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("TxPower",

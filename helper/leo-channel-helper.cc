@@ -114,11 +114,11 @@ LeoChannelHelper::SetConstellationAttributes (double eirp,
   m_gndDeviceFactory.Set ("TxPower", DoubleValue (eirp));
   m_satDeviceFactory.Set ("TxPower", DoubleValue (eirp));
 
-  m_gndDeviceFactory.Set ("RxGain", DoubleValue (rxGain));
   m_gndDeviceFactory.Set ("RxLoss", DoubleValue (rxLoss));
+  m_gndDeviceFactory.Set ("RxGain", DoubleValue (rxGain));
 
-  m_satDeviceFactory.Set ("RxLoss", DoubleValue (rxGain));
-  m_satDeviceFactory.Set ("RxGain", DoubleValue (rxLoss));
+  m_satDeviceFactory.Set ("RxLoss", DoubleValue (rxLoss));
+  m_satDeviceFactory.Set ("RxGain", DoubleValue (rxGain));
 
   m_gndDeviceFactory.Set ("DataRate", DataRateValue (DataRate (dataRate)));
   m_satDeviceFactory.Set ("DataRate", DataRateValue (DataRate (dataRate)));

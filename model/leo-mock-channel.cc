@@ -50,7 +50,7 @@ LeoMockChannel::TransmitStart (Ptr<const Packet> p,
       return false;
     }
 
-  Ptr<MockNetDevice> srcDev = DynamicCast<MockNetDevice> (GetDevice (devId));
+  Ptr<MockNetDevice> srcDev = StaticCast<MockNetDevice> (GetDevice (devId));
   if (srcDev == 0)
     {
       NS_LOG_ERROR ("Source device unknown");
@@ -89,7 +89,7 @@ LeoMockChannel::TransmitStart (Ptr<const Packet> p,
 int32_t
 LeoMockChannel::Attach (Ptr<MockNetDevice> device)
 {
-  Ptr<LeoMockNetDevice> leodev = DynamicCast<LeoMockNetDevice> (device);
+  Ptr<LeoMockNetDevice> leodev = StaticCast<LeoMockNetDevice> (device);
 
   // Add to index
   switch (leodev->GetDeviceType ())
