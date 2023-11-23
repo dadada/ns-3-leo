@@ -21,6 +21,7 @@ public:
 
 private:
   virtual void DoRun (void);
+  NodeContainer MakeSomeNodes (Vector position, size_t amount);
 };
 
 LeoTestCase1::LeoTestCase1 ()
@@ -32,26 +33,45 @@ LeoTestCase1::~LeoTestCase1 ()
 {
 }
 
+NodeContainer
+LeoTestCase1::MakeSomeNodes (Vector position, size_t amount)
+{
+  NodeContainer nodes;
+  for (uint32_t i = 0; i < amount; i ++)
+    {
+      Ptr<ConstantPositionMobilityModel> mob = CreateObject<ConstantPositionMobilityModel> ();
+      mob->SetPosition (Vector (i, 0, 0) + position);
+      Ptr<Node> node = CreateObject<Node> ();
+      node->AggregateObject (mob);
+      nodes.Add (node);
+    }
+
+  return nodes;
+}
+
 void
 LeoTestCase1::DoRun (void)
 {
-  Time::SetResolution (Time::MS);
+  Time::SetResolution (Time::NS);
 
-  std::vector<std::string> satWps =
-    {
-      "contrib/leo/data/test/waypoints.txt",
-      "contrib/leo/data/test/waypoints.txt",
-      "contrib/leo/data/test/waypoints.txt",
-      "contrib/leo/data/test/waypoints.txt",
-    };
+  //std::vector<std::string> satWps =
+  //  {
+  //    "contrib/leo/data/test/waypoints.txt",
+  //    "contrib/leo/data/test/waypoints.txt",
+  //    "contrib/leo/data/test/waypoints.txt",
+  //    "contrib/leo/data/test/waypoints.txt",
+  //  };
 
-  LeoSatNodeHelper satHelper;
-  NodeContainer satellites = satHelper.Install (satWps);
-  LeoGndNodeHelper gndHelper;
-  NodeContainer gateways = gndHelper.Install ("contrib/leo/data/test/ground-stations.txt");
-  NodeContainer terminals = gndHelper.Install ("contrib/leo/data/test/ground-stations.txt");
+  //LeoSatNodeHelper satHelper;
+  //NodeContainer satellites = satHelper.Install (satWps);
+  //LeoGndNodeHelper gndHelper;
+  //NodeContainer gateways = gndHelper.Install ("contrib/leo/data/test/ground-stations.txt");
+  //NodeContainer terminals = gndHelper.Install ("contrib/leo/data/test/ground-stations.txt");
+  NodeContainer satellites = MakeSomeNodes (Vector (0, 0, 1), 2);
+  // TODO disable forwarding for terminals, only for gateways
+  NodeContainer terminals = MakeSomeNodes (Vector (0, 0, 0), 2);
 
-  NetDeviceContainer islNet, gwNet, utNet;
+  NetDeviceContainer islNet, utNet;
 
   IslHelper islCh;
   islCh.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
@@ -61,18 +81,6 @@ LeoTestCase1::DoRun (void)
   //// TODO propagation loss from mobility model
   islCh.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::RangePropagationLossModel"));
   islNet = islCh.Install (satellites);
-
-  LeoChannelHelper gwCh;
-  gwCh.SetGndDeviceAttribute ("DataRate", StringValue ("10Mbps"));
-  gwCh.SetGndDeviceAttribute ("ReceiveErrorModel", StringValue ("ns3::BurstErrorModel"));
-  gwCh.SetSatDeviceAttribute ("DataRate", StringValue ("10Mbps"));
-  gwCh.SetSatDeviceAttribute ("ReceiveErrorModel", StringValue ("ns3::BurstErrorModel"));
-  gwCh.SetSatDeviceAttribute ("InterframeGap", TimeValue (Seconds (0.001)));
-  gwCh.SetGndDeviceAttribute ("InterframeGap", TimeValue (Seconds (0.001)));
-  gwCh.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
-  // TODO propagation loss from mobility model
-  gwCh.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::RangePropagationLossModel"));
-  gwNet = gwCh.Install (satellites, gateways);
 
   LeoChannelHelper utCh;
   utCh.SetGndDeviceAttribute ("DataRate", StringValue ("10Mbps"));
@@ -92,21 +100,18 @@ LeoTestCase1::DoRun (void)
   AodvHelper aodv;
   stack.SetRoutingHelper (aodv);
   stack.Install (satellites);
-  stack.Install (gateways);
   stack.Install (terminals);
 
   // Make all networks addressable for legacy protocol
   Ipv4AddressHelper ipv4;
   ipv4.SetBase ("10.1.0.0", "255.255.0.0");
   Ipv4InterfaceContainer islIp = ipv4.Assign (islNet);
-  ipv4.SetBase ("10.2.0.0", "255.255.0.0");
-  Ipv4InterfaceContainer gwIp = ipv4.Assign (gwNet);
   ipv4.SetBase ("10.3.0.0", "255.255.0.0");
   Ipv4InterfaceContainer utIp = ipv4.Assign (utNet);
 
+  // TODO do not add UTs to cache of other UTs
   //ArpCacheHelper arpCache;
   //arpCache.Install (islNet, islIp);
-  //arpCache.Install (gwNet, gwIp);
   //arpCache.Install (utNet, utIp);
 
   // we want to ping terminals
@@ -115,19 +120,19 @@ LeoTestCase1::DoRun (void)
 
   // install a client on one of the terminals
   ApplicationContainer clientApps;
-  Address remote = utIp.GetAddress (1, 0);
+  Address remote = utIp.GetAddress (3, 0);
   UdpEchoClientHelper echoClient (remote, 9);
-  echoClient.SetAttribute ("MaxPackets", UintegerValue (3));
-  echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
+  echoClient.SetAttribute ("MaxPackets", UintegerValue (10));
+  echoClient.SetAttribute ("Interval", TimeValue (Seconds (2.0)));
   echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
   clientApps.Add (echoClient.Install (terminals.Get (0)));
 
   serverApps.Start (Seconds (1.0));
   clientApps.Start (Seconds (2.0));
-  clientApps.Stop (Seconds (9.0));
-  serverApps.Stop (Seconds (10));
+  clientApps.Stop (Seconds (60));
+  serverApps.Stop (Seconds (60));
 
-  Simulator::Stop (Seconds (12));
+  Simulator::Stop (Seconds (60));
   Simulator::Run ();
   Simulator::Destroy ();
 }
