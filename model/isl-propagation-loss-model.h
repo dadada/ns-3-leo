@@ -1,26 +1,4 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-/*
- * Copyright (c) 2005,2006,2007 INRIA
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation;
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * Author: Mathieu Lacage <mathieu.lacage@sophia.inria.fr>
- * Contributions: Timo Bingmann <timo.bingmann@student.kit.edu>
- * Contributions: Gary Pei <guangyu.pei@boeing.com> for fixed RSS
- * Contributions: Tom Hewer <tomhewer@mac.com> for two ray ground model
- *                Pavel Boyko <boyko@iitp.ru> for matrix
- */
 
 #ifndef ISL_PROPAGATION_LOSS_MODEL_H
 #define ISL_PROPAGATION_LOSS_MODEL_H
@@ -28,13 +6,13 @@
 #include <ns3/object.h>
 #include <ns3/propagation-loss-model.h>
 
+#define LEO_EARTH_RAD 6.371009e6
+
 namespace ns3 {
 
 class IslPropagationLossModel : public PropagationLossModel
 {
 public:
-  static const double EARTH_RAD_E6;
-
   static TypeId GetTypeId (void);
   IslPropagationLossModel ();
   virtual ~IslPropagationLossModel ();
@@ -50,6 +28,14 @@ public:
    */
   static bool GetLos (Ptr<MobilityModel> a, Ptr<MobilityModel> b);
 private:
+  /**
+   * Cutoff distance for signal
+   */
+  double m_cutoffDistance;
+
+  void SetCutoffDistance (double d);
+  double GetCutoffDistance () const;
+
   /**
    * Returns the Rx Power taking into account only the particular
    * PropagationLossModel.

@@ -103,26 +103,26 @@ LeoPropagationLossModel::DoCalcRxPower (double txPowerDbm,
                                         Ptr<MobilityModel> b) const
 {
   double distance = a->GetDistanceFrom (b);
-  double angle = GetAngle (a, b);
-  double rxc = txPowerDbm - m_atmosphericLoss - m_freeSpacePathLoss - m_linkMargin;
-
-  NS_LOG_DEBUG ("LEO propagation: a=" << a->GetPosition () << " b=" << b->GetPosition () << " m_cutOff="<<m_cutoffDistance<<" m_angle="<<m_elevationAngle<<" dist=" << distance << "angle=" << angle << "rxc=" << rxc);
 
   if (distance > m_cutoffDistance)
     {
-      NS_LOG_DEBUG ("LEO DROP DISTANCE: " << distance);
+      NS_LOG_DEBUG ("LEO DROP distance: a=" << a->GetPosition () << " b=" << b->GetPosition () << " m_cutOff="<<m_cutoffDistance<<" dist=" << distance);
+
       return -1000.0;
     }
 
+  double angle = GetAngle (a, b);
   if (angle > m_elevationAngle / 2.0)
     {
-      NS_LOG_DEBUG ("LEO DROP ANGLE: " << angle <<"; " << distance);
+      NS_LOG_DEBUG ("LEO DROP angle: a=" << a->GetPosition () << " b=" << b->GetPosition () << " m_cutOff="<<m_cutoffDistance<<" m_angle="<<m_elevationAngle<<" dist=" << distance << "angle=" << angle);
       return -1000.0;
     }
 
   // txPowerDbm includes tx antenna gain and losses
   // receiver loss and gain added at net device
   // P_{RX} = P_{TX} + G_{TX} - L_{TX} - L_{FS} - L_M + G_{RX} - L_{RX}
+  double rxc = txPowerDbm - m_atmosphericLoss - m_freeSpacePathLoss - m_linkMargin;
+  NS_LOG_INFO ("LEO TRANSMIT: angle=" << angle <<";distance=" << distance << ";rxc=" << rxc);
 
   return rxc;
 }
