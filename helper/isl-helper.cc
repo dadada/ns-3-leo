@@ -101,7 +101,7 @@ IslHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool promi
     }
 
   Ptr<PcapFileWrapper> file = pcapHelper.CreateFile (filename, std::ios::out,
-                                                     PcapHelper::DLT_PPP);
+                                                     PcapHelper::DLT_EN10MB);
   pcapHelper.HookDefaultSink<MockNetDevice> (device, "PromiscSniffer", file);
 }
 

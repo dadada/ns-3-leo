@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef ISL_NET_DEVICE_H
-#define ISL_NET_DEVICE_H
+#ifndef MOCK_NET_DEVICE_H
+#define MOCK_NET_DEVICE_H
 
 #include <cstring>
 
@@ -40,28 +40,6 @@ class NetDeviceQueueInterface;
 class MockChannel;
 class ErrorModel;
 
-/**
- * \defgroup point-to-point Point-To-Point Network Device
- * This section documents the API of the ns-3 point-to-point module. For a
- * functional description, please refer to the ns-3 manual here:
- * http://www.nsnam.org/docs/models/html/point-to-point.html
- *
- * Be sure to read the manual BEFORE going down to the API.
- */
-
-/**
- * \ingroup point-to-point
- * \class MockNetDevice
- * \brief A Device for a Point to Point Network Link.
- *
- * This MockNetDevice class specializes the NetDevice abstract
- * base class.  Together with a MockChannel (and a peer
- * MockNetDevice), the class models, with some level of
- * abstraction, a generic point-to-point or serial link.
- * Key parameters or objects that can be specified for this device
- * include a queue, data rate, and interframe transmission gap (the
- * propagation delay is set in the MockChannel).
- */
 class MockNetDevice : public NetDevice
 {
 public:
@@ -476,20 +454,6 @@ private:
   uint32_t m_channelDevId;
 
   Ptr<Packet> m_currentPkt; //!< Current packet processed
-
-  /**
-   * \brief PPP to Ethernet protocol number mapping
-   * \param protocol A PPP protocol number
-   * \return The corresponding Ethernet protocol number
-   */
-  static uint16_t PppToEther (uint16_t protocol);
-
-  /**
-   * \brief Ethernet to PPP protocol number mapping
-   * \param protocol An Ethernet protocol number
-   * \return The corresponding PPP protocol number
-   */
-  static uint16_t EtherToPpp (uint16_t protocol);
 };
 
 } // namespace ns3

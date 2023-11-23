@@ -114,7 +114,7 @@ LeoChannelHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, boo
     }
 
   Ptr<PcapFileWrapper> file = pcapHelper.CreateFile (filename, std::ios::out,
-                                                     PcapHelper::DLT_PPP);
+                                                     PcapHelper::DLT_EN10MB);
   pcapHelper.HookDefaultSink<LeoMockNetDevice> (device, "PromiscSniffer", file);
 }
 

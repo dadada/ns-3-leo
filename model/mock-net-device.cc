@@ -27,6 +27,7 @@
 #include "ns3/pointer.h"
 #include "ns3/net-device-queue-interface.h"
 #include "ns3/ethernet-header.h"
+#include "ns3/ethernet-trailer.h"
 #include "mock-channel.h"
 #include "mock-net-device.h"
 
@@ -191,11 +192,54 @@ MockNetDevice::AddHeader (Ptr<Packet> p,
 			  uint16_t protocolNumber)
 {
   NS_LOG_FUNCTION (this << p << protocolNumber);
-  EthernetHeader ethernet;
-  ethernet.SetLengthType (protocolNumber);
-  ethernet.SetSource (Mac48Address::ConvertFrom (src));
-  ethernet.SetDestination (Mac48Address::ConvertFrom (dst));
-  p->AddHeader (ethernet);
+  EthernetHeader header (false);
+  header.SetSource (Mac48Address::ConvertFrom (src));
+  header.SetDestination (Mac48Address::ConvertFrom (dst));
+
+  EthernetTrailer trailer;
+
+  NS_LOG_LOGIC ("p->GetSize () = " << p->GetSize ());
+  NS_LOG_LOGIC ("m_mtu = " << m_mtu);
+
+  uint16_t lengthType = 0;
+
+  NS_LOG_LOGIC ("Encapsulating packet as LLC (length interpretation)");
+
+  LlcSnapHeader llc;
+  llc.SetType (protocolNumber);
+  p->AddHeader (llc);
+
+  //
+  // This corresponds to the length interpretation of the lengthType
+  // field but with an LLC/SNAP header added to the payload as in
+  // IEEE 802.2
+  //
+  lengthType = p->GetSize ();
+
+  //
+  // All Ethernet frames must carry a minimum payload of 46 bytes.  The
+  // LLC SNAP header counts as part of this payload.  We need to padd out
+  // if we don't have enough bytes.  These must be real bytes since they
+  // will be written to pcap files and compared in regression trace files.
+  //
+  if (p->GetSize () < 46)
+    {
+      uint8_t buffer[46];
+      memset (buffer, 0, 46);
+      Ptr<Packet> padd = Create<Packet> (buffer, 46 - p->GetSize ());
+      p->AddAtEnd (padd);
+    }
+
+  NS_LOG_LOGIC ("header.SetLengthType (" << lengthType << ")");
+  header.SetLengthType (lengthType);
+  p->AddHeader (header);
+
+  if (Node::ChecksumEnabled ())
+    {
+      trailer.EnableFcs (true);
+    }
+  trailer.CalcFcs (p);
+  p->AddTrailer (trailer);
 }
 
 void
@@ -364,6 +408,13 @@ MockNetDevice::Receive (Ptr<Packet> packet, Ptr<MockNetDevice> senderDevice)
 {
   NS_LOG_FUNCTION (this << packet << senderDevice);
 
+  if (senderDevice == this)
+    {
+      return;
+    }
+
+  m_phyRxEndTrace (packet);
+
   if (m_receiveErrorModel && m_receiveErrorModel->IsCorrupt (packet) )
     {
       //
@@ -371,60 +422,85 @@ MockNetDevice::Receive (Ptr<Packet> packet, Ptr<MockNetDevice> senderDevice)
       // corrupted packet, don't forward this packet up, let it go.
       //
       m_phyRxDropTrace (packet);
+
+      return;
+    }
+
+  //
+  // Trace sinks will expect complete packets, not packets without some of the
+  // headers.
+  //
+  Ptr<Packet> originalPacket = packet->Copy ();
+
+  EthernetTrailer trailer;
+  packet->RemoveTrailer (trailer);
+  if (Node::ChecksumEnabled ())
+    {
+      trailer.EnableFcs (true);
+    }
+
+  bool crcGood = trailer.CheckFcs (packet);
+  if (!crcGood)
+    {
+      NS_LOG_INFO ("CRC error on Packet " << packet);
+      m_phyRxDropTrace (packet);
+      return;
+    }
+
+  EthernetHeader header;
+  packet->RemoveHeader (header);
+
+  uint16_t protocol;
+
+  if (header.GetLengthType () <= 1500)
+    {
+      NS_ASSERT (packet->GetSize () >= header.GetLengthType ());
+      uint32_t padlen = packet->GetSize () - header.GetLengthType ();
+      NS_ASSERT (padlen <= 46);
+      if (padlen > 0)
+        {
+          packet->RemoveAtEnd (padlen);
+        }
+
+      LlcSnapHeader llc;
+      packet->RemoveHeader (llc);
+      protocol = llc.GetType ();
     }
   else
     {
-      //
-      // Hit the trace hooks.  All of these hooks are in the same place in this
-      // device because it is so simple, but this is not usually the case in
-      // more complicated devices.
-      //
-      m_snifferTrace (packet);
-      m_promiscSnifferTrace (packet);
-      m_phyRxEndTrace (packet);
-
-      //
-      // Trace sinks will expect complete packets, not packets without some of the
-      // headers.
-      //
-      Ptr<Packet> originalPacket = packet->Copy ();
-
-      EthernetHeader header;
-      packet->RemoveHeader (header);
-      uint16_t protocol = header.GetLengthType ();
-
-      PacketType packetType;
-      if (header.GetDestination ().IsBroadcast ())
-      	{
-      	  packetType = PACKET_BROADCAST;
-      	}
-      else if (header.GetDestination () == m_address)
-      	{
-      	  packetType = PACKET_HOST;
-      	}
-      else if (header.GetDestination ().IsGroup ())
-      	{
-      	  packetType = PACKET_MULTICAST;
-      	}
-      else
-      	{
-      	  packetType = PACKET_OTHERHOST;
-      	}
-
-      // TODO sniffer trace
-      Address remote = GetRemote (senderDevice);
-      if (!m_promiscCallback.IsNull ())
-        {
-          m_macPromiscRxTrace (originalPacket);
-          m_promiscCallback (this, packet, protocol, remote, GetAddress (), NetDevice::PACKET_HOST);
-        }
-
-      if (packetType != PACKET_OTHERHOST) {
-      	  NS_LOG_INFO ("[node " << m_node->GetId () << "] received packet on " << m_ifIndex << " from " << remote << " for " << header.GetDestination ());
-      	  m_macRxTrace (originalPacket);
-      	  m_rxCallback (this, packet, protocol, remote);
-      }
+      protocol = header.GetLengthType ();
     }
+
+  PacketType packetType;
+  if (header.GetDestination ().IsBroadcast ())
+    {
+      packetType = PACKET_BROADCAST;
+    }
+  else if (header.GetDestination () == m_address)
+    {
+      packetType = PACKET_HOST;
+    }
+  else if (header.GetDestination ().IsGroup ())
+    {
+      packetType = PACKET_MULTICAST;
+    }
+  else
+    {
+      packetType = PACKET_OTHERHOST;
+    }
+
+  m_promiscSnifferTrace (originalPacket);
+  if (!m_promiscCallback.IsNull ())
+    {
+      m_macPromiscRxTrace (originalPacket);
+      m_promiscCallback (this, packet, protocol, header.GetSource (), header.GetDestination (), packetType);
+    }
+
+  if (packetType != PACKET_OTHERHOST) {
+      NS_LOG_INFO ("[node " << m_node->GetId () << "] received packet on " << m_ifIndex << " from " << header.GetSource () << " for " << header.GetDestination ());
+      m_macRxTrace (originalPacket);
+      m_rxCallback (this, packet, protocol, header.GetSource ());
+  }
 }
 
 Ptr<Queue<Packet> >
@@ -579,7 +655,9 @@ MockNetDevice::Send (Ptr<Packet> packet,
       return false;
     }
 
-  AddHeader (packet, m_address, dest, protocolNumber);
+  Mac48Address destination = Mac48Address::ConvertFrom (dest);
+  Mac48Address source = Mac48Address::ConvertFrom (m_address);
+  AddHeader (packet, source, destination, protocolNumber);
 
   m_macTxTrace (packet);
 
@@ -594,10 +672,9 @@ MockNetDevice::Send (Ptr<Packet> packet,
       if (m_txMachineState == READY)
         {
           packet = m_queue->Dequeue ();
-          m_snifferTrace (packet);
           m_promiscSnifferTrace (packet);
-          bool ret = TransmitStart (packet, dest);
-          return ret;
+          m_snifferTrace (packet);
+          TransmitStart (packet, dest);
         }
       return true;
     }
@@ -686,38 +763,10 @@ MockNetDevice::GetMtu (void) const
   return m_mtu;
 }
 
-uint16_t
-MockNetDevice::PppToEther (uint16_t proto)
-{
-  NS_LOG_FUNCTION_NOARGS();
-  switch(proto)
-    {
-    case 0x0021: return 0x0800;   //IPv4
-    case 0x0057: return 0x86DD;   //IPv6
-    case 2054: return 0x0806;   //ARP
-    default: NS_ASSERT_MSG (false, "PPP Protocol number not defined!");
-    }
-  return 0;
-}
-
-uint16_t
-MockNetDevice::EtherToPpp (uint16_t proto)
-{
-  NS_LOG_FUNCTION_NOARGS();
-  switch(proto)
-    {
-    case 0x0800: return 0x0021;   //IPv4
-    case 0x86DD: return 0x0057;   //IPv6
-    case 0x0806: return 2054;   //ARP
-    default: NS_ASSERT_MSG (false, "PPP Protocol number not defined!");
-    }
-  return 0;
-}
-
 bool
 MockNetDevice::IsPointToPoint() const
 {
-  return true;
+  return false;
 }
 
 } // namespace ns3

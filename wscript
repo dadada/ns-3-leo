@@ -37,6 +37,7 @@ def build(bld):
         'test/leo-mock-channel-test-suite.cc',
         'test/leo-propagation-test-suite.cc',
         'test/leo-test-suite.cc',
+        'test/leo-trace-test-suite.cc',
         'test/satellite-node-helper-test-suite.cc',
     ]
 
