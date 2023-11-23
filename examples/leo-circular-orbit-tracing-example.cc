@@ -32,11 +32,11 @@ public:
 int main(int argc, char *argv[])
 {
   std::vector<Orbit> orbits = {
-      Orbit (1.150, 53.0, 32, 50),
-      Orbit (1.110, 53.8, 32, 50),
-      Orbit (1.130, 74.0,  8, 50),
-      Orbit (1.275, 81, 5, 75),
-      Orbit (1.325, 70, 6, 75),
+      Orbit (1150, 53.0, 32, 50),
+      Orbit (1110, 53.8, 32, 50),
+      Orbit (1130, 74.0,  8, 50),
+      Orbit (1275, 81, 5, 75),
+      Orbit (1325, 70, 6, 75),
   };
   NodeContainer satellites;
   for (Orbit orb: orbits)
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 
   outfile << "Time,Satellite,x,y,z,Speed" << std::endl;
 
-  Simulator::Stop (Hours (2.0));
+  Simulator::Stop (Hours (24));
   Simulator::Run ();
   Simulator::Destroy ();
 }

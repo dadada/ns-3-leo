@@ -38,7 +38,7 @@ private:
     mob->SetAttribute ("Altitude", DoubleValue (0.0));
     mob->SetAttribute ("Inclination", DoubleValue (1.0));
 
-    NS_TEST_ASSERT_MSG_EQ_TOL (mob->GetPosition ().GetLength(), LEO_EARTH_RAD_M, 0.1, "Unexpected position on earths surface for 1 deg inclination");
+    NS_TEST_ASSERT_MSG_EQ_TOL (mob->GetPosition ().GetLength() / 1000, LEO_EARTH_RAD_KM, 0.1, "Unexpected position on earths surface for 1 deg inclination");
   }
 };
 
@@ -51,7 +51,7 @@ private:
   void TestLengthPosition (double expl, double expx, Ptr<LeoCircularOrbitMobilityModel> mob)
   {
     Vector pos = mob->GetPosition ();
-    NS_TEST_EXPECT_MSG_EQ_TOL_INTERNAL (pos.GetLength (), expl, 0.001, "Distance to earth should be the same", __FILE__, __LINE__);
+    NS_TEST_EXPECT_MSG_EQ_TOL_INTERNAL (pos.GetLength () / 1000, expl, 0.001, "Distance to earth should be the same", __FILE__, __LINE__);
     NS_TEST_EXPECT_MSG_NE_INTERNAL (pos.x, expx, "Position should not be equal", __FILE__, __LINE__);
   }
 
@@ -62,7 +62,7 @@ private:
     mob->SetAttribute ("Inclination", DoubleValue (20.0));
 
     Vector pos = mob->GetPosition ();
-    Simulator::Schedule (Seconds (100.0), &LeoOrbitProgressTestCase::TestLengthPosition, this, LEO_EARTH_RAD_M, pos.x, mob);
+    Simulator::Schedule (Seconds (100.0), &LeoOrbitProgressTestCase::TestLengthPosition, this, LEO_EARTH_RAD_KM, pos.x, mob);
     Simulator::Stop (Seconds (101.0));
     Simulator::Run ();
     Simulator::Destroy ();

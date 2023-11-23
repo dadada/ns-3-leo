@@ -82,8 +82,9 @@ LeoCircularOrbitMobilityModel::GetSpeed () const
 Vector
 LeoCircularOrbitMobilityModel::DoGetVelocity () const
 {
-  Vector3D heading = CrossProduct (PlaneNorm (), DoGetPosition ());
-  // TODO
+  Vector3D pos = DoGetPosition ();
+  pos = Vector3D (pos.x / pos.GetLength (), pos.y / pos.GetLength (), pos.z / pos.GetLength ());
+  Vector3D heading = CrossProduct (PlaneNorm (), pos);
   return Product (GetSpeed (), heading);
 }
 
@@ -106,7 +107,7 @@ LeoCircularOrbitMobilityModel::GetProgress (Time t) const
     {
       sign = -1;
     }
-  return sign * (2 * M_PI * ((GetSpeed () * t.GetSeconds ()) / LEO_EARTH_RAD_M)) + m_offset;
+  return sign * (2 * M_PI * ((GetSpeed () * t.GetSeconds ()) / LEO_EARTH_RAD_KM)) + m_offset;
 }
 
 Vector3D
@@ -130,7 +131,7 @@ LeoCircularOrbitMobilityModel::CalcPosition (Time t) const
 {
   double lat = CalcLatitude ();
   // account for orbit latitude and earth rotation offset
-  Vector3D x = Product (m_orbitHeight, Vector3D (cos (m_inclination) * cos (lat),
+  Vector3D x = Product (m_orbitHeight*1000, Vector3D (cos (m_inclination) * cos (lat),
   			       cos (m_inclination) * sin (lat),
   			       sin (m_inclination)));
 
@@ -175,12 +176,12 @@ LeoCircularOrbitMobilityModel::DoSetPosition (const Vector &position)
 
 double LeoCircularOrbitMobilityModel::GetAltitude () const
 {
-  return m_orbitHeight - LEO_EARTH_RAD_M;
+  return m_orbitHeight - LEO_EARTH_RAD_KM;
 }
 
 void LeoCircularOrbitMobilityModel::SetAltitude (double h)
 {
-  m_orbitHeight = LEO_EARTH_RAD_M + h;
+  m_orbitHeight = LEO_EARTH_RAD_KM + h;
   Update ();
 }
 

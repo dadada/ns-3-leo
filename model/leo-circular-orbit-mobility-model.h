@@ -9,7 +9,7 @@
 #include "ns3/mobility-model.h"
 #include "ns3/nstime.h"
 
-#define LEO_EARTH_RAD_M 6371009.0
+#define LEO_EARTH_RAD_KM 6371.0090
 #define LEO_EARTH_GM_KM_E10 39.8600436
 
 namespace ns3 {
