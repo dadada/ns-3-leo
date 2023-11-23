@@ -44,7 +44,7 @@ namespace ns3 {
 #define LEO_ONEWEB_GATEWAY_RX_EB_N0_I0      13.3            // dB
 #define LEO_ONEWEB_GATEWAY_REQ_EB_N0        12.3            // dB
 #define LEO_ONEWEB_GATEWAY_LINK_MARGIN      1.03            // dB
-#define LEO_ONEWEB_GATEWAY_DATA_RATE        1341.1          // Mbps
+#define LEO_ONEWEB_GATEWAY_DATA_RATE        "1341.1Mbps"          // Mbps
 #define LEO_ONEWEB_GATEWAY_SHANNON_LIMIT    1.06            // dB
 
 // user uplink
@@ -68,7 +68,7 @@ namespace ns3 {
 #define LEO_ONEWEB_USER_RX_EB_N0_I0          5.5            // dB
 #define LEO_ONEWEB_USER_REQ_EB_N0            4.6            // dB
 #define LEO_ONEWEB_USER_LINK_MARGIN          0.85           // dB
-#define LEO_ONEWEB_USER_DATA_RATE            558.7          // Mbps
+#define LEO_ONEWEB_USER_DATA_RATE            "558.7Mbps"          // Mbps
 #define LEO_ONEWEB_USER_SHANNON_LIMIT        1.49           // dB
 
 };

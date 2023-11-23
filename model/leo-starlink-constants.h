@@ -44,7 +44,7 @@ namespace ns3 {
 #define LEO_STARLINK_GATEWAY_RX_EB_N0_I0      13.3           // dB
 #define LEO_STARLINK_GATEWAY_REQ_EB_N0        12.3           // dB
 #define LEO_STARLINK_GATEWAY_LINK_MARGIN      1.02           // dB
-#define LEO_STARLINK_GATEWAY_DATA_RATE        2682.1         // Mbps
+#define LEO_STARLINK_GATEWAY_DATA_RATE        "2682.1Mbps"         // Mbps
 #define LEO_STARLINK_GATEWAY_SHANNON_LIMIT    1.06           // dB
 
 // user uplink
@@ -68,7 +68,7 @@ namespace ns3 {
 #define LEO_STARLINK_USER_RX_EB_N0_I0         6.7            // dB
 #define LEO_STARLINK_USER_REQ_EB_N0           5.9            // dB
 #define LEO_STARLINK_USER_LINK_MARGIN         0.82           // dB
-#define LEO_STARLINK_USER_DATA_RATE           674.3          // Mbps
+#define LEO_STARLINK_USER_DATA_RATE           "674.3Mbps"          // Mbps
 #define LEO_STARLINK_USER_SHANNON_LIMIT       1.46           // dB
 
 };

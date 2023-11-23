@@ -76,7 +76,7 @@ private:
 				   double fspl,
 				   double atmosphericLoss,
 				   double linkMargin,
-				   double dataRate,
+				   std::string dataRate,
 				   double rxGain,
 				   double rxLoss);
 };

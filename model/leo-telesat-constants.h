@@ -44,7 +44,7 @@ namespace ns3 {
 #define LEO_TELESAT_GATEWAY_RX_EB_N0_I0      11.4         // dB
 #define LEO_TELESAT_GATEWAY_REQ_EB_N0        11.0         // dB
 #define LEO_TELESAT_GATEWAY_LINK_MARGIN      0.36         // dB
-#define LEO_TELESAT_GATEWAY_DATA_RATE        9857.1       // Mbps
+#define LEO_TELESAT_GATEWAY_DATA_RATE        "9857.1Mbps"       // Mbps
 #define LEO_TELESAT_GATEWAY_SHANNON_LIMIT    1.09         // dB
 
 // user uplink
@@ -68,7 +68,7 @@ namespace ns3 {
 #define LEO_TELESAT_USER_RX_EB_N0_I0          5.9         // dB
 #define LEO_TELESAT_USER_REQ_EB_N0            5.2         // dB
 #define LEO_TELESAT_USER_LINK_MARGIN          0.76        // dB
-#define LEO_TELESAT_USER_DATA_RATE            599.4       // Mbps
+#define LEO_TELESAT_USER_DATA_RATE            "599.4Mbps"       // Mbps
 #define LEO_TELESAT_USER_SHANNON_LIMIT        1.49        // dB
 
 };

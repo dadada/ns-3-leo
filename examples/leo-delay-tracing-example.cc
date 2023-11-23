@@ -69,7 +69,7 @@ int main (int argc, char *argv[])
   islNet = islCh.Install (satellites);
 
   LeoChannelHelper utCh;
-  utCh.SetConstellation ("TelesatUser");
+  utCh.SetConstellation ("StarlinkUser");
   utNet = utCh.Install (satellites, stations);
 
   // Install internet stack on nodes
@@ -101,17 +101,17 @@ int main (int argc, char *argv[])
 
   // we want to ping terminals
   UdpServerHelper echoServer (9);
-  ApplicationContainer serverApps = echoServer.Install (stations.Get (1));
+  ApplicationContainer serverApps = echoServer.Install (stations.Get (100));
 
   // install a client on one of the terminals
   ApplicationContainer clientApps;
-  Address remote = stations.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();//utIp.GetAddress (1, 0);
+  Address remote = stations.Get (100)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();//utIp.GetAddress (1, 0);
   std::cout << "REMOTE=" << Ipv4Address::ConvertFrom (remote);
   UdpClientHelper echoClient (remote, 9);
   echoClient.SetAttribute ("MaxPackets", UintegerValue (60));
   echoClient.SetAttribute ("Interval", TimeValue (Seconds (1)));
   echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
-  clientApps.Add (echoClient.Install (stations.Get (3)));
+  clientApps.Add (echoClient.Install (stations.Get (103)));
 
   Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::UdpServer/Rx",
   		   MakeCallback (&EchoRx));

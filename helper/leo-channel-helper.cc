@@ -107,7 +107,7 @@ LeoChannelHelper::SetConstellationAttributes (double eirp,
 					      double fspl,
 					      double atmosphericLoss,
 					      double linkMargin,
-					      double dataRate,
+					      std::string dataRate,
 					      double rxGain,
 					      double rxLoss)
 {
@@ -120,8 +120,8 @@ LeoChannelHelper::SetConstellationAttributes (double eirp,
   m_satDeviceFactory.Set ("RxLoss", DoubleValue (rxLoss));
   m_satDeviceFactory.Set ("RxGain", DoubleValue (rxGain));
 
-  m_gndDeviceFactory.Set ("DataRate", DataRateValue (DataRate (dataRate)));
-  m_satDeviceFactory.Set ("DataRate", DataRateValue (DataRate (dataRate)));
+  m_gndDeviceFactory.Set ("DataRate", StringValue (dataRate));
+  m_satDeviceFactory.Set ("DataRate", StringValue (dataRate));
 
   m_propagationLossFactory.Set ("ElevationAngle", DoubleValue (elevationAngle));
   m_propagationLossFactory.Set ("FreeSpacePathLoss", DoubleValue (fspl));
