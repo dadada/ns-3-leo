@@ -68,11 +68,7 @@ IslIcmpTestCase::DoRun (void)
 
   std::vector<std::string> satWps =
     {
-      // TODO use different waypoints
-      "contrib/leo/data/starlink/45391.waypoints",
-      "contrib/leo/data/starlink/45392.waypoints",
-      "contrib/leo/data/starlink/45393.waypoints",
-      "contrib/leo/data/starlink/45394.waypoints",
+      "contrib/leo/data/test/waypoints.txt",
     };
 
   LeoSatNodeHelper satHelper;

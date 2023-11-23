@@ -55,7 +55,7 @@ void
 LeoMobilityWaypointTestCase::DoRun (void)
 {
   Ptr<LeoWaypointInputFileStreamContainer> container = CreateObject<LeoWaypointInputFileStreamContainer> ();
-  container->SetAttribute("File", StringValue ("contrib/leo/data/waypoints.txt"));
+  container->SetAttribute("File", StringValue ("contrib/leo/data/test/waypoints.txt"));
   container->SetAttribute("LastTime", TimeValue (Time (0)));
 
   Ptr<WaypointMobilityModel> mobility = CreateObject<WaypointMobilityModel> ();
