@@ -30,7 +30,7 @@ LeoWaypointInputFileStreamContainer::GetTypeId (void)
 
 LeoWaypointInputFileStreamContainer::LeoWaypointInputFileStreamContainer () :
   m_filePath (),
-  m_input ()
+  m_lastTime (0)
 {
 }
 
@@ -66,7 +66,7 @@ LeoWaypointInputFileStreamContainer::GetNextSample (Waypoint &sample)
   sample.time = Time (0);
   sample.position = Vector (0.0, 0.0, 0.0);
   bool updated = false;
-  while (sample.time < m_lastTime && (m_input >> sample))
+  while (sample.time <= m_lastTime && (m_input >> sample))
     {
       updated = true;
     }

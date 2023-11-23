@@ -8,7 +8,6 @@
 #include "ns3/core-module.h"
 
 #include "ns3/leo-module.h"
-
 #include "ns3/test.h"
 
 using namespace ns3;
@@ -38,17 +37,23 @@ LeoTestCase1::DoRun (void)
 {
   Time::SetResolution (Time::NS);
 
-  NodeContainer satellites;
-  satellites.Create (100);
-  NodeContainer gateways;
-  gateways.Create (10);
-  NodeContainer terminals;
-  terminals.Create (20);
+  std::vector<std::string> satWps =
+    {
+      "../contrib/leo/data/starlink/45212.waypoints",
+      "../contrib/leo/data/starlink/45213.waypoints",
+      "../contrib/leo/data/starlink/45214.waypoints",
+      "../contrib/leo/data/starlink/45215.waypoints",
+    };
+
+  LeoSatNodeHelper satHelper;
+  NodeContainer satellites = satHelper.Install (satWps);
+  LeoGndNodeHelper gndHelper;
+  NodeContainer gateways = gndHelper.Install ("../contrib/leo/data/gateways");
+  NodeContainer terminals = gndHelper.Install ("../contrib/leo/data/terminals");
 
   LeoHelper leo;
   leo.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
   leo.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
-  leo.SetDeviceAttribute ("MobilityModel", StringValue ("ns3::WaypointMobilityModel"));
 
   NetDeviceContainer allDevices = leo.Install (satellites, gateways, terminals);
 

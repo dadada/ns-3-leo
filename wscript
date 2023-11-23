@@ -9,18 +9,20 @@
 def build(bld):
     module = bld.create_ns3_module('leo', ['core','internet', 'propagation', 'stats', 'traffic', 'flow-monitor', 'applications'])
     module.source = [
-        'model/isl-mock-channel.cc',
-        'model/isl-propagation-loss-model.cc',
         'helper/isl-helper.cc',
-        'model/leo.cc',
         'helper/leo-channel-helper.cc',
+        'helper/leo-helper.cc',
+        'helper/nd-cache-helper.cc',
+        'helper/ground-node-helper.cc',
+        'helper/satellite-node-helper.cc',
+        'model/leo.cc',
         'model/leo-mock-channel.cc',
         'model/leo-mock-net-device.cc',
-        'helper/leo-helper.cc',
         'model/leo-propagation-loss-model.cc',
         'model/mock-net-device.cc',
         'model/mock-channel.cc',
-        'helper/nd-cache-helper.cc',
+        'model/isl-mock-channel.cc',
+        'model/isl-propagation-loss-model.cc',
         'utils/leo-input-fstream-container.cc',
         ]
 
@@ -32,23 +34,27 @@ def build(bld):
         'test/leo-mock-channel-test-suite.cc',
         'test/leo-input-fstream-container-test-suite.cc',
         'test/leo-mobility-test-suite.cc',
+        'test/satellite-node-helper-test-suite.cc',
+        'test/ground-node-helper-test-suite.cc',
         ]
 
     headers = bld(features='ns3header')
     headers.module = 'leo'
     headers.source = [
-        'model/isl-mock-channel.h',
-        'model/isl-propagation-loss-model.h',
         'helper/isl-helper.h',
-        'model/leo.h',
         'helper/leo-channel-helper.h',
+        'helper/leo-helper.h',
+        'helper/nd-cache-helper.h',
+        'helper/ground-node-helper.h',
+        'helper/satellite-node-helper.h',
+        'model/leo.h',
         'model/leo-mock-channel.h',
         'model/leo-mock-net-device.h',
-        'helper/leo-helper.h',
         'model/leo-propagation-loss-model.h',
         'model/mock-net-device.h',
         'model/mock-channel.h',
-        'helper/nd-cache-helper.h',
+        'model/isl-mock-channel.h',
+        'model/isl-propagation-loss-model.h',
         'utils/leo-input-fstream-container.h',
         ]
 
