@@ -42,7 +42,7 @@ LeoCircularOrbitMobilityModel::GetTypeId ()
   return tid;
 }
 
-LeoCircularOrbitMobilityModel::LeoCircularOrbitMobilityModel() : MobilityModel (), m_latitude (0.0), m_offset (0.0), m_position ()
+LeoCircularOrbitMobilityModel::LeoCircularOrbitMobilityModel() : MobilityModel (), m_longitude (0.0), m_offset (0.0), m_position ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
@@ -123,7 +123,7 @@ LeoCircularOrbitMobilityModel::RotatePlane (double a, const Vector3D &x) const
 double
 LeoCircularOrbitMobilityModel::CalcLatitude () const
 {
-  return m_latitude + ((Simulator::Now ().GetDouble () / Hours (24).GetDouble ()) * 2 * M_PI);
+  return m_longitude + ((Simulator::Now ().GetDouble () / Hours (24).GetDouble ()) * 2 * M_PI);
 }
 
 Vector
@@ -169,7 +169,7 @@ LeoCircularOrbitMobilityModel::DoSetPosition (const Vector &position)
   // this works nicely with MobilityHelper and GetPostion will still get the
   // correct position, but be aware that it will not be the same as supplied to
   // SetPostion
-  m_latitude = position.x;
+  m_longitude = position.x;
   m_offset = position.y;
   Update ();
 }

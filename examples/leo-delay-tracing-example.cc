@@ -133,6 +133,7 @@ int main (int argc, char *argv[])
   if (routingProto == "epidemic")
     {
       EpidemicHelper epidemic;
+      //epidemic.Set ("BeaconInterval", TimeValue (MilliSeconds (100)));
       stack.SetRoutingHelper (epidemic);
     }
   else

@@ -56,9 +56,9 @@ private:
   double m_inclination;
 
   /**
-   * Latitude in rad
+   * Longitudinal offset in rad
    */
-  double m_latitude;
+  double m_longitude;
 
   /**
    * Offset on the orbital plane in rad

@@ -14,7 +14,7 @@ using namespace ns3;
 class LeoOrbitSpeedTestCase : public TestCase
 {
 public:
-  LeoOrbitSpeedTestCase () : TestCase ("Test speed for 0 altitude") {}
+  LeoOrbitSpeedTestCase () : TestCase ("speed at 0 altitude is earth rotation speed") {}
   virtual ~LeoOrbitSpeedTestCase () {}
 private:
   virtual void DoRun (void)
@@ -22,14 +22,14 @@ private:
     Ptr<LeoCircularOrbitMobilityModel> mob = CreateObject<LeoCircularOrbitMobilityModel> ();
     mob->SetAttribute ("Altitude", DoubleValue (0.0));
 
-    NS_TEST_ASSERT_MSG_EQ ((uint64_t) mob->GetSpeed (), (uint64_t) 7909.79, "Unexpected velocity at earths surface");
+    NS_TEST_ASSERT_MSG_EQ ((uint64_t) mob->GetSpeed (), (uint64_t) 7909.79, "postion at 0 altitude is on surface");
   }
 };
 
 class LeoOrbitPositionTestCase : public TestCase
 {
 public:
-  LeoOrbitPositionTestCase () : TestCase ("Test position for 0 altitude and 1.0 inclination") {}
+  LeoOrbitPositionTestCase () : TestCase ("position is on surface") {}
   virtual ~LeoOrbitPositionTestCase () {}
 private:
   virtual void DoRun (void)
@@ -38,21 +38,21 @@ private:
     mob->SetAttribute ("Altitude", DoubleValue (0.0));
     mob->SetAttribute ("Inclination", DoubleValue (1.0));
 
-    NS_TEST_ASSERT_MSG_EQ_TOL (mob->GetPosition ().GetLength() / 1000, LEO_EARTH_RAD_KM, 0.1, "Unexpected position on earths surface for 1 deg inclination");
+    NS_TEST_ASSERT_MSG_EQ_TOL (mob->GetPosition ().GetLength() / 1000, LEO_EARTH_RAD_KM, 0.1, "unexpected position on earths surface for 1 deg inclination");
   }
 };
 
 class LeoOrbitProgressTestCase : public TestCase
 {
 public:
-  LeoOrbitProgressTestCase () : TestCase ("Test position shoudl not be the same after some time") {}
+  LeoOrbitProgressTestCase () : TestCase ("position changes over time") {}
   virtual ~LeoOrbitProgressTestCase () {}
 private:
   void TestLengthPosition (double expl, double expx, Ptr<LeoCircularOrbitMobilityModel> mob)
   {
     Vector pos = mob->GetPosition ();
     NS_TEST_EXPECT_MSG_EQ_TOL_INTERNAL (pos.GetLength () / 1000, expl, 0.001, "Distance to earth should be the same", __FILE__, __LINE__);
-    NS_TEST_EXPECT_MSG_NE_INTERNAL (pos.x, expx, "Position should not be equal", __FILE__, __LINE__);
+    NS_TEST_EXPECT_MSG_NE_INTERNAL (pos.x, expx, "position should not be equal", __FILE__, __LINE__);
   }
 
   virtual void DoRun (void)
@@ -72,7 +72,7 @@ private:
 class LeoOrbitLatitudeTestCase : public TestCase
 {
 public:
-  LeoOrbitLatitudeTestCase () : TestCase ("Test offset between neighboring satellites planes") {}
+  LeoOrbitLatitudeTestCase () : TestCase ("neighboring satellite planes have offset") {}
   virtual ~LeoOrbitLatitudeTestCase () {}
 private:
   virtual void DoRun (void)
@@ -86,14 +86,14 @@ private:
     mob->SetPosition (Vector3D (20.0, 0, 0));
     Vector pos2 = mob->GetPosition ();
 
-    NS_TEST_ASSERT_MSG_NE (pos1.x, pos2.x, "Neighboring satellite should have different position");
+    NS_TEST_ASSERT_MSG_NE (pos1.x, pos2.x, "neighboring satellite planes should have different position");
   }
 };
 
 class LeoOrbitOffsetTestCase : public TestCase
 {
 public:
-  LeoOrbitOffsetTestCase () : TestCase ("Test offset between neighboring satellites") {}
+  LeoOrbitOffsetTestCase () : TestCase ("neighboring satellites have offset") {}
   virtual ~LeoOrbitOffsetTestCase () {}
 private:
   virtual void DoRun (void)
@@ -107,21 +107,19 @@ private:
     mob->SetPosition (Vector3D (0, 20.0, 0));
     Vector pos2 = mob->GetPosition ();
 
-    NS_TEST_ASSERT_MSG_NE (pos1.x, pos2.x, "Neighboring satellite should have different position");
+    NS_TEST_ASSERT_MSG_NE (pos1.x, pos2.x, "neighboring satellite should have different position");
   }
 };
 
 class LeoOrbitTracingTestCase : public TestCase
 {
 public:
-  LeoOrbitTracingTestCase () : TestCase ("Test tracing of position changes") {}
+  LeoOrbitTracingTestCase () : TestCase ("position changes are traced") {}
   virtual ~LeoOrbitTracingTestCase () {}
-  static void CourseChange (std::string context, Ptr<const MobilityModel> position)
-  {
-    Vector pos = position->GetPosition ();
-    std::cout << Simulator::Now () << ", pos=" << position << ", x=" << pos.x << ", y=" << pos.y
-      << ", z=" << pos.z << std::endl;
-  }
+
+  static uint64_t traced;
+
+  static void CourseChange (std::string context, Ptr<const MobilityModel> position);
 private:
   virtual void DoRun (void)
   {
@@ -142,12 +140,26 @@ private:
 
     Config::Connect ("/NodeList/*/$ns3::MobilityModel/CourseChange",
                      MakeCallback (&CourseChange));
+    traced = 0;
 
     Simulator::Stop (Seconds (100.0));
     Simulator::Run ();
+
+    NS_TEST_ASSERT_MSG_GT (traced, 8, "position not every time");
+
     Simulator::Destroy ();
   }
 };
+
+uint64_t LeoOrbitTracingTestCase::traced = 0;
+
+void LeoOrbitTracingTestCase::CourseChange (std::string context, Ptr<const MobilityModel> position)
+  {
+    traced ++;
+    Vector pos = position->GetPosition ();
+    std::cout << Simulator::Now () << ", pos=" << position << ", x=" << pos.x << ", y=" << pos.y
+      << ", z=" << pos.z << std::endl;
+  }
 
 
 class LeoOrbitTestSuite : TestSuite
