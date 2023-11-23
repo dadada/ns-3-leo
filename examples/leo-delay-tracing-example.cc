@@ -149,12 +149,9 @@ int main (int argc, char *argv[])
     {
       AodvHelper aodv;
       aodv.Set ("EnableHello", BooleanValue (false));
-      //aodv.Set ("HelloInterval", TimeValue (Seconds (5)));
-      //aodv.Set ("RreqRetries", UintegerValue (1000));
-      //aodv.Set ("RerrRateLimit", UintegerValue (1000));
-      //aodv.Set ("RreqRateLimit", UintegerValue (10));
-      aodv.Set ("TtlThreshold", UintegerValue (20));
-      aodv.Set ("NetDiameter", UintegerValue (50));
+      //aodv.Set ("HelloInterval", TimeValue (Seconds (10)));
+      //aodv.Set ("TtlThreshold", UintegerValue (16));
+      //aodv.Set ("NetDiameter", UintegerValue (32));
       stack.SetRoutingHelper (aodv);
     }
 
