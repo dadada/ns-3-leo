@@ -21,7 +21,7 @@ LeoCircularOrbitMobilityModel::GetTypeId ()
     .SetGroupName ("Leo")
     .AddConstructor<LeoCircularOrbitMobilityModel> ()
     .AddAttribute ("Altitude",
-                   "A height from the earth's surface in meters",
+                   "A height from the earth's surface in kilometers",
                    DoubleValue (1000.0),
                    MakeDoubleAccessor (&LeoCircularOrbitMobilityModel::SetAltitude,
                    		       &LeoCircularOrbitMobilityModel::GetAltitude),
@@ -76,7 +76,7 @@ DotProduct (const Vector3D &l, const Vector3D &r)
 double
 LeoCircularOrbitMobilityModel::GetSpeed () const
 {
-   return sqrt (LEO_EARTH_GM / m_orbitHeight);
+   return sqrt (LEO_EARTH_GM_KM_E10 / m_orbitHeight) * 1e5;
 }
 
 Vector

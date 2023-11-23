@@ -10,7 +10,7 @@
 #include "ns3/nstime.h"
 
 #define LEO_EARTH_RAD_M 6371009.0
-#define LEO_EARTH_GM 3.98600436e14
+#define LEO_EARTH_GM_KM_E10 39.8600436
 
 namespace ns3 {
 
