@@ -9,14 +9,16 @@
 def build(bld):
     module = bld.create_ns3_module('leo', ['core','internet', 'propagation', 'stats', 'traffic', 'flow-monitor', 'applications'])
     module.source = [
-        'model/leo.cc',
-        'model/mock-net-device.cc',
-        'model/mock-channel.cc',
         'model/isl-mock-channel.cc',
         'model/isl-propagation-loss-model.cc',
-        'model/leo-mobility-model.cc',
-        'helper/leo-helper.cc',
         'helper/isl-helper.cc',
+        'model/leo.cc',
+        'model/leo-mobility-model.cc',
+        'model/leo-mock-channel.cc',
+        'model/leo-mock-net-device.cc',
+        'helper/leo-helper.cc',
+        'model/mock-net-device.cc',
+        'model/mock-channel.cc',
         ]
 
     module_test = bld.create_ns3_module_test_library('leo')
@@ -27,14 +29,16 @@ def build(bld):
     headers = bld(features='ns3header')
     headers.module = 'leo'
     headers.source = [
-        'model/leo.h',
-        'model/mock-net-device.h',
-        'model/mock-channel.h',
         'model/isl-mock-channel.h',
         'model/isl-propagation-loss-model.h',
-        'model/leo-mobility-model.h',
-        'helper/leo-helper.h',
         'helper/isl-helper.h',
+        'model/leo.h',
+        'model/leo-mobility-model.h',
+        'model/leo-mock-channel.h',
+        'model/leo-mock-net-device.h',
+        'helper/leo-helper.h',
+        'model/mock-net-device.h',
+        'model/mock-channel.h',
         ]
 
     if bld.env.ENABLE_EXAMPLES:

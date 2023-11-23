@@ -30,7 +30,7 @@
 #include "ns3/mobility-module.h"
 #include "ns3/propagation-delay-model.h"
 #include "ns3/propagation-loss-model.h"
-#include "mock-net-device.h"
+#include "leo-mock-net-device.h"
 #include "mock-channel.h"
 
 namespace ns3 {
@@ -63,10 +63,8 @@ protected:
 
   enum ChannelType
   {
-    GW_FORWARD,
-    GW_RETURN,
-    UT_FORWARD,
-    UT_RETURN,
+    GW,
+    UT,
     UNKNOWN
   };
 
@@ -77,6 +75,8 @@ private:
    * \brief Type of the channel
    */
   ChannelType m_channelType;
+
+  bool IsChannel (Ptr<LeoMockNetDevice> dstType, Ptr<LeoMockNetDevice> srcType, bool isBroadcast);
 
 }; // class MockChannel
 
