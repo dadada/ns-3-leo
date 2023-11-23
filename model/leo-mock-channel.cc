@@ -62,12 +62,17 @@ LeoMockChannel::TransmitStart (Ptr<const Packet> p,
           NS_LOG_ERROR ("unable to find satellite with address " << dst);
           return false;
         }
-      NS_LOG_DEBUG ("BOOOOM " << srcDev->GetAddress () << " -> " << dst);
       return Deliver (p, srcDev, it->second, txTime);
     }
   else
     // space to ground delivers to everything within the beam
     {
+      DeviceIndex::iterator it = m_groundDevices.find (dst);
+      if (it == m_groundDevices.end ())
+        {
+          NS_LOG_ERROR ("unable to find satellite with address " << dst);
+          return false;
+        }
       for (DeviceIndex::iterator it = m_groundDevices.begin ();
            it != m_groundDevices.end ();
            it++)

@@ -18,6 +18,7 @@ def build(bld):
         'model/leo-mock-channel.cc',
         'model/leo-mock-net-device.cc',
         'helper/leo-helper.cc',
+        'model/leo-propagation-loss-model.cc',
         'model/mock-net-device.cc',
         'model/mock-channel.cc',
         'helper/nd-cache-helper.cc',
@@ -28,6 +29,7 @@ def build(bld):
         'test/leo-test-suite.cc',
         'test/isl-test-suite.cc',
         'test/isl-mock-channel-test-suite.cc',
+        'test/leo-mock-channel-test-suite.cc',
         ]
 
     headers = bld(features='ns3header')
@@ -42,6 +44,7 @@ def build(bld):
         'model/leo-mock-channel.h',
         'model/leo-mock-net-device.h',
         'helper/leo-helper.h',
+        'model/leo-propagation-loss-model.h',
         'model/mock-net-device.h',
         'model/mock-channel.h',
         'helper/nd-cache-helper.h',
