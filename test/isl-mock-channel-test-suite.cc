@@ -11,27 +11,27 @@
 
 using namespace ns3;
 
-class IslMockChannelTransmitTestCase : public TestCase
+class IslMockChannelTransmitUnknownTestCase : public TestCase
 {
 public:
-  IslMockChannelTransmitTestCase ();
-  virtual ~IslMockChannelTransmitTestCase ();
+  IslMockChannelTransmitUnknownTestCase ();
+  virtual ~IslMockChannelTransmitUnknownTestCase ();
 
 private:
   virtual void DoRun (void);
 };
 
-IslMockChannelTransmitTestCase::IslMockChannelTransmitTestCase ()
+IslMockChannelTransmitUnknownTestCase::IslMockChannelTransmitUnknownTestCase ()
   : TestCase ("Test channel transmission")
 {
 }
 
-IslMockChannelTransmitTestCase::~IslMockChannelTransmitTestCase ()
+IslMockChannelTransmitUnknownTestCase::~IslMockChannelTransmitUnknownTestCase ()
 {
 }
 
 void
-IslMockChannelTransmitTestCase::DoRun (void)
+IslMockChannelTransmitUnknownTestCase::DoRun (void)
 {
   Ptr<IslMockChannel> channel = CreateObject<IslMockChannel> ();
   Packet *packet = new Packet ();
@@ -55,7 +55,7 @@ IslMockChannelTestSuite::IslMockChannelTestSuite ()
   : TestSuite ("isl-mock-channel", UNIT)
 {
   // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
-  AddTestCase (new IslMockChannelTransmitTestCase, TestCase::QUICK);
+  AddTestCase (new IslMockChannelTransmitUnknownTestCase, TestCase::QUICK);
 }
 
 // Do not forget to allocate an instance of this TestSuite
