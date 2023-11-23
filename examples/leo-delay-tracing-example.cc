@@ -10,22 +10,23 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("LeoDelayTracingExample");
 
+Time t_start;
+uint64_t send = 0;;
+uint64_t received = 0;
+
 static void
 EchoTx (std::string context, Ptr<const Packet> packet)
 {
-  std::cout << context << ",ClientTx," << packet << std::endl;
+  send ++;
+  t_start = Simulator::Now ();
 }
 
 static void
 EchoRx (std::string context, Ptr<const Packet> packet)
 {
-  std::cout << context << ",ClientRx," << packet << std::endl;
-}
-
-static void
-EchoServerRx (std::string context, Ptr<const Packet> packet)
-{
-  std::cout << context << ",ServerRx," << packet << std::endl;
+  received ++;
+  Time now = Simulator::Now ();
+  std::cout << context << "," << (now - t_start) << std::endl;
 }
 
 int main (int argc, char *argv[])
@@ -67,15 +68,16 @@ int main (int argc, char *argv[])
   // Install internet stack on nodes
   AodvHelper aodv;
   aodv.Set ("HelloInterval", TimeValue (Seconds (10)));
-  aodv.Set ("TtlStart", UintegerValue (100));
-  aodv.Set ("TtlIncrement", UintegerValue (100));
+  aodv.Set ("TtlStart", UintegerValue (10));
+  aodv.Set ("TtlIncrement", UintegerValue (10));
   aodv.Set ("TtlThreshold", UintegerValue (1000));
   aodv.Set ("RreqRetries", UintegerValue (100));
-  aodv.Set ("RerrRateLimit", UintegerValue (1000));
-  aodv.Set ("RreqRateLimit", UintegerValue (1000));
+  aodv.Set ("RreqRateLimit", UintegerValue (100));
+  aodv.Set ("RerrRateLimit", UintegerValue (100));
+  aodv.Set ("ActiveRouteTimeout", TimeValue (Seconds (10)));
   aodv.Set ("NextHopWait", TimeValue (MilliSeconds (100)));
   aodv.Set ("NetDiameter", UintegerValue (1000));
-  aodv.Set ("PathDiscoveryTime", TimeValue (Seconds (100)));
+  aodv.Set ("PathDiscoveryTime", TimeValue (Seconds (1)));
   InternetStackHelper stack;
   stack.SetRoutingHelper (aodv);
   stack.Install (satellites);
@@ -90,22 +92,17 @@ int main (int argc, char *argv[])
 
   // we want to ping terminals
   UdpEchoServerHelper echoServer (9);
-  ApplicationContainer serverApps = echoServer.Install (stations);
+  ApplicationContainer serverApps = echoServer.Install (stations.Get (1));
 
   // install a client on one of the terminals
   ApplicationContainer clientApps;
   Address remote = stations.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();//utIp.GetAddress (1, 0);
-  std::cerr << "REMOTE: node=" <<stations.Get (1)->GetId ()<<"addr="<<remote << std::endl;
   UdpEchoClientHelper echoClient (remote, 9);
-  echoClient.SetAttribute ("MaxPackets", UintegerValue (100));
+  echoClient.SetAttribute ("MaxPackets", UintegerValue (360));
   echoClient.SetAttribute ("Interval", TimeValue (Minutes (1.0)));
   echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
-  clientApps.Add (echoClient.Install (stations.Get (0)));
-  Address local = stations.Get (0)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();//utIp.GetAddress (1, 0);
-  std::cerr << "LOCAL: node=" <<stations.Get (0)->GetId ()<<"addr="<<local << std::endl;
+  clientApps.Add (echoClient.Install (stations.Get (3)));
 
-  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::UdpEchoServer/Rx",
-  		   MakeCallback (&EchoServerRx));
   Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::UdpEchoClient/Rx",
   		   MakeCallback (&EchoRx));
   Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::UdpEchoClient/Tx",
@@ -114,9 +111,11 @@ int main (int argc, char *argv[])
   serverApps.Start (Seconds (1));
   clientApps.Start (Seconds (2));
 
-  Simulator::Stop (Minutes (10));
+  Simulator::Stop (Minutes (60));
   Simulator::Run ();
   Simulator::Destroy ();
+
+  std::cout << std::endl << received << "," << send << std::endl;
 
   return 0;
 }
