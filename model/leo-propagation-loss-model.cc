@@ -23,13 +23,13 @@ LeoPropagationLossModel::GetTypeId (void)
     .AddConstructor<LeoPropagationLossModel> ()
     .AddAttribute ("MaxDistance",
                    "Cut-off distance for signal propagation",
-                   DoubleValue (3000),
+                   DoubleValue (4000.0),
                    MakeDoubleAccessor (&LeoPropagationLossModel::SetCutoffDistance,
 				       &LeoPropagationLossModel::GetCutoffDistance),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("ElevationAngle",
                    "Cut-off angle for signal propagation",
-                   DoubleValue (M_PI / 9),
+                   DoubleValue (40.0),
                    MakeDoubleAccessor (&LeoPropagationLossModel::SetElevationAngle,
 				       &LeoPropagationLossModel::GetElevationAngle),
                    MakeDoubleChecker<double> ())
@@ -63,12 +63,23 @@ LeoPropagationLossModel::~LeoPropagationLossModel ()
 double
 LeoPropagationLossModel::GetAngle (Ptr<MobilityModel> a, Ptr<MobilityModel> b)
 {
-  Vector3D pa = a->GetPosition () - b->GetPosition ();
-  Vector3D pb = b->GetPosition ();
-  pb = Vector3D (-pb.x, -pb.y, -pb.z);
+  Vector3D x = a->GetPosition ();
+  Vector3D y = b->GetPosition ();
 
-  double prod = abs ((pa.x * pb.x) + (pa.y * pb.y) + (pa.z * pb.z));
-  double norm = pb.GetLength () * pa.GetLength ();
+  Vector3D pa, pb;
+  if (x.GetLength () < y.GetLength ())
+    {
+      pa = x - y;
+      pb = y;
+    }
+  else
+    {
+      pa = y - x;
+      pb = x;
+    }
+
+  double prod = (pa.x*-pb.x) + (pa.y*-pb.y) + (pa.z*-pb.z);
+  double norm = pa.GetLength () * pb.GetLength ();
 
   return acos (prod / norm);
 }
@@ -122,7 +133,7 @@ LeoPropagationLossModel::DoCalcRxPower (double txPowerDbm,
   // receiver loss and gain added at net device
   // P_{RX} = P_{TX} + G_{TX} - L_{TX} - L_{FS} - L_M + G_{RX} - L_{RX}
   double rxc = txPowerDbm - m_atmosphericLoss - m_freeSpacePathLoss - m_linkMargin;
-  NS_LOG_INFO ("LEO TRANSMIT: angle=" << angle <<";distance=" << distance << ";rxc=" << rxc);
+  NS_LOG_DEBUG ("LEO TRANSMIT: angle=" << angle <<";distance=" << distance << ";rxc=" << rxc);
 
   return rxc;
 }

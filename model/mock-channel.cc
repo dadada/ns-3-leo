@@ -184,12 +184,13 @@ MockChannel::Deliver (
     	{
       	  // check if signal reaches destination
       	  rxPower = pLoss->CalcRxPower (txPower, srcMob, dstMob);
-      	  if (rxPower == -1000.0)
+      	  if (rxPower <= -1000.0)
     	    {
       	      return false;
     	    }
     	}
-      delay += GetPropagationDelay (srcMob, dstMob, txTime);
+      delay = GetPropagationDelay (srcMob, dstMob, txTime);
+      NS_LOG_DEBUG ("delay = "<<delay);
     }
 
   Simulator::ScheduleWithContext (dst->GetNode ()->GetId (),

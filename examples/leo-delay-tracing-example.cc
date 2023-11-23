@@ -58,7 +58,7 @@ int main (int argc, char *argv[])
     }
 
   LeoGndNodeHelper ground;
-  NodeContainer stations = ground.Install ("contrib/leo/data/ground-stations/usa.waypoints");
+  NodeContainer stations = ground.Install ("contrib/leo/data/ground-stations/usa-60.waypoints");
 
   NetDeviceContainer islNet, utNet;
 
@@ -75,15 +75,15 @@ int main (int argc, char *argv[])
   // Install internet stack on nodes
   AodvHelper aodv;
   //aodv.Set ("HelloInterval", TimeValue (Minutes (1)));
-  aodv.Set ("TtlStart", UintegerValue (5));
-  aodv.Set ("TtlIncrement", UintegerValue (5));
-  aodv.Set ("TtlThreshold", UintegerValue (200));
-  aodv.Set ("RreqRetries", UintegerValue (1000));
-  aodv.Set ("RreqRateLimit", UintegerValue (100));
+  //aodv.Set ("TtlStart", UintegerValue (2));
+  //aodv.Set ("TtlIncrement", UintegerValue (1));
+  //aodv.Set ("TtlThreshold", UintegerValue (20));
+  //aodv.Set ("RreqRetries", UintegerValue (1000));
+  //aodv.Set ("RreqRateLimit", UintegerValue (1));
   //aodv.Set ("RerrRateLimit", UintegerValue (1));
   //aodv.Set ("ActiveRouteTimeout", TimeValue (Minutes (1)));
   //aodv.Set ("NextHopWait", TimeValue (MilliSeconds (200)));
-  aodv.Set ("NetDiameter", UintegerValue (100));
+  //aodv.Set ("NetDiameter", UintegerValue (300));
   //aodv.Set ("AllowedHelloLoss", UintegerValue (10000));
   //aodv.Set ("PathDiscoveryTime", TimeValue (Seconds (1)));
 
@@ -99,22 +99,27 @@ int main (int argc, char *argv[])
   ipv4.SetBase ("10.3.0.0", "255.255.0.0");
   Ipv4InterfaceContainer utIp = ipv4.Assign (utNet);
 
+  Ptr<Node> client = stations.Get (0);
+  Ptr<Node> server = stations.Get (1);
+
   // we want to ping terminals
   UdpServerHelper echoServer (9);
-  ApplicationContainer serverApps = echoServer.Install (stations.Get (100));
+  ApplicationContainer serverApps = echoServer.Install (server);
 
   // install a client on one of the terminals
   ApplicationContainer clientApps;
-  Address remote = stations.Get (100)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();//utIp.GetAddress (1, 0);
-  std::cout << "REMOTE=" << Ipv4Address::ConvertFrom (remote);
+  Address remote = server->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();
   UdpClientHelper echoClient (remote, 9);
   echoClient.SetAttribute ("MaxPackets", UintegerValue (60));
   echoClient.SetAttribute ("Interval", TimeValue (Seconds (1)));
   echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
-  clientApps.Add (echoClient.Install (stations.Get (103)));
+  clientApps.Add (echoClient.Install (client));
 
   Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::UdpServer/Rx",
   		   MakeCallback (&EchoRx));
+
+  std::cout << "LOCAL =" << client->GetId () << std::endl;
+  std::cout << "REMOTE=" << server->GetId () << std::endl;
 
   std::cout << "Context,Sequence Number,Timestamp,Delay" << std::endl;
 
@@ -127,9 +132,9 @@ int main (int argc, char *argv[])
   Simulator::Run ();
   Simulator::Destroy ();
 
-  Ptr<UdpServer> server = StaticCast<UdpServer> (serverApps.Get (0));
+  Ptr<UdpServer> result = StaticCast<UdpServer> (serverApps.Get (0));
   std::cout << "Received,Lost" << std::endl
-    << server->GetReceived () << "," << server->GetLost () << std::endl;
+    << result->GetReceived () << "," << result->GetLost () << std::endl;
 
   return 0;
 }
