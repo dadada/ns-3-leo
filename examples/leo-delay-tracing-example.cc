@@ -21,54 +21,19 @@ EchoRx (std::string context, Ptr<const Packet> packet)
   std::cout << context << "," << seqTs.GetSeq () << "," << seqTs.GetTs () << "," << Simulator::Now () - seqTs.GetTs () << std::endl;
 }
 
-class Orbit {
-public:
-  Orbit (double a, double i, double p, double s) : alt (a), inc (i), planes (p), sats (s) {}
-  double alt;
-  double inc;
-  uint16_t planes;
-  uint16_t sats;
-};
-
-
-// Starlink
-//Orbit (1150, 53.0, 32, 50),
-//Orbit (1110, 53.8, 32, 50),
-//Orbit (1130, 74.0,  8, 50),
-//Orbit (1275, 81, 5, 75),
-//Orbit (1325, 70, 6, 75),
-
-// Telesat
-//Orbit (1000.0, 99.5, 6, 12),
-//Orbit (1248.0, 37.4, 5, 9),
-
 int main (int argc, char *argv[])
 {
-  std::vector<Orbit> orbits = {
-  //Orbit (1000.0, 99.5, 6, 12),
-  //Orbit (1248.0, 37.4, 5, 9),
-Orbit (1150, 53.0, 32, 50),
-Orbit (1110, 53.8, 32, 50),
-//      Orbit (1150, 53.0, 32, 50),
- //     Orbit (1110, 53.8, 32, 50),
-  };
-  NodeContainer satellites;
-  for (Orbit orb: orbits)
-    {
-      NodeContainer c;
-      c.Create (orb.sats*orb.planes);
 
-      MobilityHelper mobility;
-      mobility.SetPositionAllocator ("ns3::LeoCircularOrbitPostionAllocator",
-                                     "NumOrbits", IntegerValue (orb.planes),
-                                     "NumSatellites", IntegerValue (orb.sats));
-      mobility.SetMobilityModel ("ns3::LeoCircularOrbitMobilityModel",
-  			     	 "Altitude", DoubleValue (orb.alt),
-  			     	 "Inclination", DoubleValue (orb.inc),
-  			     	 "Precision", TimeValue (Minutes (1)));
-      mobility.Install (c);
-      satellites.Add (c);
-    }
+  CommandLine cmd;
+  std::string orbitFile;
+  cmd.AddValue("orbitFile", "CSV file with orbit parameters", orbitFile);
+  // TODO write position allocator for long,lat
+  cmd.AddValue("groundFile", "CSV file with ground station locations", orbitFile);
+  cmd.AddValue("precision", "ns3::LeoCircularOrbitMobilityModel");
+  cmd.Parse (argc, argv);
+
+  LeoOrbitNodeHelper orbit;
+  NodeContainer satellites = orbit.Install (orbitFile);
 
   LeoGndNodeHelper ground;
   NodeContainer stations = ground.Install ("contrib/leo/data/ground-stations/usa-60.waypoints");
@@ -89,18 +54,6 @@ Orbit (1110, 53.8, 32, 50),
   AodvHelper aodv;
   // This disabled is far better for performance (huge network)
   aodv.Set ("EnableHello", BooleanValue (false));
-  //aodv.Set ("HelloInterval", TimeValue (Seconds (10)));
-  //aodv.Set ("TtlStart", UintegerValue (2));
-  //aodv.Set ("TtlIncrement", UintegerValue (1));
-  //aodv.Set ("TtlThreshold", UintegerValue (20));
-  //aodv.Set ("RreqRetries", UintegerValue (1000));
-  //aodv.Set ("RreqRateLimit", UintegerValue (1));
-  //aodv.Set ("RerrRateLimit", UintegerValue (1));
-  //aodv.Set ("ActiveRouteTimeout", TimeValue (Minutes (1)));
-  //aodv.Set ("NextHopWait", TimeValue (MilliSeconds (200)));
-  //aodv.Set ("NetDiameter", UintegerValue (300));
-  //aodv.Set ("AllowedHelloLoss", UintegerValue (10000));
-  //aodv.Set ("PathDiscoveryTime", TimeValue (Seconds (1)));
 
   InternetStackHelper stack;
   stack.SetRoutingHelper (aodv);

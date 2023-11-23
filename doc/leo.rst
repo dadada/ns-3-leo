@@ -140,6 +140,7 @@ planes,number of satellites per plane``. The duration is given in seconds.
   --orbitsFile=orbits.csv \
   --traceFile=mobility-trace.csv \
   --duration=10.0
+  --precision=1.0
 
 leo-delay
 #########

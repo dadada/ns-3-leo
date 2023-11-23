@@ -12,6 +12,7 @@ def build(bld):
         'helper/arp-cache-helper.cc',
         'helper/isl-helper.cc',
         'helper/leo-channel-helper.cc',
+        'helper/leo-orbit-node-helper.cc',
         'helper/nd-cache-helper.cc',
         'helper/ground-node-helper.cc',
         'helper/satellite-node-helper.cc',
@@ -20,6 +21,7 @@ def build(bld):
         'model/leo-circular-orbit-position-allocator.cc',
         'model/leo-mock-channel.cc',
         'model/leo-mock-net-device.cc',
+        'model/leo-orbit.cc',
         'model/leo-propagation-loss-model.cc',
         'model/mock-net-device.cc',
         'model/mock-channel.cc',
@@ -51,6 +53,7 @@ def build(bld):
         'helper/arp-cache-helper.h',
         'helper/isl-helper.h',
         'helper/leo-channel-helper.h',
+        'helper/leo-orbit-node-helper.h',
         'helper/nd-cache-helper.h',
         'helper/ground-node-helper.h',
         'helper/satellite-node-helper.h',
@@ -67,6 +70,7 @@ def build(bld):
         'model/mock-channel.h',
         'model/isl-mock-channel.h',
         'model/isl-propagation-loss-model.h',
+        'model/leo-orbit.h',
         'utils/leo-input-fstream-container.h',
         ]
 
