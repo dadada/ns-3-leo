@@ -21,6 +21,7 @@ def build(bld):
         'model/mock-net-device.cc',
         'model/mock-channel.cc',
         'helper/nd-cache-helper.cc',
+        'utils/leo-input-fstream-container.cc',
         ]
 
     module_test = bld.create_ns3_module_test_library('leo')
@@ -29,6 +30,7 @@ def build(bld):
         'test/isl-test-suite.cc',
         'test/isl-mock-channel-test-suite.cc',
         'test/leo-mock-channel-test-suite.cc',
+        'test/leo-input-fstream-container-test-suite.cc',
         ]
 
     headers = bld(features='ns3header')
@@ -46,6 +48,7 @@ def build(bld):
         'model/mock-net-device.h',
         'model/mock-channel.h',
         'helper/nd-cache-helper.h',
+        'utils/leo-input-fstream-container.h',
         ]
 
     if bld.env.ENABLE_EXAMPLES:
