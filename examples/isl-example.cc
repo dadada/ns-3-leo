@@ -21,7 +21,7 @@ main (int argc, char *argv[])
   Time::SetResolution (Time::NS);
   LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
   LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
-  LogComponentEnable ("UdpClient", LOG_LEVEL_INFO);
+  LogComponentEnable ("UdpEchoClient", LOG_LEVEL_INFO);
 
   NodeContainer nodes;
   nodes.Create (3);

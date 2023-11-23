@@ -10,6 +10,8 @@
 
 using namespace ns3;
 
+NS_LOG_COMPONENT_DEFINE ("LeoExample");
+
 int
 main (int argc, char *argv[])
 {
@@ -23,14 +25,14 @@ main (int argc, char *argv[])
   Time::SetResolution (Time::NS);
   LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
   LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
-  LogComponentEnable ("UdpClient", LOG_LEVEL_INFO);
+  LogComponentEnable ("MockNetDevice", LOG_LEVEL_DEBUG);
 
   NodeContainer satellites;
   satellites.Create (100);
   NodeContainer gateways;
   gateways.Create (10);
   NodeContainer terminals;
-  terminals.Create (2000);
+  terminals.Create (20);
 
   LeoHelper leo;
   leo.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
@@ -60,9 +62,10 @@ main (int argc, char *argv[])
   ApplicationContainer clientApps;
   for (uint32_t i = 1; i < terminals.GetN (); i++)
     {
-      Address remote = terminals.Get (i)->GetObject<Ipv6> ()->GetAddress (0, 0).GetAddress ();
+      Address remote = terminals.Get (i)->GetObject<Ipv6> ()->GetAddress (1, 0).GetAddress ();
+      NS_LOG_DEBUG ("REMOTE " << i << " " << remote);
       UdpEchoClientHelper echoClient (remote, 9);
-      echoClient.SetAttribute ("MaxPackets", UintegerValue (10));
+      echoClient.SetAttribute ("MaxPackets", UintegerValue (1));
       echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
       echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
 

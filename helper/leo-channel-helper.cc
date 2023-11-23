@@ -22,8 +22,9 @@ LeoChannelHelper::LeoChannelHelper ()
 
   m_gndDeviceFactory.SetTypeId ("ns3::LeoMockNetDevice");
   m_gndDeviceFactory.Set ("DeviceType", EnumValue (LeoMockNetDevice::GND));
+
   m_satDeviceFactory.SetTypeId ("ns3::LeoMockNetDevice");
-  m_gndDeviceFactory.Set ("DeviceType", EnumValue (LeoMockNetDevice::SAT));
+  m_satDeviceFactory.Set ("DeviceType", EnumValue (LeoMockNetDevice::SAT));
 
   m_channelFactory.SetTypeId ("ns3::LeoMockChannel");
 }
