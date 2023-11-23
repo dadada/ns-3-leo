@@ -10,6 +10,7 @@
 #include <ns3/net-device-container.h>
 #include <ns3/node-container.h>
 #include <ns3/trace-helper.h>
+#include "ns3/internet-stack-helper.h"
 
 #include "leo-channel-helper.h"
 #include "isl-helper.h"
@@ -142,6 +143,11 @@ public:
   void SetIslChannelAttribute (std::string name, const AttributeValue &value);
   void SetUtChannelAttribute (std::string name, const AttributeValue &value);
   void SetGwChannelAttribute (std::string name, const AttributeValue &value);
+
+  void SetInternetStackAttribute (std::string name, const AttributeValue &value);
+
+  void SetRoutingHelper (const Ipv4RoutingHelper &routing);
+  void SetRoutingHelper (const Ipv6RoutingHelper &routing);
 private:
   /**
    * \brief Enable pcap output the indicated net device.
@@ -173,6 +179,7 @@ private:
     Ptr<NetDevice> nd,
     bool explicitFilename);
 
+  InternetStackHelper m_stackHelper;
   IslHelper m_islChannelHelper;
   LeoChannelHelper m_utChannelHelper;
   LeoChannelHelper m_gwChannelHelper;

@@ -6,9 +6,10 @@
 #include "ns3/applications-module.h"
 #include "ns3/node-container.h"
 #include "ns3/core-module.h"
+#include "ns3/aodv-module.h"
+#include "ns3/test.h"
 
 #include "ns3/leo-module.h"
-#include "ns3/test.h"
 
 using namespace ns3;
 
@@ -54,14 +55,13 @@ LeoTestCase1::DoRun (void)
   LeoHelper leo;
   leo.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
   leo.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
+  leo.SetRoutingHelper (AodvHelper ());
 
   NetDeviceContainer allDevices = leo.Install (satellites, gateways, terminals);
 
   // we want to ping terminals
   UdpEchoServerHelper echoServer (9);
   ApplicationContainer serverApps = echoServer.Install (terminals);
-
-  // TODO routing
 
   // install a client on each of the terminals
   ApplicationContainer clientApps;

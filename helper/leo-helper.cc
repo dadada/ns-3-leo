@@ -25,10 +25,9 @@ LeoHelper::Install (NodeContainer &satellites, NodeContainer &gateways, NodeCont
   utNet = m_utChannelHelper.Install (satellites, terminals);
 
   // Install internet stack on nodes
-  InternetStackHelper stack;
-  stack.Install (satellites);
-  stack.Install (gateways);
-  stack.Install (terminals);
+  m_stackHelper.Install (satellites);
+  m_stackHelper.Install (gateways);
+  m_stackHelper.Install (terminals);
 
   // Make all networks addressable
   Ipv6AddressHelper address;
@@ -199,6 +198,18 @@ LeoHelper::EnableAsciiInternal (
   m_islChannelHelper.EnableAsciiInternal (stream, prefix, nd, explicitFilename);
   m_gwChannelHelper.EnableAsciiInternal (stream, prefix, nd, explicitFilename);
   m_utChannelHelper.EnableAsciiInternal (stream, prefix, nd, explicitFilename);
+}
+
+void
+LeoHelper::SetRoutingHelper (const Ipv4RoutingHelper &routing)
+{
+  m_stackHelper.SetRoutingHelper (routing);
+}
+
+void
+LeoHelper::SetRoutingHelper (const Ipv6RoutingHelper &routing)
+{
+  m_stackHelper.SetRoutingHelper (routing);
 }
 
 } /* namespace ns3 */
