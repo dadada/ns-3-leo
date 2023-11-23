@@ -7,7 +7,7 @@
 #     conf.check_nonfatal(header_name='stdint.h', define_name='HAVE_STDINT_H')
 
 def build(bld):
-    module = bld.create_ns3_module('leo', ['core','internet', 'propagation', 'stats', 'traffic', 'flow-monitor', 'applications', 'netanim'])
+    module = bld.create_ns3_module('leo', ['core','internet', 'propagation', 'stats', 'flow-monitor', 'applications', 'netanim'])
     module.source = [
         'helper/arp-cache-helper.cc',
         'helper/isl-helper.cc',
