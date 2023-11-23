@@ -59,8 +59,9 @@ public:
   bool TransmitStart (Ptr<const Packet> p, uint32_t devId, Address dst, Time txTime);
 
 private:
+  std::vector<Ptr<MockNetDevice> > m_link;
 
-  bool Deliver (Ptr<const Packet> p, Ptr<MockNetDevice> src, Ptr<MockNetDevice> dst, Time txTime);
+
 }; // class MockChannel
 
 } // namespace ns3

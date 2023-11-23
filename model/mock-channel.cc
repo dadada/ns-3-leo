@@ -152,4 +152,37 @@ MockChannel::GetPropagationLoss () const
   return m_propagationLoss;
 }
 
+bool
+MockChannel::Deliver (
+    Ptr<const Packet> p,
+    Ptr<MockNetDevice> src,
+    Ptr<MockNetDevice> dst,
+    Time txTime)
+{
+  NS_LOG_FUNCTION (this << p << src->GetAddress () << dst->GetAddress () << txTime);
+  Time delay = GetDelay (src, dst, txTime);
+
+  /* Check if there is LOS between the source and destination */
+  if (GetPropagationLoss ()->CalcRxPower(1, src->GetMobilityModel(), dst->GetMobilityModel()) > 0)
+  {
+    Simulator::ScheduleWithContext (dst->GetNode ()->GetId (),
+        delay,
+        &MockNetDevice::Receive,
+        dst,
+        p->Copy (),
+        src);
+
+    // Call the tx anim callback on the net device
+    m_txrxMock (p, src, dst, txTime, delay);
+    return true;
+  }
+  else
+  {
+    NS_LOG_LOGIC (dst << " unreachable from " << src);
+
+    return false;
+  }
+}
+
+
 } // namespace ns3

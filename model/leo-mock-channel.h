@@ -44,6 +44,8 @@ namespace ns3 {
  * \brief Mocked satellite-gateway, satellite-terminal channel types
  *
  */
+    // TODO make separate clases for ut and gw links
+    // TODO make separate clases for ut and gw devices
 class LeoMockChannel : public MockChannel
 {
 public:
@@ -60,7 +62,6 @@ public:
   virtual bool TransmitStart (Ptr<const Packet> p, uint32_t devId, Address dst, Time txTime);
 
 protected:
-
   enum ChannelType
   {
     GW,
@@ -77,6 +78,10 @@ private:
   ChannelType m_channelType;
 
   bool IsChannel (Ptr<LeoMockNetDevice> dstType, Ptr<LeoMockNetDevice> srcType, bool isBroadcast);
+
+  typedef std::map<Address, Ptr<LeoMockNetDevice> > DeviceIndex;
+  DeviceIndex m_gndDevs;
+  DeviceIndex m_satDevs;
 
 }; // class MockChannel
 

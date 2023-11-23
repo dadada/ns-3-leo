@@ -23,10 +23,8 @@ LeoMockNetDevice::GetTypeId (void)
                    EnumValue (),
                    MakeEnumAccessor (&LeoMockNetDevice::m_deviceType),
                    MakeEnumChecker (
-                     DeviceType::GW, "ns3::LeoMockNetDevice::NetDeviceType::GW_FORWARD",
-                     DeviceType::UT, "ns3::LeoMockNetDevice::NetDeviceType::GW_RETURN",
-                     DeviceType::SAT_GW, "ns3::LeoMockNetDevice::NetDeviceType::UT_FORWARD",
-                     DeviceType::SAT_UT, "ns3::LeoMockNetDevice::NetDeviceType::UT_RETURN"))
+                     DeviceType::GND, "ns3::LeoMockNetDevice::NetDeviceType::GND",
+                     DeviceType::SAT, "ns3::LeoMockNetDevice::NetDeviceType::SAT"))
   ;
   return tid;
 };

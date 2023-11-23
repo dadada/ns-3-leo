@@ -21,13 +21,6 @@ LeoMockChannel::GetTypeId (void)
     .SetParent<Channel> ()
     .SetGroupName ("Leo")
     .AddConstructor<LeoMockChannel> ()
-    .AddAttribute ("ChannelType",
-                   "The type of the channel",
-                   EnumValue (),
-                   MakeEnumAccessor (&LeoMockChannel::m_channelType),
-                   MakeEnumChecker (
-                     ChannelType::GW, "ns3::LeoMockChannel::ChannelType::GW",
-                     ChannelType::UT, "ns3::LeoMockChannel::ChannelType::UT"))
   ;
   return tid;
 }
@@ -51,63 +44,24 @@ LeoMockChannel::TransmitStart (Ptr<const Packet> p,
 {
   // Find devices joined to channel
   Ptr<LeoMockNetDevice> srcDev = DynamicCast<LeoMockNetDevice> (GetDevice (devId));
-
-  if (srcDev == nullptr)
-    {
-      NS_LOG_ERROR ("Dropping packet: invalid source device");
-      return false;
-    }
-
   Ptr<LeoMockNetDevice> dstDev = DynamicCast<LeoMockNetDevice> (GetDevice (dst));
+
   bool isBroadcast = (srcDev->GetBroadcast () == dst);
-  if (dstDev == nullptr && !isBroadcast)
+  if (!isBroadcast && dstDev == nullptr)
     {
-      NS_LOG_ERROR ("Dropping packet: invalid destination device");
+      NS_LOG_LOGIC (this << "Dropping packet: direct communication between ground stations and satellites not allowed using this channel");
       return false;
     }
 
-  LeoMockNetDevice::DeviceType srcType = srcDev->GetDeviceType ();
-
-  switch (m_channelType)
+  for (uint32_t i = 0; i < GetNDevices (); i++)
     {
-    case LeoMockChannel::ChannelType::GW:
-      if (srcType == LeoMockNetDevice::GW)
+      if (srcDev->GetDeviceType () != dstDev->GetDeviceType ())
       	{
-          // Get device from SAT_GW set
-          return true;
+      	  Deliver (p, srcDev, dstDev, txTime);
       	}
-      else if (srcType == LeoMockNetDevice::SAT_GW)
-      	{
-          // Get device from GW set
-          return true;
-      	}
-      break;
-    case LeoMockChannel::ChannelType::UT:
-      if (srcType == LeoMockNetDevice::UT)
-      	{
-          // Get device from SAT_UT set
-          return true;
-      	}
-      else if (srcType == LeoMockNetDevice::SAT_UT)
-      	{
-          // Get device from UT set
-          return true;
-      	}
-      break;
-    // Other kinds of transmissions are not allowed
-    default:
-      NS_LOG_ERROR ("Dropping packet: invalid channel type");
-      return false;
     }
 
-  // Apply propagation loss and schedule transmission
-
-
-  // Get propagation delay
-  Time delay = GetDelay (srcDev, dstDev, txTime);
-
-  // Make compiler happy
-  return false;
+  return true;
 }
 
 }; // namespace ns3

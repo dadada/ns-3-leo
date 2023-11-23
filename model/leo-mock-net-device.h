@@ -15,10 +15,8 @@ class LeoMockNetDevice : public MockNetDevice
 public:
   enum DeviceType
   {
-    GW,
-    UT,
-    SAT_UT,
-    SAT_GW
+    GND,
+    SAT
   };
 
   static TypeId GetTypeId (void);

@@ -89,6 +89,9 @@ protected:
   Ptr<PropagationDelayModel> GetPropagationDelay () const;
   Ptr<PropagationLossModel> GetPropagationLoss () const;
   Ptr<MockNetDevice> GetDevice (Address &addr) const;
+
+  bool Deliver ( Ptr<const Packet> p, Ptr<MockNetDevice> src, Ptr<MockNetDevice> dst, Time txTime);
+
 private:
 
   std::vector<Ptr<MockNetDevice> > m_link;
