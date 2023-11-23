@@ -24,7 +24,7 @@ namespace ns3 {
 #define LEO_TELESAT_FREQUENCY        28.5         // GHz
 #define LEO_TELESAT_BANDWIDTH        2.1          // GHz
 #define LEO_TELESAT_TX_ANTENNA_D     3.5          // m
-#define LEO_TELESAT_EIRP             75.9         // dBW
+#define LEO_TELESAT_EIRP             105.9        // dBm
 #define LEO_TELESAT_MODCOD           "64APSK 3/4" // -
 #define LEO_TELESAT_ROLL_OFF_FACTOR  0.1          // -
 #define LEO_TELESAT_SPECTRAL_EFF     4.1          // bps/Hz

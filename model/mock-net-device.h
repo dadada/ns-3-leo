@@ -92,6 +92,16 @@ public:
   bool Attach (Ptr<MockChannel> ch);
 
   /**
+   * Get the transmission power in dbm
+   */
+  double GetTxPower () const;
+
+  /**
+   * Set the transmission power in dbm
+   */
+  void SetTxPower (double txPower);
+
+  /**
    * Attach a queue to the MockNetDevice.
    *
    * The MockNetDevice "owns" a queue that implements a queueing
@@ -280,6 +290,11 @@ private:
     READY,   /**< The transmitter is ready to begin transmission of a packet */
     BUSY     /**< The transmitter is busy transmitting a packet */
   };
+  /**
+   * Transmission power used for transmissions
+   */
+  double m_txPower;
+
   /**
    * The state of the Net Device transmit state machine.
    */

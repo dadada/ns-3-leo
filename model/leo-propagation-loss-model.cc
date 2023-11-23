@@ -26,10 +26,25 @@ LeoPropagationLossModel::GetTypeId (void)
                    DoubleValue (1000000.0),
                    MakeDoubleAccessor (&LeoPropagationLossModel::m_cutoffDistance),
                    MakeDoubleChecker<double> ())
-    .AddAttribute ("MaxAngle",
+    .AddAttribute ("ElevationAngle",
                    "Cut-off angle for signal propagation",
                    DoubleValue (20.0),
-                   MakeDoubleAccessor (&LeoPropagationLossModel::m_cutoffAngle),
+                   MakeDoubleAccessor (&LeoPropagationLossModel::m_elevationAngle),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("AtmosphericLoss",
+                   "Atmospheric loss due to attenuation in dB",
+                   DoubleValue (0.0),
+                   MakeDoubleAccessor (&LeoPropagationLossModel::m_atmosphericLoss),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("FreeSpacePathLoss",
+                   "Free space path loss in dB",
+                   DoubleValue (0.0),
+                   MakeDoubleAccessor (&LeoPropagationLossModel::m_atmosphericLoss),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("LinkMargin",
+                   "Link margin in dB",
+                   DoubleValue (0.0),
+                   MakeDoubleAccessor (&LeoPropagationLossModel::m_linkMargin),
                    MakeDoubleChecker<double> ())
   ;
   return tid;
@@ -61,13 +76,14 @@ LeoPropagationLossModel::DoCalcRxPower (double txPowerDbm,
                                         Ptr<MobilityModel> a,
                                         Ptr<MobilityModel> b) const
 {
-  if (a->GetDistanceFrom (b) > m_cutoffDistance && GetAngle (a, b) > m_cutoffAngle)
+  if (a->GetDistanceFrom (b) > m_cutoffDistance && GetAngle (a, b) > m_elevationAngle / 2.0)
     {
       return 0.0;
     }
 
-  double rxc = 0.0;//-m_variable->GetValue ();
-  //NS_LOG_DEBUG ("attenuation coefficient="<<rxc<<"Db");
+  double rxc = -m_atmosphericLoss - m_freeSpacePathLoss;
+  NS_LOG_DEBUG ("attenuation coefficient= " << rxc << " dB");
+
   return txPowerDbm + rxc;
 }
 

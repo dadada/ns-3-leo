@@ -28,6 +28,7 @@
 #include "ns3/net-device-queue-interface.h"
 #include "ns3/ethernet-header.h"
 #include "ns3/ethernet-trailer.h"
+#include "ns3/double.h"
 #include "mock-channel.h"
 #include "mock-net-device.h"
 
@@ -69,6 +70,11 @@ MockNetDevice::GetTypeId (void)
                    TimeValue (Seconds (0.0)),
                    MakeTimeAccessor (&MockNetDevice::m_tInterframeGap),
                    MakeTimeChecker ())
+    .AddAttribute ("TxPower",
+                   "Transmit power in dBm",
+                   DoubleValue (1.0),
+                   MakeDoubleAccessor (&MockNetDevice::m_txPower),
+                   MakeDoubleChecker<double> ())
 
     //
     // Transmit queueing discipline for the device which includes its own set
@@ -763,6 +769,18 @@ bool
 MockNetDevice::IsPointToPoint() const
 {
   return false;
+}
+
+double
+MockNetDevice::GetTxPower () const
+{
+  return m_txPower;
+}
+
+void
+MockNetDevice::SetTxPower (double txPower)
+{
+  m_txPower = txPower;
 }
 
 } // namespace ns3

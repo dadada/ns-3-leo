@@ -25,9 +25,24 @@ private:
   double m_cutoffDistance;
 
   /**
-   * Cutoff angle for signal
+   * Maximum elevation angle
    */
-  double m_cutoffAngle;
+  double m_elevationAngle;
+
+  /**
+   * Atmospheric loss
+   */
+  double m_atmosphericLoss;
+
+  /**
+   * Free space path loss (FSPL)
+   */
+  double m_freeSpacePathLoss;
+
+  /**
+   * Link margin
+   */
+  double m_linkMargin;
 
   /**
    * Returns the Rx Power taking into account only the particular

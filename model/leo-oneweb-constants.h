@@ -24,7 +24,7 @@ namespace ns3 {
 #define LEO_ONEWEB_FREQUENCY        28.5            // GHz
 #define LEO_ONEWEB_BANDWIDTH        0.25            // GHz
 #define LEO_ONEWEB_TX_ANTENNA_D     2.4             // m
-#define LEO_ONEWEB_EIRP             63.2            // dBW
+#define LEO_ONEWEB_EIRP             93.2            // dBm
 #define LEO_ONEWEB_MODCOD           "256APSK 32/45" // -
 #define LEO_ONEWEB_ROLL_OFF_FACTOR  0.1             // -
 #define LEO_ONEWEB_SPECTRAL_EFF     5.1             // bps/Hz

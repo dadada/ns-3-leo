@@ -173,7 +173,8 @@ MockChannel::Deliver (
       Ptr<PropagationLossModel> pLoss = GetPropagationLoss ();
       if (pLoss != 0)
     	{
-      	  if (pLoss->CalcRxPower (1.0, srcMob, dstMob) == 0.0)
+      	  // check if Rx power is below link margin
+      	  if (pLoss->CalcRxPower (src->GetTxPower (), srcMob, dstMob) == 0.0)
     	    {
       	      return false;
     	    }
