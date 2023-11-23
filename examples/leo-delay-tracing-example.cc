@@ -26,20 +26,19 @@ int main (int argc, char *argv[])
 
   CommandLine cmd;
   std::string orbitFile;
-  std::string groundFile;
   std::string traceFile;
   LeoLatLong source;
   LeoLatLong destination;
   std::string islRate;
   std::string constellation;
+  uint64_t numGws;
   Time interval;
   Time duration;
   cmd.AddValue("orbitFile", "CSV file with orbit parameters", orbitFile);
   cmd.AddValue("traceFile", "CSV file to store mobility trace in", traceFile);
-  // TODO write position allocator for long,lat
-  cmd.AddValue("groundFile", "CSV file with ground station locations", groundFile);
   cmd.AddValue("precision", "ns3::LeoCircularOrbitMobilityModel::Precision");
   cmd.AddValue("duration", "Duration of the simulation", duration);
+  cmd.AddValue("numGws", "Number of gateways", numGws);
   cmd.AddValue("source", "Traffic source", source);
   cmd.AddValue("destination", "Traffic destination", destination);
   cmd.AddValue("islRate", "Throughput of the ISL link", islRate);
@@ -60,11 +59,10 @@ int main (int argc, char *argv[])
   NodeContainer satellites = orbit.Install (orbitFile);
 
   LeoGndNodeHelper ground;
-  NodeContainer stations = ground.Install (groundFile);
+  NodeContainer stations = ground.Install (numGws);
   NodeContainer users = ground.Install (source, destination);
   stations.Add (users);
 
-  // TODO create source and sink with ConstantPosition MobilityHelper
   Ptr<Node> client = users.Get (0);
   Ptr<Node> server = users.Get (1);
 

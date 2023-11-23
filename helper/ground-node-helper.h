@@ -29,10 +29,17 @@ public:
 
   /**
    *
-   * \param wpFile path to latitude longitude file
+   * \param file path to latitude longitude file
    * \returns a node container containing nodes using the specified attributes
    */
   NodeContainer Install (const std::string &file);
+
+  /**
+   *
+   * \param numNodes a number of nodes to uniformly distribute accross earth
+   * \returns a node container containing nodes using the specified attributes
+   */
+  NodeContainer Install (uint64_t numNodes);
 
   /**
    *

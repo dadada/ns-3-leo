@@ -5,6 +5,8 @@
 #include "ns3/log.h"
 #include "ns3/config.h"
 #include "ns3/waypoint.h"
+#include "ns3/double.h"
+#include "ns3/mobility-helper.h"
 
 #include "ground-node-helper.h"
 
@@ -51,6 +53,24 @@ LeoGndNodeHelper::Install (const std::string &file)
   stream.close ();
 
   NS_LOG_INFO ("Added " << nodes.GetN () << " ground nodes");
+
+  return nodes;
+}
+
+NodeContainer
+LeoGndNodeHelper::Install (uint64_t numNodes)
+{
+  NodeContainer nodes;
+  for (uint64_t i = 0; i < numNodes; i++)
+    {
+      nodes.Add (m_gndNodeFactory.Create<Node> ());
+    }
+  MobilityHelper mobility;
+  mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
+  mobility.SetPositionAllocator ("ns3::LeoPolarPositionAllocator",
+  				 "Step", DoubleValue (360.0 * 180.0 / numNodes));
+
+  mobility.Install (nodes);
 
   return nodes;
 }
