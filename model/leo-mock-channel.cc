@@ -18,7 +18,7 @@ TypeId
 LeoMockChannel::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::LeoMockChannel")
-    .SetParent<Channel> ()
+    .SetParent<MockChannel> ()
     .SetGroupName ("Leo")
     .AddConstructor<LeoMockChannel> ()
   ;
