@@ -123,7 +123,8 @@ LeoCircularOrbitMobilityModel::GetProgress (Time t) const
     {
       sign = -1;
     }
-  return sign * (2 * M_PI * ((GetSpeed () * t.GetSeconds ()) / LEO_EARTH_RAD_KM)) + m_offset;
+  // 2pi * (distance travelled / circumference of earth) + offset
+  return sign * (((GetSpeed () * t.GetSeconds ()) / (LEO_EARTH_RAD_KM * 1000))) + m_offset;
 }
 
 Vector3D
