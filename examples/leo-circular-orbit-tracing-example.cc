@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
   CommandLine cmd;
   std::string orbitFile;
   std::string traceFile;
-  double duration;
+  double duration = 60;
   cmd.AddValue("orbitFile", "CSV file with orbit parameters", orbitFile);
   cmd.AddValue("traceFile", "CSV file to store mobility trace in", traceFile);
   cmd.AddValue("precision", "ns3::LeoCircularOrbitMobilityModel::Precision");
@@ -30,7 +30,16 @@ int main(int argc, char *argv[])
   cmd.Parse (argc, argv);
 
   LeoOrbitNodeHelper orbit;
-  NodeContainer satellites = orbit.Install (orbitFile);
+  NodeContainer satellites;
+  if (orbitFile.empty())
+    {
+      satellites = orbit.Install (orbitFile);
+    }
+  else
+    {
+      satellites = orbit.Install ({ LeoOrbit (1200, 20, 32, 16),
+      				  LeoOrbit (1180, 30, 12, 10) });
+    }
 
   Config::Connect ("/NodeList/*/$ns3::MobilityModel/CourseChange",
                    MakeCallback (&CourseChange));

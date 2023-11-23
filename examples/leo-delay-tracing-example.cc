@@ -74,18 +74,18 @@ int main (int argc, char *argv[])
   CommandLine cmd;
   std::string orbitFile;
   std::string traceFile;
-  LeoLatLong source;
-  LeoLatLong destination;
-  std::string islRate;
-  std::string constellation;
+  LeoLatLong source (51.84, 10.28);
+  LeoLatLong destination (40.76, -73.96);
+  std::string islRate = "2Gbps";
+  std::string constellation = "TelesatGateway";
   uint32_t latGws = 20;
   uint32_t lonGws = 20;
-  double interval;
-  double duration;
-  bool islEnabled = false;
-  bool traceDrops = false;
-  bool traceTxRx = false;
-  bool traceFwd = false;
+  double interval = 1;
+  double duration = 100;
+  bool islEnabled = true;
+  bool traceDrops = true;
+  bool traceTxRx = true;
+  bool traceFwd = true;
   std::string routingProto = "aodv";
   cmd.AddValue("orbitFile", "CSV file with orbit parameters", orbitFile);
   cmd.AddValue("traceFile", "CSV file to store mobility trace in", traceFile);
@@ -117,7 +117,16 @@ int main (int argc, char *argv[])
     }
 
   LeoOrbitNodeHelper orbit;
-  NodeContainer satellites = orbit.Install (orbitFile);
+  NodeContainer satellites;
+  if (orbitFile.empty())
+    {
+      satellites = orbit.Install (orbitFile);
+    }
+  else
+    {
+      satellites = orbit.Install ({ LeoOrbit (1200, 20, 32, 16),
+      				  LeoOrbit (1180, 30, 12, 10) });
+    }
 
   LeoGndNodeHelper ground;
   NodeContainer stations = ground.Install (latGws, lonGws);

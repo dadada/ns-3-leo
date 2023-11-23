@@ -9,6 +9,7 @@
 #include "ns3/node-container.h"
 #include "ns3/leo-circular-orbit-mobility-model.h"
 #include "ns3/leo-circular-orbit-position-allocator.h"
+#include "ns3/leo-orbit.h"
 
 /**
  * \brief Builds a node container of nodes with LEO positions using a list of
@@ -32,6 +33,20 @@ public:
    * \returns a node container containing nodes using the specified attributes
    */
   NodeContainer Install (const std::string &orbitFile);
+
+  /**
+   *
+   * \param orbits orbit definitions
+   * \returns a node container containing nodes using the specified attributes
+   */
+  NodeContainer Install (const std::vector<LeoOrbit> &orbits);
+
+  /**
+   *
+   * \param orbit orbit definition
+   * \returns a node container containing nodes using the specified attributes
+   */
+  NodeContainer Install (const LeoOrbit &orbit);
 
   /**
    * Set an attribute for each node
