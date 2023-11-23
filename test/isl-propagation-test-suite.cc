@@ -7,67 +7,41 @@
 
 using namespace ns3;
 
+#define EARTH_RAD 6.3781e6
+
 class IslPropagationAngleTestCase1 : public TestCase
 {
 public:
-  IslPropagationAngleTestCase1 ();
-  virtual ~IslPropagationAngleTestCase1 ();
-
+  IslPropagationAngleTestCase1 () : TestCase ("neighboring sats have line-of-sight") {}
+  virtual ~IslPropagationAngleTestCase1 () {}
 private:
-  virtual void DoRun (void);
+  void DoRun (void)
+  {
+    Ptr<ConstantPositionMobilityModel> a = CreateObject<ConstantPositionMobilityModel> ();
+    a->SetPosition (Vector3D (EARTH_RAD + 1.0e6, 10, 0));
+    Ptr<ConstantPositionMobilityModel> b = CreateObject<ConstantPositionMobilityModel> ();
+    b->SetPosition (Vector3D (EARTH_RAD + 1.0e6, 0, 0));
+
+    NS_TEST_ASSERT_MSG_EQ (IslPropagationLossModel::GetLos (a, b), true, "no line-of-sight");
+  }
 };
-
-IslPropagationAngleTestCase1::IslPropagationAngleTestCase1 ()
-  : TestCase ("Test LOS computation neighboring sats")
-{
-}
-
-IslPropagationAngleTestCase1::~IslPropagationAngleTestCase1 ()
-{
-}
-
-#define EARTH_RAD 6.3781e6
-
-void
-IslPropagationAngleTestCase1::DoRun (void)
-{
-  Ptr<ConstantPositionMobilityModel> a = CreateObject<ConstantPositionMobilityModel> ();
-  a->SetPosition (Vector3D (EARTH_RAD + 1.0e6, 10, 0));
-  Ptr<ConstantPositionMobilityModel> b = CreateObject<ConstantPositionMobilityModel> ();
-  b->SetPosition (Vector3D (EARTH_RAD + 1.0e6, 0, 0));
-
-  NS_TEST_ASSERT_MSG_EQ (IslPropagationLossModel::GetLos (a, b), true, "LOS of neighboring satellites");
-}
 
 class IslPropagationAngleTestCase2 : public TestCase
 {
 public:
-  IslPropagationAngleTestCase2 ();
-  virtual ~IslPropagationAngleTestCase2 ();
-
+  IslPropagationAngleTestCase2 () : TestCase ("satellites on opposing sites of earth have no line-of-sight") {}
+  virtual ~IslPropagationAngleTestCase2 () {}
 private:
-  virtual void DoRun (void);
+  virtual void DoRun (void)
+  {
+    Ptr<ConstantPositionMobilityModel> a = CreateObject<ConstantPositionMobilityModel> ();
+    a->SetPosition (Vector3D (EARTH_RAD + 1.0e6, 0, 0));
+    Ptr<ConstantPositionMobilityModel> b = CreateObject<ConstantPositionMobilityModel> ();
+    b->SetPosition (Vector3D (- (EARTH_RAD + 1.0e6), 0, 0));
+
+    NS_TEST_ASSERT_MSG_EQ (IslPropagationLossModel::GetLos (a, b), false, "line-of-sight");
+  }
 };
-
-IslPropagationAngleTestCase2::IslPropagationAngleTestCase2 ()
-  : TestCase ("Test LOS of sats without LOS")
-{
-}
-
-IslPropagationAngleTestCase2::~IslPropagationAngleTestCase2 ()
-{
-}
-
-void
-IslPropagationAngleTestCase2::DoRun (void)
-{
-  Ptr<ConstantPositionMobilityModel> a = CreateObject<ConstantPositionMobilityModel> ();
-  a->SetPosition (Vector3D (EARTH_RAD + 1.0e6, 0, 0));
-  Ptr<ConstantPositionMobilityModel> b = CreateObject<ConstantPositionMobilityModel> ();
-  b->SetPosition (Vector3D (- (EARTH_RAD + 1.0e6), 0, 0));
-
-  NS_TEST_ASSERT_MSG_EQ (IslPropagationLossModel::GetLos (a, b), false, "LOS of opposing");
-}
 
 class IslPropagationTestSuite : public TestSuite
 {
