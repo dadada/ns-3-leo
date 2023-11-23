@@ -38,7 +38,7 @@ EmptyGndNodeHelperTestCase::DoRun (void)
   std::vector<std::string> gndWps = {};
 
   LeoGndNodeHelper gndHelper;
-  NodeContainer nodes = gndHelper.Install ("contrib/leo/data/test/empty");
+  NodeContainer nodes = gndHelper.Install ("hsksjhskjhs");
 
   NS_ASSERT_MSG (nodes.GetN () == 0, "Empty position file produces non-empty node container");
 }
@@ -68,9 +68,10 @@ void
 SomeGndNodeHelperTestCase::DoRun (void)
 {
   LeoGndNodeHelper gndHelper;
-  NodeContainer nodes = gndHelper.Install ("contrib/leo/data/test/ground-stations.txt");
+  NodeContainer nodes = gndHelper.Install (LeoLatLong ("station1", 50.1, 10.0),
+  					   LeoLatLong ("station2", -70.1, -21.0));
 
-  NS_ASSERT_MSG (nodes.GetN () > 1, "No ground stations");
+  NS_ASSERT_MSG (nodes.GetN () == 2, "No ground stations");
 
   Ptr<MobilityModel> mob = nodes.Get (0)->GetObject<MobilityModel> ();
   NS_ASSERT_MSG (mob != Ptr<MobilityModel> (), "Mobility model is valid");

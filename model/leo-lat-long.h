@@ -12,8 +12,10 @@ class LeoLatLong
 public:
   LeoLatLong ();
   LeoLatLong (double latitude, double longitude);
+  LeoLatLong (std::string label, double latitude, double longitude);
   virtual ~LeoLatLong();
 
+  std::string label;
   double latitude;
   double longitude;
 };

@@ -9,6 +9,7 @@
 #include "ns3/assert.h"
 #include "ns3/string.h"
 #include "ns3/data-rate.h"
+#include "ns3/net-device-queue-interface.h"
 
 #include "../model/leo-mock-channel.h"
 #include "../model/leo-mock-net-device.h"
@@ -347,6 +348,12 @@ LeoChannelHelper::Install (std::vector<Ptr<Node> > &satellites, std::vector<Ptr<
     node->AddDevice (dev);
     Ptr<Queue<Packet> > queue = m_satQueueFactory.Create<Queue<Packet> > ();
     dev->SetQueue (queue);
+
+    // Aggregate NetDeviceQueueInterface objects
+    Ptr<NetDeviceQueueInterface> ndqi = CreateObject<NetDeviceQueueInterface> ();
+    ndqi->GetTxQueue (0)->ConnectQueueTraces (queue);
+    dev->AggregateObject (ndqi);
+
     dev->Attach (channel);
     container.Add (dev);
 
@@ -360,6 +367,12 @@ LeoChannelHelper::Install (std::vector<Ptr<Node> > &satellites, std::vector<Ptr<
     node->AddDevice (dev);
     Ptr<Queue<Packet> > queue = m_gndQueueFactory.Create<Queue<Packet> > ();
     dev->SetQueue (queue);
+
+    // Aggregate NetDeviceQueueInterface objects
+    Ptr<NetDeviceQueueInterface> ndqi = CreateObject<NetDeviceQueueInterface> ();
+    ndqi->GetTxQueue (0)->ConnectQueueTraces (queue);
+    dev->AggregateObject (ndqi);
+
     dev->Attach (channel);
     container.Add (dev);
 

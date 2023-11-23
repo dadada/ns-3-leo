@@ -6,6 +6,7 @@
 #include "ns3/network-module.h"
 #include "ns3/aodv-module.h"
 #include "ns3/udp-server.h"
+#include "ns3/epidemic-routing-module.h"
 
 using namespace ns3;
 
@@ -34,6 +35,7 @@ int main (int argc, char *argv[])
   uint64_t numGws;
   double interval;
   double duration;
+  std::string routingProto = "aodv";
   cmd.AddValue("orbitFile", "CSV file with orbit parameters", orbitFile);
   cmd.AddValue("traceFile", "CSV file to store mobility trace in", traceFile);
   cmd.AddValue("precision", "ns3::LeoCircularOrbitMobilityModel::Precision");
@@ -44,6 +46,7 @@ int main (int argc, char *argv[])
   cmd.AddValue("islRate", "Throughput of the ISL link", islRate);
   cmd.AddValue("constellation", "LEO constellation link settings name", constellation);
   cmd.AddValue("interval", "Echo interval", interval);
+  cmd.AddValue("routing", "Routing protocol", routingProto);
   cmd.AddValue("ttlThresh", "ns3::aodv::RoutingProtocol::TtlThreshold");
   cmd.AddValue("routeTimeout", "ns3::aodv::RoutingProtocol::ActiveRouteTimeout");
   cmd.Parse (argc, argv);
@@ -80,18 +83,28 @@ int main (int argc, char *argv[])
   utCh.SetConstellation (constellation);
   utNet = utCh.Install (satellites, stations);
 
-  //if (proto == "aodv")
-  // Install internet stack on nodes
-  AodvHelper aodv;
-  // This disabled is far better for performance (huge network)
-  aodv.Set ("EnableHello", BooleanValue (false));
-  //aodv.Set ("TtlThreshold", UintegerValue (ttlThresh));
-  aodv.Set ("RreqRateLimit", UintegerValue (1));
-  aodv.Set ("RerrRateLimit", UintegerValue (1));
-  //aodv.Set ("ActiveRouteTimeout", TimeValue (Seconds (routeTimeout)));
-
   InternetStackHelper stack;
-  stack.SetRoutingHelper (aodv);
+  if (routingProto == "epidemic")
+    {
+      EpidemicHelper epidemic;
+      epidemic.Set ("HopCount", UintegerValue (50));
+      //epidemic.Set ("QueueLength", UintegerValue (50));
+      //epidemic.Set ("QueueEntryExpireTime", TimeValue (Seconds (100)));
+      //epidemic.Set ("BeaconInterval", TimeValue (Seconds (1)));
+
+      stack.SetRoutingHelper (epidemic);
+    }
+  else
+    {
+      // Install internet stack on nodes
+      AodvHelper aodv;
+      aodv.Set ("EnableHello", BooleanValue (false));
+      aodv.Set ("RreqRateLimit", UintegerValue (1));
+      aodv.Set ("RerrRateLimit", UintegerValue (1));
+
+      stack.SetRoutingHelper (aodv);
+    }
+
   stack.Install (satellites);
   stack.Install (stations);
 
