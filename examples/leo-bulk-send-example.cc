@@ -1,122 +1,154 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
+#include <iostream>
+
 #include "ns3/core-module.h"
 #include "ns3/mobility-module.h"
 #include "ns3/leo-module.h"
 #include "ns3/network-module.h"
 #include "ns3/aodv-module.h"
 #include "ns3/udp-server.h"
+#include "ns3/epidemic-routing-module.h"
 
 using namespace ns3;
 
+static void
+EchoTxRx (std::string context, const Ptr< const Packet > packet, const TcpHeader &header, const Ptr< const TcpSocketBase > socket)
+{
+  std::cout << Simulator::Now () << ":" << context << ":" << packet->GetUid() << ":" << socket->GetNode () << ":" << header.GetSequenceNumber () << std::endl;
+}
+
 NS_LOG_COMPONENT_DEFINE ("LeoBulkSendTracingExample");
-
-uint64_t maxBytes = 1000000000;
-uint16_t port = 9;
-bool tracing = false;
-
-class Orbit {
-public:
-  Orbit (double a, double i, double p, double s) : alt (a), inc (i), planes (p), sats (s) {}
-  double alt;
-  double inc;
-  uint16_t planes;
-  uint16_t sats;
-};
 
 int main (int argc, char *argv[])
 {
-  std::vector<Orbit> orbits = {
-      Orbit (1150, 53.0, 32, 50),
-      Orbit (1110, 53.8, 32, 50),
-      //Orbit (1130, 74.0,  8, 50),
-      //Orbit (1275, 81, 5, 75),
-      //Orbit (1325, 70, 6, 75),
-  };
-  NodeContainer satellites;
-  for (Orbit orb: orbits)
-    {
-      NodeContainer c;
-      c.Create (orb.sats*orb.planes);
 
-      MobilityHelper mobility;
-      mobility.SetPositionAllocator ("ns3::LeoCircularOrbitPostionAllocator",
-                                     "NumOrbits", IntegerValue (orb.planes),
-                                     "NumSatellites", IntegerValue (orb.sats));
-      mobility.SetMobilityModel ("ns3::LeoCircularOrbitMobilityModel",
-  			     	 "Altitude", DoubleValue (orb.alt),
-  			     	 "Inclination", DoubleValue (orb.inc),
-  			     	 "Precision", TimeValue (Minutes (1)));
-      mobility.Install (c);
-      satellites.Add (c);
+  CommandLine cmd;
+  std::string orbitFile;
+  std::string traceFile;
+  LeoLatLong source (51.399, 10.536);
+  LeoLatLong destination (40.76, -73.96);
+  std::string islRate = "2Gbps";
+  std::string constellation = "TelesatGateway";
+  uint16_t port = 9;
+  uint32_t latGws = 20;
+  uint32_t lonGws = 20;
+  double duration = 100;
+  bool islEnabled = true;
+  bool pcap = false;
+  std::string routingProto = "aodv";
+
+  cmd.AddValue("orbitFile", "CSV file with orbit parameters", orbitFile);
+  cmd.AddValue("traceFile", "CSV file to store mobility trace in", traceFile);
+  cmd.AddValue("precision", "ns3::LeoCircularOrbitMobilityModel::Precision");
+  cmd.AddValue("duration", "Duration of the simulation in seconds", duration);
+  cmd.AddValue("source", "Traffic source", source);
+  cmd.AddValue("destination", "Traffic destination", destination);
+  cmd.AddValue("islRate", "ns3::MockNetDevice::DataRate");
+  cmd.AddValue("constellation", "LEO constellation link settings name", constellation);
+  cmd.AddValue("routing", "Routing protocol", routingProto);
+  cmd.AddValue("islEnabled", "Enable inter-satellite links", islEnabled);
+  cmd.AddValue("latGws", "Latitudal rows of gateways", latGws);
+  cmd.AddValue("lonGws", "Longitudinal rows of gateways", lonGws);
+  cmd.AddValue("destOnly", "ns3::aodv::RoutingProtocol::DestinationOnly");
+  cmd.AddValue("routeTimeout", "ns3::aodv::RoutingProtocol::ActiveRouteTimeout");
+  cmd.AddValue("pcap", "Enable packet capture", pcap);
+  cmd.Parse (argc, argv);
+
+  std::streambuf *coutbuf = std::cout.rdbuf();
+  // redirect cout if traceFile
+  std::ofstream out;
+  out.open (traceFile);
+  if (out.is_open ())
+    {
+      std::cout.rdbuf(out.rdbuf());
+    }
+
+  LeoOrbitNodeHelper orbit;
+  NodeContainer satellites;
+  if (orbitFile.empty())
+    {
+      satellites = orbit.Install (orbitFile);
+    }
+  else
+    {
+      satellites = orbit.Install ({ LeoOrbit (1200, 20, 32, 16),
+      				  LeoOrbit (1180, 30, 12, 10) });
     }
 
   LeoGndNodeHelper ground;
-  NodeContainer stations = ground.Install ("contrib/leo/data/ground-stations/usa-60.waypoints");
+  NodeContainer stations = ground.Install (latGws, lonGws);
 
-  NetDeviceContainer islNet, utNet;
-
-  IslHelper islCh;
-  islCh.SetDeviceAttribute ("DataRate", StringValue ("1Gbps"));
-  islCh.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
-  islCh.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::IslPropagationLossModel"));
-  islNet = islCh.Install (satellites);
+  NodeContainer users = ground.Install (source, destination);
+  stations.Add (users);
 
   LeoChannelHelper utCh;
-  utCh.SetConstellation ("StarlinkUser");
-  utNet = utCh.Install (satellites, stations);
-
-  // Install internet stack on nodes
-  AodvHelper aodv;
-  //aodv.Set ("HelloInterval", TimeValue (Minutes (1)));
-  //aodv.Set ("TtlStart", UintegerValue (2));
-  //aodv.Set ("TtlIncrement", UintegerValue (1));
-  //aodv.Set ("TtlThreshold", UintegerValue (20));
-  //aodv.Set ("RreqRetries", UintegerValue (1000));
-  //aodv.Set ("RreqRateLimit", UintegerValue (1));
-  //aodv.Set ("RerrRateLimit", UintegerValue (1));
-  //aodv.Set ("ActiveRouteTimeout", TimeValue (Minutes (1)));
-  //aodv.Set ("NextHopWait", TimeValue (MilliSeconds (200)));
-  //aodv.Set ("NetDiameter", UintegerValue (300));
-  //aodv.Set ("AllowedHelloLoss", UintegerValue (10000));
-  //aodv.Set ("PathDiscoveryTime", TimeValue (Seconds (1)));
+  utCh.SetConstellation (constellation);
+  NetDeviceContainer utNet = utCh.Install (satellites, stations);
 
   InternetStackHelper stack;
-  stack.SetRoutingHelper (aodv);
+  if (routingProto == "epidemic")
+    {
+      EpidemicHelper epidemic;
+      //epidemic.Set ("BeaconInterval", TimeValue (MilliSeconds (100)));
+      stack.SetRoutingHelper (epidemic);
+    }
+  else
+    {
+      AodvHelper aodv;
+      aodv.Set ("EnableHello", BooleanValue (true));
+      //aodv.Set ("HelloInterval", TimeValue (Seconds (5)));
+      //aodv.Set ("RreqRetries", UintegerValue (1000));
+      //aodv.Set ("RerrRateLimit", UintegerValue (1000));
+      //aodv.Set ("RreqRateLimit", UintegerValue (10));
+      //aodv.Set ("TtlThreshold", UintegerValue (10));
+      //aodv.Set ("NetDiameter", UintegerValue (50));
+      stack.SetRoutingHelper (aodv);
+    }
+
+  // Install internet stack on nodes
   stack.Install (satellites);
   stack.Install (stations);
 
-  // Make all networks addressable for legacy protocol
   Ipv4AddressHelper ipv4;
+
   ipv4.SetBase ("10.1.0.0", "255.255.0.0");
-  Ipv4InterfaceContainer islIp = ipv4.Assign (islNet);
-  ipv4.SetBase ("10.3.0.0", "255.255.0.0");
-  Ipv4InterfaceContainer utIp = ipv4.Assign (utNet);
+  ipv4.Assign (utNet);
 
-  //
-  // Create a PacketSinkApplication and install it on node 1
-  //
-  PacketSinkHelper sink ("ns3::TcpSocketFactory",
-                         InetSocketAddress (Ipv4Address::GetAny (), port));
-  ApplicationContainer sinkApps = sink.Install (stations.Get (1));
+  if (islEnabled)
+    {
+      std::cerr << "ISL enabled" << std::endl;
+      IslHelper islCh;
+      NetDeviceContainer islNet = islCh.Install (satellites);
+      ipv4.SetBase ("10.2.0.0", "255.255.0.0");
+      ipv4.Assign (islNet);
+    }
 
-  // install a client on one of the terminals
-  ApplicationContainer clientApps;
-  Address remote = stations.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();//utIp.GetAddress (1, 0);
-  BulkSendHelper source ("ns3::TcpSocketFactory",
-  			 remote);
+  Ipv4Address remote = users.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();
+  BulkSendHelper sender ("ns3::TcpSocketFactory",
+                         InetSocketAddress (remote, port));
   // Set the amount of data to send in bytes.  Zero is unlimited.
-  source.SetAttribute ("MaxBytes", UintegerValue (maxBytes));
-  ApplicationContainer sourceApps = source.Install (stations.Get (0));
+  sender.SetAttribute ("MaxBytes", UintegerValue (0));
+  ApplicationContainer sourceApps = sender.Install (users.Get (0));
   sourceApps.Start (Seconds (0.0));
 
-  //Config::Connect ("/NodeList/[i]/$ns3::TcpL4Protocol/SocketList/[i]"
-  //		   MakeCallback (&EchoRx));
+//
+// Create a PacketSinkApplication and install it on node 1
+//
+  PacketSinkHelper sink ("ns3::TcpSocketFactory",
+                         InetSocketAddress (Ipv4Address::GetAny (), port));
+  ApplicationContainer sinkApps = sink.Install (users.Get (1));
+  sinkApps.Start (Seconds (0.0));
+
+  Config::Connect ("/NodeList/*/$ns3::TcpL4Protocol/SocketList/*/Tx",
+  		   MakeCallback (&EchoTxRx));
+  Config::Connect ("/NodeList/*/$ns3::TcpL4Protocol/SocketList/*/Rx",
+  		   MakeCallback (&EchoTxRx));
 
   //
   // Set up tracing if enabled
   //
-  if (tracing)
+  if (pcap)
     {
       AsciiTraceHelper ascii;
       utCh.EnableAsciiAll (ascii.CreateFileStream ("tcp-bulk-send.tr"));
@@ -124,16 +156,16 @@ int main (int argc, char *argv[])
     }
 
   NS_LOG_INFO ("Run Simulation.");
-  Simulator::Stop (Minutes (1));
+  Simulator::Stop (Seconds (duration));
   Simulator::Run ();
   Simulator::Destroy ();
   NS_LOG_INFO ("Done.");
 
   Ptr<PacketSink> sink1 = DynamicCast<PacketSink> (sinkApps.Get (0));
-  std::cout << "Total Bytes Received: " << sink1->GetTotalRx () << std::endl;
+  std::cout << users.Get (0)->GetId () << ":" << users.Get (1)->GetId () << ": " << sink1->GetTotalRx () << std::endl;
 
-  Simulator::Run ();
-  Simulator::Destroy ();
+  out.close ();
+  std::cout.rdbuf(coutbuf);
 
   return 0;
 }
