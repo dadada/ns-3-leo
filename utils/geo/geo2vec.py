@@ -9,7 +9,7 @@ from skyfield.api import Topos, load
 log.basicConfig(level=log.DEBUG)
 
 """
-Converts pairs of format `longitute latitude` to `ns3::Vector` format in ITRF frame
+Converts pairs of format `name longitute latitude` to `ns3::Vector` format in ITRF frame
 
 See `ns3::Vector::operator >>`
 """
@@ -34,7 +34,7 @@ if __name__ == "__main__":
         f = fileinput.input()
 
     for line in f:
-        lat, lng = line.split(',')
+        _, lat, lng = line.split(',')
         location = Topos(float(lat), float(lng))
         d = location.itrf_xyz().m
         print(Vector(d[0], d[1], d[2]))
