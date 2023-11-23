@@ -40,22 +40,23 @@ LeoTestCase1::DoRun (void)
 
   std::vector<std::string> satWps =
     {
-      "../contrib/leo/data/starlink/45212.waypoints",
-      "../contrib/leo/data/starlink/45213.waypoints",
-      "../contrib/leo/data/starlink/45214.waypoints",
-      "../contrib/leo/data/starlink/45215.waypoints",
+      "contrib/leo/data/test/waypoints.txt",
+      "contrib/leo/data/test/waypoints.txt",
+      "contrib/leo/data/test/waypoints.txt",
+      "contrib/leo/data/test/waypoints.txt",
     };
 
   LeoSatNodeHelper satHelper;
   NodeContainer satellites = satHelper.Install (satWps);
   LeoGndNodeHelper gndHelper;
-  NodeContainer gateways = gndHelper.Install ("../contrib/leo/data/gateways");
-  NodeContainer terminals = gndHelper.Install ("../contrib/leo/data/terminals");
+  NodeContainer gateways = gndHelper.Install ("contrib/leo/data/test/ground-stations.txt");
+  NodeContainer terminals = gndHelper.Install ("contrib/leo/data/test/ground-stations.txt");
 
   LeoHelper leo;
   leo.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
   leo.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
-  leo.SetRoutingHelper (AodvHelper ());
+  AodvHelper aodv;
+  leo.SetRoutingHelper (aodv);
 
   NetDeviceContainer allDevices = leo.Install (satellites, gateways, terminals);
 
@@ -67,7 +68,7 @@ LeoTestCase1::DoRun (void)
   ApplicationContainer clientApps;
   for (uint32_t i = 1; i < terminals.GetN (); i++)
     {
-      Address remote = terminals.Get (i)->GetObject<Ipv6> ()->GetAddress (1, 0).GetAddress ();
+      Address remote = terminals.Get (i)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();
       UdpEchoClientHelper echoClient (remote, 9);
       echoClient.SetAttribute ("MaxPackets", UintegerValue (1));
       echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));

@@ -38,7 +38,7 @@ ArpCacheHelper::Install (NetDeviceContainer &devices, Ipv4InterfaceContainer &in
 
           // and associated address
           uint32_t otherIfIndex = otherDevice->GetIfIndex ();
-          Ipv4Address ipaddr = interfaces.GetAddress (otherIfIndex, 1); // IP
+          Ipv4Address ipaddr = interfaces.GetAddress (otherIfIndex, 0); // IP
 
           // update cache
           ArpCache::Entry* entry = cache->Lookup (ipaddr);
