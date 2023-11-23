@@ -20,12 +20,6 @@ IslPropagationLossModel::GetTypeId (void)
     .SetParent<PropagationLossModel> ()
     .SetGroupName ("Leo")
     .AddConstructor<IslPropagationLossModel> ()
-    .AddAttribute ("MaxDistance",
-                   "Cut-off distance for signal propagation",
-                   DoubleValue (2000.0),
-                   MakeDoubleAccessor (&IslPropagationLossModel::SetCutoffDistance,
-				       &IslPropagationLossModel::GetCutoffDistance),
-                   MakeDoubleChecker<double> ())
   ;
   return tid;
 }
@@ -71,7 +65,7 @@ IslPropagationLossModel::DoCalcRxPower (double txPowerDbm,
                                         Ptr<MobilityModel> a,
                                         Ptr<MobilityModel> b) const
 {
-  if (a->GetDistanceFrom (b) > m_cutoffDistance || !GetLos (a, b))
+  if (!GetLos (a, b))
     {
       NS_LOG_DEBUG ("DROP;"<<a->GetPosition ()<<";"<<b->GetPosition ());
       return -1000.0;
@@ -88,15 +82,4 @@ IslPropagationLossModel::DoAssignStreams (int64_t stream)
   return 0;
 }
 
-void
-IslPropagationLossModel::SetCutoffDistance (double d)
-{
-  m_cutoffDistance = d * 1000.0;
-}
-
-double
-IslPropagationLossModel::GetCutoffDistance () const
-{
-  return m_cutoffDistance / 1000.0;
-}
 };

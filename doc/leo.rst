@@ -136,11 +136,11 @@ planes,number of satellites per plane``. The duration is given in seconds.
 
 .. sourcode::bash
 
-  $ ./waf --run leo-circular-orbit \
-  --orbitsFile=orbits.csv \
-  --traceFile=mobility-trace.csv \
-  --duration=10.0
-  --precision=1.0
+  $ ./waf --run "leo-orbit \
+  --orbitFile=contrib/leo/data/orbits/starlink.csv \
+  --duration=360.0 \
+  --precision=1.0 \
+  --traceFile=out.csv"
 
 leo-delay
 #########
@@ -151,18 +151,19 @@ given as pairs of longitude and latitude.
 
 .. sourcode::bash
 
-  $ ./waf --run leo-delay \
-  --orbitsFile=orbits.csv \
-  --groundFile=ground-stations.csv \
-  --traceFile=delay-trace.csv \
+  $ ./waf --run "leo-delay \
+  --orbitFile=contrib/leo/data/orbits/starlink.csv \
+  --traceFile=out.csv
+  --precision=1.0 \
+  --duration=360.0 \
+  --numGws=120 \
   --source=54.4:77.1 \
   --destination=-10.0:25.8 \
   --islRate=1Gbps \
   --constellation="StarlinkGateway" \
-  --duration=10.0 \
-  --maxPackets=360 \
   --interval=1 \
-  --packetSize=1024
+  --ttlThresh=30 \
+  --routeTimeout=0.25"
 
 leo-throughput
 ##############

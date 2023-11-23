@@ -32,18 +32,20 @@ int main (int argc, char *argv[])
   std::string islRate;
   std::string constellation;
   uint64_t numGws;
-  Time interval;
-  Time duration;
+  double interval;
+  double duration;
   cmd.AddValue("orbitFile", "CSV file with orbit parameters", orbitFile);
   cmd.AddValue("traceFile", "CSV file to store mobility trace in", traceFile);
   cmd.AddValue("precision", "ns3::LeoCircularOrbitMobilityModel::Precision");
-  cmd.AddValue("duration", "Duration of the simulation", duration);
+  cmd.AddValue("duration", "Duration of the simulation in seconds", duration);
   cmd.AddValue("numGws", "Number of gateways", numGws);
   cmd.AddValue("source", "Traffic source", source);
   cmd.AddValue("destination", "Traffic destination", destination);
   cmd.AddValue("islRate", "Throughput of the ISL link", islRate);
   cmd.AddValue("constellation", "LEO constellation link settings name", constellation);
   cmd.AddValue("interval", "Echo interval", interval);
+  cmd.AddValue("ttlThresh", "ns3::aodv::RoutingProtocol::TtlThreshold");
+  cmd.AddValue("routeTimeout", "ns3::aodv::RoutingProtocol::ActiveRouteTimeout");
   cmd.Parse (argc, argv);
 
   std::streambuf *coutbuf = std::cout.rdbuf();
@@ -78,10 +80,15 @@ int main (int argc, char *argv[])
   utCh.SetConstellation (constellation);
   utNet = utCh.Install (satellites, stations);
 
+  //if (proto == "aodv")
   // Install internet stack on nodes
   AodvHelper aodv;
   // This disabled is far better for performance (huge network)
   aodv.Set ("EnableHello", BooleanValue (false));
+  //aodv.Set ("TtlThreshold", UintegerValue (ttlThresh));
+  aodv.Set ("RreqRateLimit", UintegerValue (1));
+  aodv.Set ("RerrRateLimit", UintegerValue (1));
+  //aodv.Set ("ActiveRouteTimeout", TimeValue (Seconds (routeTimeout)));
 
   InternetStackHelper stack;
   stack.SetRoutingHelper (aodv);
@@ -103,7 +110,7 @@ int main (int argc, char *argv[])
   ApplicationContainer clientApps;
   Address remote = server->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();
   UdpClientHelper echoClient (remote, 9);
-  echoClient.SetAttribute ("MaxPackets", UintegerValue (duration.GetDouble ()/interval.GetDouble ()));
+  echoClient.SetAttribute ("MaxPackets", UintegerValue (duration / interval));
   echoClient.SetAttribute ("Interval", TimeValue (Seconds (interval)));
   echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
   clientApps.Add (echoClient.Install (client));
@@ -119,7 +126,7 @@ int main (int argc, char *argv[])
   //serverApps.Start (Seconds (1));
   //clientApps.Start (Seconds (1));
 
-  Simulator::Stop (duration);
+  Simulator::Stop (Seconds (duration));
   Simulator::Run ();
   Simulator::Destroy ();
 

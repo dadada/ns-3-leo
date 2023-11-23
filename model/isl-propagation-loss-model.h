@@ -29,14 +29,6 @@ public:
   static bool GetLos (Ptr<MobilityModel> a, Ptr<MobilityModel> b);
 private:
   /**
-   * Cutoff distance for signal
-   */
-  double m_cutoffDistance;
-
-  void SetCutoffDistance (double d);
-  double GetCutoffDistance () const;
-
-  /**
    * Returns the Rx Power taking into account only the particular
    * PropagationLossModel.
    *

@@ -23,7 +23,7 @@ LeoPropagationLossModel::GetTypeId (void)
     .AddConstructor<LeoPropagationLossModel> ()
     .AddAttribute ("MaxDistance",
                    "Cut-off distance for signal propagation",
-                   DoubleValue (4000.0),
+                   DoubleValue (2000.0),
                    MakeDoubleAccessor (&LeoPropagationLossModel::SetCutoffDistance,
 				       &LeoPropagationLossModel::GetCutoffDistance),
                    MakeDoubleChecker<double> ())
@@ -80,7 +80,7 @@ LeoPropagationLossModel::GetAngle (Ptr<MobilityModel> a, Ptr<MobilityModel> b)
       NS_LOG_DEBUG ("LEO space -> ground");
     }
 
-  double prod = (pa.x*-pb.x) + (pa.y*-pb.y) + (pa.z*-pb.z);
+  double prod = abs ((pa.x*-pb.x) + (pa.y*-pb.y) + (pa.z*-pb.z));
   double norm = pa.GetLength () * pb.GetLength ();
 
   return acos (prod / norm);
@@ -119,7 +119,7 @@ LeoPropagationLossModel::DoCalcRxPower (double txPowerDbm,
 
   if (distance > m_cutoffDistance)
     {
-      NS_LOG_DEBUG ("LEO DROP distance: a=" << a->GetPosition () << " b=" << b->GetPosition () << " m_cutOff="<<m_cutoffDistance<<" dist=" << distance);
+      NS_LOG_DEBUG ("LEO DROP distance: a=" << a->GetPosition () << " b=" << b->GetPosition ()<<" dist=" << distance);
 
       return -1000.0;
     }
@@ -127,7 +127,7 @@ LeoPropagationLossModel::DoCalcRxPower (double txPowerDbm,
   double angle = GetAngle (a, b);
   if (angle > m_elevationAngle)
     {
-      NS_LOG_DEBUG ("LEO DROP angle: a=" << a->GetPosition () << " b=" << b->GetPosition () << " m_cutOff="<<m_cutoffDistance<<" m_angle="<<m_elevationAngle<<" dist=" << distance << "angle=" << angle);
+      NS_LOG_DEBUG ("LEO DROP angle: a=" << a->GetPosition () << " b=" << b->GetPosition () << " dist=" << distance << "angle=" << angle);
       return -1000.0;
     }
 

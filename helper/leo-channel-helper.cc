@@ -24,7 +24,9 @@ NS_LOG_COMPONENT_DEFINE ("LeoChannelHelper");
 LeoChannelHelper::LeoChannelHelper ()
 {
   m_gndQueueFactory.SetTypeId ("ns3::DropTailQueue<Packet>");
+ // m_gndQueueFactory.Set ("MaxSize", QueueSizeValue (QueueSize ("10000p")));
   m_satQueueFactory.SetTypeId ("ns3::DropTailQueue<Packet>");
+  //m_satQueueFactory.Set ("MaxSize", QueueSizeValue (QueueSize ("10000p")));
 
   m_gndDeviceFactory.SetTypeId ("ns3::LeoMockNetDevice");
   m_gndDeviceFactory.Set ("DeviceType", EnumValue (LeoMockNetDevice::GND));
