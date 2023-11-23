@@ -5,28 +5,20 @@
 #include "ns3/leo-module.h"
 #include "ns3/network-module.h"
 #include "ns3/aodv-module.h"
+#include "ns3/udp-server.h"
 
 using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("LeoDelayTracingExample");
 
-Time t_start;
-uint64_t send = 0;;
-uint64_t received = 0;
-
-static void
-EchoTx (std::string context, Ptr<const Packet> packet)
-{
-  send ++;
-  t_start = Simulator::Now ();
-}
-
 static void
 EchoRx (std::string context, Ptr<const Packet> packet)
 {
-  received ++;
-  Time now = Simulator::Now ();
-  std::cout << context << "," << (now - t_start) << std::endl;
+  SeqTsHeader seqTs;
+  Ptr<Packet> p = packet->Copy ();
+  p->RemoveHeader (seqTs);
+  // seqnr, timestamp, delay
+  std::cout << context << "," << seqTs.GetSeq () << "," << seqTs.GetTs () << "," << Simulator::Now () - seqTs.GetTs () << std::endl;
 }
 
 int main (int argc, char *argv[])
@@ -91,22 +83,22 @@ int main (int argc, char *argv[])
   Ipv4InterfaceContainer utIp = ipv4.Assign (utNet);
 
   // we want to ping terminals
-  UdpEchoServerHelper echoServer (9);
+  UdpServerHelper echoServer (9);
   ApplicationContainer serverApps = echoServer.Install (stations.Get (1));
 
   // install a client on one of the terminals
   ApplicationContainer clientApps;
   Address remote = stations.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();//utIp.GetAddress (1, 0);
-  UdpEchoClientHelper echoClient (remote, 9);
+  UdpClientHelper echoClient (remote, 9);
   echoClient.SetAttribute ("MaxPackets", UintegerValue (360));
   echoClient.SetAttribute ("Interval", TimeValue (Minutes (1.0)));
   echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
   clientApps.Add (echoClient.Install (stations.Get (3)));
 
-  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::UdpEchoClient/Rx",
+  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::UdpServer/Rx",
   		   MakeCallback (&EchoRx));
-  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::UdpEchoClient/Tx",
-  		   MakeCallback (&EchoTx));
+
+  std::cout << "Context,Sequence Number,Timestamp,Delay" << std::endl;
 
   serverApps.Start (Seconds (1));
   clientApps.Start (Seconds (2));
@@ -115,7 +107,9 @@ int main (int argc, char *argv[])
   Simulator::Run ();
   Simulator::Destroy ();
 
-  std::cout << std::endl << received << "," << send << std::endl;
+  Ptr<UdpServer> server = StaticCast<UdpServer> (serverApps.Get (0));
+  std::cout << "Received,Lost" << std::endl
+    << server->GetReceived () << "," << server->GetLost () << std::endl;
 
   return 0;
 }
