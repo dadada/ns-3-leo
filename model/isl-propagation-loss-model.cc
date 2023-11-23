@@ -23,6 +23,7 @@
  */
 
 #include "ns3/log.h"
+#include "ns3/mobility-model.h"
 
 #include "isl-propagation-loss-model.h"
 
@@ -53,13 +54,18 @@ IslPropagationLossModel::~IslPropagationLossModel ()
 
 double
 IslPropagationLossModel::DoCalcRxPower (double txPowerDbm,
-                                           Ptr<MobilityModel> a,
-                                           Ptr<MobilityModel> b) const
+                                        Ptr<MobilityModel> a,
+                                        Ptr<MobilityModel> b) const
 {
-  //Vector aPos = a->GetPosition ();
-  //Vector bPos = b->GetPosition ();
 
-  // TODO perform line-earth intersection (ray tracing)
+  // TODO perform line-earth intersection (ray tracing or based on earth
+  // curvature + distance)
+
+  // primitivec cut-of at 1000 km
+  if (a->GetDistanceFrom (b) > 1000000.0)
+    {
+      return 0;
+    }
 
   double rxc = 0;//-m_variable->GetValue ();
   NS_LOG_DEBUG ("attenuation coefficient="<<rxc<<"Db");

@@ -1,6 +1,8 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
 #include "ns3/log.h"
+#include "ns3/mobility-model.h"
+
 #include "leo-propagation-loss-model.h"
 
 namespace ns3 {
@@ -38,6 +40,11 @@ LeoPropagationLossModel::DoCalcRxPower (double txPowerDbm,
 
   // TODO perform line-earth intersection (ray tracing)
   // TODO check angle between satellite and ground-station
+  // primitivec cut-of at 1000 km
+  if (a->GetDistanceFrom (b) > 1000000.0)
+    {
+      return 0;
+    }
 
   double rxc = 0;//-m_variable->GetValue ();
   //NS_LOG_DEBUG ("attenuation coefficient="<<rxc<<"Db");
