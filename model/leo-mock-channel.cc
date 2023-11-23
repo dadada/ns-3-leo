@@ -79,11 +79,16 @@ LeoMockChannel::TransmitStart (Ptr<const Packet> p,
       return false;
     }
 
+  // make sure to return false if packet has been delivered to *no* device
+  bool result = false;
   for (DeviceIndex::iterator it = dests->begin (); it != dests->end(); it ++)
     {
-      Deliver (p, srcDev, it->second, txTime);
+      if (Deliver (p, srcDev, it->second, txTime))
+      	{
+      	  result = true;
+      	}
     }
-  return true;
+  return result;
 }
 
 int32_t

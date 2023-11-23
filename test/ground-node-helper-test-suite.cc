@@ -68,8 +68,8 @@ void
 SomeGndNodeHelperTestCase::DoRun (void)
 {
   LeoGndNodeHelper gndHelper;
-  NodeContainer nodes = gndHelper.Install (LeoLatLong ("station1", 50.1, 10.0),
-  					   LeoLatLong ("station2", -70.1, -21.0));
+  NodeContainer nodes = gndHelper.Install (LeoLatLong (50.1, 10.0),
+  					   LeoLatLong (-70.1, -21.0));
 
   NS_ASSERT_MSG (nodes.GetN () == 2, "No ground stations");
 

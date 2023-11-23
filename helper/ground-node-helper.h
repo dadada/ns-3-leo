@@ -36,10 +36,11 @@ public:
 
   /**
    *
-   * \param numNodes a number of nodes to uniformly distribute accross earth
+   * \param latNodes a number of nodes to in latitude direction
+   * \param lonNodes a number of nodes to in longitude direction
    * \returns a node container containing nodes using the specified attributes
    */
-  NodeContainer Install (uint64_t numNodes);
+  NodeContainer Install (uint32_t latNodes, uint32_t lonNodes);
 
   /**
    *

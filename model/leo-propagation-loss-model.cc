@@ -23,7 +23,7 @@ LeoPropagationLossModel::GetTypeId (void)
     .AddConstructor<LeoPropagationLossModel> ()
     .AddAttribute ("MaxDistance",
                    "Cut-off distance for signal propagation",
-                   DoubleValue (2000.0),
+                   DoubleValue (3000.0),
                    MakeDoubleAccessor (&LeoPropagationLossModel::SetCutoffDistance,
 				       &LeoPropagationLossModel::GetCutoffDistance),
                    MakeDoubleChecker<double> ())

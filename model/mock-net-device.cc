@@ -102,14 +102,12 @@ MockNetDevice::GetTypeId (void)
                      "This is a non-promiscuous trace,",
                      MakeTraceSourceAccessor (&MockNetDevice::m_macRxTrace),
                      "ns3::Packet::TracedCallback")
-#if 0
     // Not currently implemented for this device
     .AddTraceSource ("MacRxDrop",
                      "Trace source indicating a packet was dropped "
                      "before being forwarded up the stack",
                      MakeTraceSourceAccessor (&MockNetDevice::m_macRxDropTrace),
                      "ns3::Packet::TracedCallback")
-#endif
     //
     // Trace sources at the "bottom" of the net device, where packets transition
     // to/from the channel.
@@ -413,6 +411,7 @@ MockNetDevice::Receive (Ptr<Packet> packet,
 
   if (senderDevice == this)
     {
+      m_macRxDropTrace (packet);
       return;
     }
 
@@ -684,10 +683,15 @@ MockNetDevice::Send (Ptr<Packet> packet,
           m_snifferTrace (packet);
           TransmitStart (packet, dest);
         }
+      else
+      	{
+      	  NS_LOG_LOGIC (this << "channel not ready, postponing transmit start: " << m_queue->GetCurrentSize () << "/" << m_queue->GetMaxSize ());
+      	}
       return true;
     }
 
   // Enqueue may fail (overflow)
+  NS_LOG_WARN ("queue overflowed: " << m_queue->GetCurrentSize () << "/" << m_queue->GetMaxSize ());
 
   m_macTxDropTrace (packet);
   return false;

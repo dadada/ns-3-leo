@@ -170,6 +170,7 @@ MockChannel::Deliver (
       	  rxPower = pLoss->CalcRxPower (txPower, srcMob, dstMob);
       	  if (rxPower <= -1000.0)
     	    {
+      	      NS_LOG_WARN (this << "unable to reach destination " << dst->GetNode ()->GetId () << " from " << src->GetNode ()->GetId ());
       	      return false;
     	    }
     	}

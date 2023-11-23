@@ -6,6 +6,7 @@
 #include "ns3/config.h"
 #include "ns3/waypoint.h"
 #include "ns3/double.h"
+#include "ns3/uinteger.h"
 #include "ns3/mobility-helper.h"
 
 #include "ground-node-helper.h"
@@ -58,17 +59,18 @@ LeoGndNodeHelper::Install (const std::string &file)
 }
 
 NodeContainer
-LeoGndNodeHelper::Install (uint64_t numNodes)
+LeoGndNodeHelper::Install (uint32_t latNodes, uint32_t lonNodes)
 {
   NodeContainer nodes;
-  for (uint64_t i = 0; i < numNodes; i++)
+  for (uint64_t i = 0; i < lonNodes * latNodes; i++)
     {
       nodes.Add (m_gndNodeFactory.Create<Node> ());
     }
   MobilityHelper mobility;
   mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
   mobility.SetPositionAllocator ("ns3::LeoPolarPositionAllocator",
-  				 "Step", DoubleValue (360.0 * 180.0 / numNodes));
+  				 "LatNum", UintegerValue (latNodes),
+  				 "LonNum", UintegerValue (lonNodes));
 
   mobility.Install (nodes);
 

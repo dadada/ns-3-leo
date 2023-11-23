@@ -22,6 +22,44 @@ EchoRx (std::string context, Ptr<const Packet> packet)
   std::cout << context << "," << seqTs.GetSeq () << "," << seqTs.GetTs () << "," << Simulator::Now () - seqTs.GetTs () << std::endl;
 }
 
+static void
+EchoTx (std::string context, Ptr<const Packet> packet)
+{
+  SeqTsHeader seqTs;
+  Ptr<Packet> p = packet->Copy ();
+  p->RemoveHeader (seqTs);
+  // seqnr, timestamp, delay
+  std::cout << context << "," << seqTs.GetSeq () << "," << seqTs.GetTs () << "," << Simulator::Now () - seqTs.GetTs () << std::endl;
+}
+
+static void
+MacTxDrop (std::string context, Ptr<const Packet> packet)
+{
+  Ptr<Packet> p = packet->Copy ();
+  std::cout << context << ",MacTxDrop," << p << std::endl;
+}
+
+static void
+MacRxDrop (std::string context, Ptr<const Packet> packet)
+{
+  Ptr<Packet> p = packet->Copy ();
+  std::cout << context << ",MacRxDrop," << p << std::endl;
+}
+
+static void
+PhyTxDrop (std::string context, Ptr<const Packet> packet)
+{
+  Ptr<Packet> p = packet->Copy ();
+  std::cout << context << ",PhyTxDrop," << p << std::endl;
+}
+
+static void
+PhyRxDrop (std::string context, Ptr<const Packet> packet)
+{
+  Ptr<Packet> p = packet->Copy ();
+  std::cout << context << ",PhyRxDrop," << p << std::endl;
+}
+
 int main (int argc, char *argv[])
 {
 
@@ -32,23 +70,29 @@ int main (int argc, char *argv[])
   LeoLatLong destination;
   std::string islRate;
   std::string constellation;
-  uint64_t numGws;
+  uint32_t latGws = 20;
+  uint32_t lonGws = 20;
   double interval;
   double duration;
+  bool islEnable = false;
+  bool traceDrops = false;
   std::string routingProto = "aodv";
   cmd.AddValue("orbitFile", "CSV file with orbit parameters", orbitFile);
   cmd.AddValue("traceFile", "CSV file to store mobility trace in", traceFile);
   cmd.AddValue("precision", "ns3::LeoCircularOrbitMobilityModel::Precision");
   cmd.AddValue("duration", "Duration of the simulation in seconds", duration);
-  cmd.AddValue("numGws", "Number of gateways", numGws);
   cmd.AddValue("source", "Traffic source", source);
   cmd.AddValue("destination", "Traffic destination", destination);
-  cmd.AddValue("islRate", "Throughput of the ISL link", islRate);
+  cmd.AddValue("islRate", "ns3::MockNetDevice::DataRate");
   cmd.AddValue("constellation", "LEO constellation link settings name", constellation);
   cmd.AddValue("interval", "Echo interval", interval);
   cmd.AddValue("routing", "Routing protocol", routingProto);
   cmd.AddValue("ttlThresh", "ns3::aodv::RoutingProtocol::TtlThreshold");
   cmd.AddValue("routeTimeout", "ns3::aodv::RoutingProtocol::ActiveRouteTimeout");
+  cmd.AddValue("islEnable", "Enable inter-satellite links", islEnable);
+  cmd.AddValue("traceDrops", "Enable tracing of PHY and MAC drops", traceDrops);
+  cmd.AddValue("latGws", "Latitudal rows of gateways", latGws);
+  cmd.AddValue("latGws", "Longitudinal rows of gateways", lonGws);
   cmd.Parse (argc, argv);
 
   std::streambuf *coutbuf = std::cout.rdbuf();
@@ -64,34 +108,19 @@ int main (int argc, char *argv[])
   NodeContainer satellites = orbit.Install (orbitFile);
 
   LeoGndNodeHelper ground;
-  NodeContainer stations = ground.Install (numGws);
+  NodeContainer stations = ground.Install (latGws, lonGws);
+
   NodeContainer users = ground.Install (source, destination);
   stations.Add (users);
 
-  Ptr<Node> client = users.Get (0);
-  Ptr<Node> server = users.Get (1);
-
-  NetDeviceContainer islNet, utNet;
-
-  IslHelper islCh;
-  islCh.SetDeviceAttribute ("DataRate", StringValue (islRate));
-  islCh.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
-  islCh.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::IslPropagationLossModel"));
-  islNet = islCh.Install (satellites);
-
   LeoChannelHelper utCh;
   utCh.SetConstellation (constellation);
-  utNet = utCh.Install (satellites, stations);
+  NetDeviceContainer utNet = utCh.Install (satellites, stations);
 
   InternetStackHelper stack;
   if (routingProto == "epidemic")
     {
       EpidemicHelper epidemic;
-      epidemic.Set ("HopCount", UintegerValue (50));
-      //epidemic.Set ("QueueLength", UintegerValue (50));
-      //epidemic.Set ("QueueEntryExpireTime", TimeValue (Seconds (100)));
-      //epidemic.Set ("BeaconInterval", TimeValue (Seconds (1)));
-
       stack.SetRoutingHelper (epidemic);
     }
   else
@@ -104,16 +133,24 @@ int main (int argc, char *argv[])
 
       stack.SetRoutingHelper (aodv);
     }
-
   stack.Install (satellites);
   stack.Install (stations);
 
-  // Make all networks addressable for legacy protocol
   Ipv4AddressHelper ipv4;
+
   ipv4.SetBase ("10.1.0.0", "255.255.0.0");
-  Ipv4InterfaceContainer islIp = ipv4.Assign (islNet);
-  ipv4.SetBase ("10.3.0.0", "255.255.0.0");
-  Ipv4InterfaceContainer utIp = ipv4.Assign (utNet);
+  ipv4.Assign (utNet);
+
+  if (islEnable)
+    {
+      IslHelper islCh;
+      NetDeviceContainer islNet = islCh.Install (satellites);
+      ipv4.SetBase ("10.2.0.0", "255.255.0.0");
+      ipv4.Assign (islNet);
+    }
+
+  Ptr<Node> client = users.Get (0);
+  Ptr<Node> server = users.Get (1);
 
   // we want to ping terminals
   UdpServerHelper echoServer (9);
@@ -130,9 +167,23 @@ int main (int argc, char *argv[])
 
   Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::UdpServer/Rx",
   		   MakeCallback (&EchoRx));
+  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::UdpServer/Tx",
+  		   MakeCallback (&EchoTx));
 
-  std::cout << "LOCAL =" << client->GetId () << std::endl;
-  std::cout << "REMOTE=" << server->GetId () << std::endl;
+  if (traceDrops)
+    {
+      Config::Connect ("/NodeList/*/DeviceList/*/$ns3::MockNetDevice/MacTxDrop",
+  		       MakeCallback (&MacTxDrop));
+      Config::Connect ("/NodeList/*/DeviceList/*/$ns3::MockNetDevice/PhyTxDrop",
+  		       MakeCallback (&PhyTxDrop));
+      Config::Connect ("/NodeList/*/DeviceList/*/$ns3::MockNetDevice/MacRxDrop",
+  		       MakeCallback (&MacRxDrop));
+      Config::Connect ("/NodeList/*/DeviceList/*/$ns3::MockNetDevice/PhyRxDrop",
+  		       MakeCallback (&PhyRxDrop));
+    }
+
+  std::cerr << "LOCAL =" << client->GetId () << std::endl;
+  std::cerr << "REMOTE=" << server->GetId () << ",addr=" << Ipv4Address::ConvertFrom (remote) << std::endl;
 
   std::cout << "Context,Sequence Number,Timestamp,Delay" << std::endl;
 

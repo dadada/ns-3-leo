@@ -85,7 +85,7 @@ IslMockChannel::TransmitStart (
       }
     else
       {
-        NS_LOG_LOGIC ("destination address " << destAddr << " unknown on channel");
+        NS_LOG_ERROR ("destination address " << destAddr << " unknown on channel");
         return false;
       }
   }

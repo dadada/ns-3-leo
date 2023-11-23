@@ -29,6 +29,7 @@
 #include "ns3/packet.h"
 #include "ns3/names.h"
 #include "ns3/trace-helper.h"
+#include "ns3/string.h"
 
 #include "../model/mock-net-device.h"
 #include "../model/isl-mock-channel.h"
@@ -43,6 +44,8 @@ IslHelper::IslHelper ()
   m_queueFactory.SetTypeId ("ns3::DropTailQueue<Packet>");
   m_deviceFactory.SetTypeId ("ns3::MockNetDevice");
   m_channelFactory.SetTypeId ("ns3::IslMockChannel");
+  m_channelFactory.Set ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
+  m_channelFactory.Set ("PropagationLoss", StringValue ("ns3::IslPropagationLossModel"));
 }
 
 void

@@ -158,7 +158,7 @@ given as pairs of longitude and latitude.
   --duration=360.0 \
   --numGws=120 \
   --source=54.4:77.1 \
-  --destination=-10.0:25.8 \
+  --destination=40.58:-74.97 \
   --islRate=1Gbps \
   --constellation="StarlinkGateway" \
   --interval=1 \
