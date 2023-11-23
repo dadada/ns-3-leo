@@ -86,6 +86,7 @@ int main (int argc, char *argv[])
   bool traceDrops = false;
   bool traceTxRx = false;
   bool traceFwd = false;
+  uint64_t ttlThresh = 0;
   std::string routingProto = "aodv";
   cmd.AddValue("orbitFile", "CSV file with orbit parameters", orbitFile);
   cmd.AddValue("traceFile", "CSV file to store mobility trace in", traceFile);
@@ -103,6 +104,7 @@ int main (int argc, char *argv[])
   cmd.AddValue("traceFwd", "Enable tracing of IP layer forwarding", traceFwd);
   cmd.AddValue("latGws", "Latitudal rows of gateways", latGws);
   cmd.AddValue("lonGws", "Longitudinal rows of gateways", lonGws);
+  cmd.AddValue("ttlThresh", "TTL threshold", ttlThresh);
   cmd.AddValue("destOnly", "ns3::aodv::RoutingProtocol::DestinationOnly");
   cmd.AddValue("routeTimeout", "ns3::aodv::RoutingProtocol::ActiveRouteTimeout");
   cmd.Parse (argc, argv);
@@ -150,8 +152,11 @@ int main (int argc, char *argv[])
       AodvHelper aodv;
       aodv.Set ("EnableHello", BooleanValue (false));
       //aodv.Set ("HelloInterval", TimeValue (Seconds (10)));
-      //aodv.Set ("TtlThreshold", UintegerValue (16));
-      //aodv.Set ("NetDiameter", UintegerValue (32));
+      if (ttlThresh != 0)
+        {
+        aodv.Set ("TtlThreshold", UintegerValue (ttlThresh));
+        aodv.Set ("NetDiameter", UintegerValue (2*ttlThresh));
+        }
       stack.SetRoutingHelper (aodv);
     }
 
