@@ -67,8 +67,21 @@ IslMockChannel::TransmitStart (
 
   if (dst == nullptr)
   {
-    NS_LOG_LOGIC ("destination address " << destAddr << " unknown on channel");
-    return false;
+    if (src->IsBroadcast () || src->IsMulticast ())
+      // try to deliver to every node in LOS
+      {
+        for (size_t i = 0; i < GetNDevices (); i ++)
+          {
+            if (i == srcId) continue;
+            Deliver (p, src, GetDevice (i), txTime);
+          }
+        return true;
+      }
+    else
+      {
+        NS_LOG_LOGIC ("destination address " << destAddr << " unknown on channel");
+        return false;
+      }
   }
   else
   {

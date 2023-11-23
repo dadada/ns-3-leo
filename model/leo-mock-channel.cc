@@ -64,7 +64,7 @@ LeoMockChannel::TransmitStart (Ptr<const Packet> p,
         }
       return Deliver (p, srcDev, it->second, txTime);
     }
-  else
+  else if (srcDev->IsBroadcast () || srcDev->IsMulticast ())
     // space to ground delivers to everything within the beam
     {
       DeviceIndex::iterator it = m_groundDevices.find (dst);
