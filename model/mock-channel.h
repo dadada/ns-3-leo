@@ -14,8 +14,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef ISL_CHANNEL_H
-#define ISL_CHANNEL_H
+#ifndef MOCK_CHANNEL_H
+#define MOCK_CHANNEL_H
 
 #include <string>
 #include <stdint.h>
@@ -42,9 +42,7 @@ class MockNetDevice;
  */
 /**
  * \ingroup channel
- * \brief Simplified inter-satellite channel
- *
- * A perfect channel with varariable delay (time-of-flight).
+ * \brief Mocked channel
  *
  */
 class MockChannel : public Channel
@@ -54,6 +52,8 @@ public:
 
   MockChannel ();
   virtual ~MockChannel ();
+
+  Ptr<NetDevice> GetDevice (std::size_t i) const;
 
   /**
    * \brief Attach a device to the channel.
@@ -68,27 +68,31 @@ public:
    * \return true on success, false on failure
    */
   bool Detach (uint32_t deviceId);
-  virtual std::size_t GetNDevices (void) const;
-  virtual Ptr<NetDevice> GetDevice (std::size_t i) const;
-  virtual bool TransmitStart (Ptr<const Packet> p, uint32_t devId, Address dst, Time txTime);
+
+  std::size_t GetNDevices (void) const;
+  virtual bool TransmitStart (Ptr<const Packet> p, uint32_t devId, Address dst, Time txTime) = 0;
 
 protected:
-  /**
-   * \brief Get the delay associated with this channel
-   * \returns Time delay
-   */
-  Time GetDelay (Ptr<const MockNetDevice> first, Ptr<const MockNetDevice> second, Time txTime) const;
-
-private:
-
-  Ptr<MockNetDevice> GetDevice (Address &addr) const;
-
   TracedCallback<Ptr<const Packet>,     // Packet being transmitted
                  Ptr<NetDevice>,  // Transmitting NetDevice
                  Ptr<NetDevice>,  // Receiving NetDevice
                  Time,                  // Amount of time to transmit the pkt
                  Time                   // Last bit receive time (relative to now)
                  > m_txrxMock;
+
+  /**
+   * \brief Get the delay associated with this channel
+   * \returns Time delay
+   */
+  Time GetDelay (Ptr<const MockNetDevice> first, Ptr<const MockNetDevice> second, Time txTime) const;
+
+  Ptr<PropagationDelayModel> GetPropagationDelay () const;
+  Ptr<PropagationLossModel> GetPropagationLoss () const;
+  Ptr<MockNetDevice> GetDevice (Address &addr) const;
+private:
+
+  std::vector<Ptr<MockNetDevice> > m_link;
+
   /**
    * \brief Propagation delay model to be used with this channel
    */
@@ -97,11 +101,8 @@ private:
    * \brief Propagation loss model to be used with this channel
    */
   Ptr<PropagationLossModel> m_propagationLoss;
-  std::vector<Ptr<MockNetDevice> > m_link;
-
-  bool Deliver (Ptr<const Packet> p, Ptr<MockNetDevice> src, Ptr<MockNetDevice> dst, Time txTime);
 }; // class MockChannel
 
 } // namespace ns3
 
-#endif /* ISL_CHANNEL_H */
+#endif /* MOCK_CHANNEL_H */

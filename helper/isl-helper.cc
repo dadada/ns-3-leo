@@ -31,7 +31,7 @@
 #include "ns3/trace-helper.h"
 
 #include "../model/mock-net-device.h"
-#include "../model/mock-channel.h"
+#include "../model/isl-mock-channel.h"
 #include "isl-helper.h"
 
 namespace ns3 {
@@ -42,7 +42,7 @@ IslHelper::IslHelper ()
 {
   m_queueFactory.SetTypeId ("ns3::DropTailQueue<Packet>");
   m_deviceFactory.SetTypeId ("ns3::MockNetDevice");
-  m_channelFactory.SetTypeId ("ns3::MockChannel");
+  m_channelFactory.SetTypeId ("ns3::IslMockChannel");
 }
 
 void

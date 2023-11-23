@@ -35,7 +35,6 @@ MockChannel::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::MockChannel")
     .SetParent<Channel> ()
     .SetGroupName ("Leo")
-    .AddConstructor<MockChannel> ()
     .AddAttribute ("PropagationDelay",
                    "A propagation delay model for the channel.",
                    PointerValue (),
@@ -112,65 +111,6 @@ MockChannel::GetDevice (std::size_t i) const
   return m_link[i];
 }
 
-bool MockChannel::Deliver (
-    Ptr<const Packet> p,
-    Ptr<MockNetDevice> src,
-    Ptr<MockNetDevice> dst,
-    Time txTime)
-{
-  NS_LOG_FUNCTION (this << p << src->GetAddress () << dst->GetAddress () << txTime);
-  Time delay = GetDelay (src, dst, txTime);
-
-  /* Check if there is LOS between the source and destination */
-  if (m_propagationLoss->CalcRxPower(1, src->GetMobilityModel(), dst->GetMobilityModel()) > 0)
-  {
-    Simulator::ScheduleWithContext (dst->GetNode ()->GetId (),
-        delay,
-        &MockNetDevice::Receive,
-        dst,
-        p->Copy (),
-        src);
-
-    // Call the tx anim callback on the net device
-    m_txrxMock (p, src, dst, txTime, delay);
-    return true;
-  }
-  else
-  {
-    NS_LOG_LOGIC (dst << " unreachable from " << src);
-
-    return false;
-  }
-}
-
-bool
-MockChannel::TransmitStart (
-    Ptr<const Packet> p,
-    uint32_t srcId,
-    Address destAddr,
-    Time txTime)
-{
-  NS_LOG_FUNCTION (this << p << srcId << destAddr << txTime);
-  NS_LOG_LOGIC ("UID is " << p->GetUid () << ")");
-
-  Ptr<MockNetDevice> src = m_link[srcId];
-  Ptr<MockNetDevice> dst = GetDevice (destAddr);
-
-  if (dst == nullptr)
-  {
-    NS_LOG_LOGIC ("destination address " << destAddr << " unknown on channel");
-    for (uint32_t i = 0; i < m_link.size (); i++)
-    {
-      Deliver (p, src, m_link[i], txTime);
-    }
-    return true;
-  }
-  else
-  {
-    return Deliver (p, src, dst, txTime);
-  }
-}
-
 Time
 MockChannel::GetDelay (Ptr<const MockNetDevice> src, Ptr<const MockNetDevice> dst, Time txTime) const
 {
@@ -197,6 +137,18 @@ MockChannel::GetDevice (Address &addr) const
   }
 
   return 0;
+}
+
+Ptr<PropagationDelayModel>
+MockChannel::GetPropagationDelay () const
+{
+  return m_propagationDelay;
+}
+
+Ptr<PropagationLossModel>
+MockChannel::GetPropagationLoss () const
+{
+  return m_propagationLoss;
 }
 
 } // namespace ns3
