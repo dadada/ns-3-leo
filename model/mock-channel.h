@@ -101,6 +101,7 @@ private:
    * \brief Propagation loss model to be used with this channel
    */
   Ptr<PropagationLossModel> m_propagationLoss;
+
 }; // class MockChannel
 
 } // namespace ns3
