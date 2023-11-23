@@ -22,42 +22,12 @@ EchoRx (std::string context, Ptr<const Packet> packet)
   std::cout << context << "," << seqTs.GetSeq () << "," << seqTs.GetTs () << "," << Simulator::Now () - seqTs.GetTs () << std::endl;
 }
 
+uint64_t countBytes = 0;
 static void
-EchoTx (std::string context, Ptr<const Packet> packet)
-{
-  SeqTsHeader seqTs;
-  Ptr<Packet> p = packet->Copy ();
-  p->RemoveHeader (seqTs);
-  // seqnr, timestamp, delay
-  std::cout << context << "," << seqTs.GetSeq () << "," << seqTs.GetTs () << "," << Simulator::Now () - seqTs.GetTs () << std::endl;
-}
-
-static void
-MacTxDrop (std::string context, Ptr<const Packet> packet)
+TracePacket (std::string context, Ptr<const Packet> packet)
 {
   Ptr<Packet> p = packet->Copy ();
-  std::cout << context << ",MacTxDrop," << p << std::endl;
-}
-
-static void
-MacRxDrop (std::string context, Ptr<const Packet> packet)
-{
-  Ptr<Packet> p = packet->Copy ();
-  std::cout << context << ",MacRxDrop," << p << std::endl;
-}
-
-static void
-PhyTxDrop (std::string context, Ptr<const Packet> packet)
-{
-  Ptr<Packet> p = packet->Copy ();
-  std::cout << context << ",PhyTxDrop," << p << std::endl;
-}
-
-static void
-PhyRxDrop (std::string context, Ptr<const Packet> packet)
-{
-  Ptr<Packet> p = packet->Copy ();
-  std::cout << context << ",PhyRxDrop," << p << std::endl;
+  std::cout << Simulator::Now () << ":" << context << ":" << (countBytes += p->GetSerializedSize ()) << ":" << p->GetUid () << std::endl;
 }
 
 int main (int argc, char *argv[])
@@ -76,6 +46,7 @@ int main (int argc, char *argv[])
   double duration;
   bool islEnable = false;
   bool traceDrops = false;
+  bool traceTxRx = false;
   std::string routingProto = "aodv";
   cmd.AddValue("orbitFile", "CSV file with orbit parameters", orbitFile);
   cmd.AddValue("traceFile", "CSV file to store mobility trace in", traceFile);
@@ -88,11 +59,14 @@ int main (int argc, char *argv[])
   cmd.AddValue("interval", "Echo interval", interval);
   cmd.AddValue("routing", "Routing protocol", routingProto);
   cmd.AddValue("ttlThresh", "ns3::aodv::RoutingProtocol::TtlThreshold");
+  cmd.AddValue("netDiameter", "ns3::aodv::RoutingProtocol::NetDiameter");
   cmd.AddValue("routeTimeout", "ns3::aodv::RoutingProtocol::ActiveRouteTimeout");
   cmd.AddValue("islEnable", "Enable inter-satellite links", islEnable);
   cmd.AddValue("traceDrops", "Enable tracing of PHY and MAC drops", traceDrops);
+  cmd.AddValue("traceTxRx", "Enable tracing of PHY and MAC transmits", traceTxRx);
   cmd.AddValue("latGws", "Latitudal rows of gateways", latGws);
   cmd.AddValue("lonGws", "Longitudinal rows of gateways", lonGws);
+  cmd.AddValue("destinationOnly", "ns3::aodv::RoutingProtocol::DestinationOnly");
   cmd.Parse (argc, argv);
 
   std::streambuf *coutbuf = std::cout.rdbuf();
@@ -128,9 +102,6 @@ int main (int argc, char *argv[])
       // Install internet stack on nodes
       AodvHelper aodv;
       aodv.Set ("EnableHello", BooleanValue (false));
-      aodv.Set ("NetDiameter", UintegerValue (1000));
-      aodv.Set ("RreqRateLimit", UintegerValue (10));
-      aodv.Set ("RerrRateLimit", UintegerValue (10));
 
       stack.SetRoutingHelper (aodv);
     }
@@ -169,19 +140,27 @@ int main (int argc, char *argv[])
 
   Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::UdpServer/Rx",
   		   MakeCallback (&EchoRx));
-  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::UdpServer/Tx",
-  		   MakeCallback (&EchoTx));
 
   if (traceDrops)
     {
       Config::Connect ("/NodeList/*/DeviceList/*/$ns3::MockNetDevice/MacTxDrop",
-  		       MakeCallback (&MacTxDrop));
+  		       MakeCallback (&TracePacket));
       Config::Connect ("/NodeList/*/DeviceList/*/$ns3::MockNetDevice/PhyTxDrop",
-  		       MakeCallback (&PhyTxDrop));
+  		       MakeCallback (&TracePacket));
       Config::Connect ("/NodeList/*/DeviceList/*/$ns3::MockNetDevice/MacRxDrop",
-  		       MakeCallback (&MacRxDrop));
+  		       MakeCallback (&TracePacket));
       Config::Connect ("/NodeList/*/DeviceList/*/$ns3::MockNetDevice/PhyRxDrop",
-  		       MakeCallback (&PhyRxDrop));
+  		       MakeCallback (&TracePacket));
+    }
+
+  if (traceTxRx)
+    {
+      Config::Connect ("/NodeList/*/DeviceList/*/$ns3::MockNetDevice/MacTx",
+  		       MakeCallback (&TracePacket));
+      Config::Connect ("/NodeList/*/DeviceList/*/$ns3::MockNetDevice/MacRx",
+  		       MakeCallback (&TracePacket));
+      Config::Connect ("/NodeList/*/DeviceList/*/$ns3::MockNetDevice/PhyRx",
+  		       MakeCallback (&TracePacket));
     }
 
   std::cerr << "LOCAL =" << client->GetId () << std::endl;
