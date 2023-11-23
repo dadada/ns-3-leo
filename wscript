@@ -27,6 +27,7 @@ def build(bld):
     module_test.source = [
         'test/leo-test-suite.cc',
         'test/isl-test-suite.cc',
+        'test/isl-mock-channel-test-suite.cc',
         ]
 
     headers = bld(features='ns3header')

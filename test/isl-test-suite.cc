@@ -56,6 +56,7 @@ IslIcmpTestCase::DoRun (void)
   NdCacheHelper nsHelper;
   nsHelper.Install (devices, interfaces);
 
+  // install echo server on all nodes
   UdpEchoServerHelper echoServer (9);
   ApplicationContainer serverApps = echoServer.Install (nodes);
 
@@ -70,13 +71,12 @@ IslIcmpTestCase::DoRun (void)
       Address destAddress = interfaces.GetAddress (i, 0);
       echoClient.SetAttribute ("RemoteAddress", AddressValue (destAddress));
 
-      clientApps.Add (echoClient.Install (nodes.Get (i-1)));
+      clientApps.Add (echoClient.Install (nodes.Get (0)));
     }
 
+  serverApps.Start (Seconds (1.0));
   clientApps.Start (Seconds (2.0));
   clientApps.Stop (Seconds (10.0));
-
-  serverApps.Start (Seconds (1.0));
   serverApps.Stop (Seconds (10.0));
 
   Simulator::Run ();
