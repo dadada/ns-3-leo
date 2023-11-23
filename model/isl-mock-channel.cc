@@ -73,7 +73,8 @@ IslMockChannel::TransmitStart (
         for (size_t i = 0; i < GetNDevices (); i ++)
           {
             if (i == srcId) continue;
-            Deliver (p, src, GetDevice (i), txTime);
+            dst = DynamicCast<MockNetDevice> (GetDevice (i));
+            Deliver (p, src, dst, txTime);
           }
         return true;
       }
