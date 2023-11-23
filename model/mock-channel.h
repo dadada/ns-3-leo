@@ -81,10 +81,10 @@ protected:
                  > m_txrxMock;
 
   /**
-   * \brief Get the delay associated with this channel
-   * \returns Time delay
+   * \brief Get the propagation delay associated with this channel
+   * \returns Propagation time delay
    */
-  Time GetDelay (Ptr<const MockNetDevice> first, Ptr<const MockNetDevice> second, Time txTime) const;
+  Time GetPropagationDelay (Ptr<MobilityModel> first, Ptr<MobilityModel> second, Time txTime) const;
 
   Ptr<PropagationDelayModel> GetPropagationDelay () const;
   Ptr<PropagationLossModel> GetPropagationLoss () const;

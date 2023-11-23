@@ -43,7 +43,6 @@ LeoMockChannelTransmitUnknownTestCase::DoRun (void)
   Time txTime;
   channel->SetAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
   channel->SetAttribute ("PropagationLoss", StringValue ("ns3::LeoPropagationLossModel"));
-  dev->SetAttribute ("MobilityModel", StringValue ("ns3::ConstantPositionMobilityModel"));
   bool result = channel->TransmitStart (p, srcId, destAddr, txTime);
 
   NS_TEST_ASSERT_MSG_EQ (result, false, "Unknown destination fails to deliver");

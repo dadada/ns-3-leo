@@ -582,7 +582,7 @@ bool
 MockNetDevice::IsBroadcast (void) const
 {
   NS_LOG_FUNCTION (this);
-  return false;
+  return true;
 }
 
 //
@@ -601,7 +601,7 @@ bool
 MockNetDevice::IsMulticast (void) const
 {
   NS_LOG_FUNCTION (this);
-  return false;
+  return true;
 }
 
 Address
