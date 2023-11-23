@@ -28,7 +28,7 @@ LeoPropagationLossModel::GetTypeId (void)
                    MakeDoubleChecker<double> ())
     .AddAttribute ("ElevationAngle",
                    "Cut-off angle for signal propagation",
-                   DoubleValue (20.0),
+                   DoubleValue (M_PI / 9),
                    MakeDoubleAccessor (&LeoPropagationLossModel::m_elevationAngle),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("AtmosphericLoss",
@@ -39,7 +39,7 @@ LeoPropagationLossModel::GetTypeId (void)
     .AddAttribute ("FreeSpacePathLoss",
                    "Free space path loss in dB",
                    DoubleValue (0.0),
-                   MakeDoubleAccessor (&LeoPropagationLossModel::m_atmosphericLoss),
+                   MakeDoubleAccessor (&LeoPropagationLossModel::m_freeSpacePathLoss),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("LinkMargin",
                    "Link margin in dB",
@@ -76,7 +76,7 @@ LeoPropagationLossModel::DoCalcRxPower (double txPowerDbm,
                                         Ptr<MobilityModel> a,
                                         Ptr<MobilityModel> b) const
 {
-  if (a->GetDistanceFrom (b) > m_cutoffDistance && GetAngle (a, b) > m_elevationAngle / 2.0)
+  if (a->GetDistanceFrom (b) > m_cutoffDistance || GetAngle (a, b) > m_elevationAngle / 2.0)
     {
       return 0.0;
     }

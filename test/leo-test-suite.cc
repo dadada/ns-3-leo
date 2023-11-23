@@ -78,7 +78,6 @@ LeoTestCase1::DoRun (void)
   islCh.SetDeviceAttribute ("ReceiveErrorModel", StringValue ("ns3::BurstErrorModel"));
   islCh.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
   islCh.SetDeviceAttribute ("InterframeGap", TimeValue (Seconds (0.001)));
-  //// TODO propagation loss from mobility model
   islCh.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::IslPropagationLossModel"));
   islNet = islCh.Install (satellites);
 
@@ -90,7 +89,6 @@ LeoTestCase1::DoRun (void)
   utCh.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
   utCh.SetSatDeviceAttribute ("InterframeGap", TimeValue (Seconds (0.001)));
   utCh.SetGndDeviceAttribute ("InterframeGap", TimeValue (Seconds (0.001)));
-  // TODO propagation loss from mobility model
   utCh.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::LeoPropagationLossModel"));
   utCh.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
   utNet = utCh.Install (satellites, terminals);
@@ -108,11 +106,6 @@ LeoTestCase1::DoRun (void)
   Ipv4InterfaceContainer islIp = ipv4.Assign (islNet);
   ipv4.SetBase ("10.3.0.0", "255.255.0.0");
   Ipv4InterfaceContainer utIp = ipv4.Assign (utNet);
-
-  // TODO do not add UTs to cache of other UTs
-  //ArpCacheHelper arpCache;
-  //arpCache.Install (islNet, islIp);
-  //arpCache.Install (utNet, utIp);
 
   // we want to ping terminals
   UdpEchoServerHelper echoServer (9);
