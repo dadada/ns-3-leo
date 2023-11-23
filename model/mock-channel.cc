@@ -31,30 +31,30 @@ NS_LOG_COMPONENT_DEFINE ("MockChannel");
 NS_OBJECT_ENSURE_REGISTERED (MockChannel);
 
 TypeId
-  MockChannel::GetTypeId (void)
-    {
-      static TypeId tid = TypeId ("ns3::MockChannel")
-    	.SetParent<Channel> ()
-    	.SetGroupName ("Leo")
-    	.AddAttribute ("PropagationDelay",
-                       "A propagation delay model for the channel.",
-                       PointerValue (),
-                       MakePointerAccessor (&MockChannel::m_propagationDelay),
-                       MakePointerChecker<PropagationDelayModel> ())
-    	.AddAttribute ("PropagationLoss",
-                       "A propagation loss model for the channel.",
-                       PointerValue (),
-                       MakePointerAccessor (&MockChannel::m_propagationLoss),
-                       MakePointerChecker<PropagationLossModel> ())
-    	.AddTraceSource ("TxRxMockChannel",
-                     	 "Trace source indicating transmission of packet "
-                     	 "from the MockChannel, used by the Animation "
-                     	 "interface.",
-                     	 MakeTraceSourceAccessor (&MockChannel::m_txrxMock),
-                     	 "ns3::MockChannel::TxRxAnimationCallback")
-  	;
-      return tid;
-    }
+MockChannel::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::MockChannel")
+    .SetParent<Channel> ()
+    .SetGroupName ("Leo")
+    .AddAttribute ("PropagationDelay",
+                   "A propagation delay model for the channel.",
+                   PointerValue (),
+                   MakePointerAccessor (&MockChannel::m_propagationDelay),
+                   MakePointerChecker<PropagationDelayModel> ())
+    .AddAttribute ("PropagationLoss",
+                   "A propagation loss model for the channel.",
+                   PointerValue (),
+                   MakePointerAccessor (&MockChannel::m_propagationLoss),
+                   MakePointerChecker<PropagationLossModel> ())
+    .AddTraceSource ("TxRxMockChannel",
+                     "Trace source indicating transmission of packet "
+                     "from the MockChannel, used by the Animation "
+                     "interface.",
+                     MakeTraceSourceAccessor (&MockChannel::m_txrxMock),
+                     "ns3::MockChannel::TxRxAnimationCallback")
+    ;
+  return tid;
+}
 
 //
 // By default, you get a channel that
@@ -65,132 +65,132 @@ MockChannel::MockChannel() : Channel (), m_link (0)
 }
 
 MockChannel::~MockChannel()
-  {
-  }
+{
+}
 
 bool
-  MockChannel::Detach (uint32_t deviceId)
+MockChannel::Detach (uint32_t deviceId)
+{
+  NS_LOG_FUNCTION (this << deviceId);
+  if (deviceId < m_link.size ())
     {
-      NS_LOG_FUNCTION (this << deviceId);
-      if (deviceId < m_link.size ())
-  	{
-    	  if (!m_link[deviceId]->IsLinkUp ())
-    	    {
-      	      NS_LOG_WARN ("MockChannel::Detach(): Device is already detached (" << deviceId << ")");
-      	      return false;
-    	    }
+      if (!m_link[deviceId]->IsLinkUp ())
+    	{
+      	  NS_LOG_WARN ("MockChannel::Detach(): Device is already detached (" << deviceId << ")");
+      	  return false;
+    	}
 
-    	  m_link[deviceId]->NotifyLinkDown ();
-  	}
-      else
-  	{
-    	  return false;
-  	}
-      return true;
+      m_link[deviceId]->NotifyLinkDown ();
     }
+  else
+    {
+      return false;
+    }
+  return true;
+}
 
 int32_t
-  MockChannel::Attach (Ptr<MockNetDevice> device)
-    {
-      NS_LOG_FUNCTION (this << device);
-      NS_ASSERT (device != 0);
-      m_link.push_back(device);
-      return  m_link.size() - 1;
-    }
+MockChannel::Attach (Ptr<MockNetDevice> device)
+{
+  NS_LOG_FUNCTION (this << device);
+  NS_ASSERT (device != 0);
+  m_link.push_back(device);
+  return  m_link.size() - 1;
+}
 
 std::size_t
-  MockChannel::GetNDevices (void) const
-    {
-      NS_LOG_FUNCTION_NOARGS ();
-      return m_link.size ();
-    }
+MockChannel::GetNDevices (void) const
+{
+  NS_LOG_FUNCTION_NOARGS ();
+  return m_link.size ();
+}
 
 Ptr<NetDevice>
-  MockChannel::GetDevice (std::size_t i) const
-    {
-      NS_LOG_FUNCTION_NOARGS ();
-      return m_link[i];
-    }
+MockChannel::GetDevice (std::size_t i) const
+{
+  NS_LOG_FUNCTION_NOARGS ();
+  return m_link[i];
+}
 
 Time
-  MockChannel::GetPropagationDelay (Ptr<MobilityModel> srcMob, Ptr<MobilityModel> dstMob, Time txTime) const
-    {
-      NS_LOG_FUNCTION (this << srcMob << dstMob << txTime);
+MockChannel::GetPropagationDelay (Ptr<MobilityModel> srcMob, Ptr<MobilityModel> dstMob, Time txTime) const
+{
+  NS_LOG_FUNCTION (this << srcMob << dstMob << txTime);
 
-      if (GetPropagationDelay ())
-    	{
-      	  Time propagationDelay = m_propagationDelay->GetDelay (srcMob, dstMob);
-      	  return propagationDelay;
-    	}
-      else
-    	{
-      	  return Time (0);
-    	}
+  if (GetPropagationDelay ())
+    {
+      Time propagationDelay = m_propagationDelay->GetDelay (srcMob, dstMob);
+      return propagationDelay;
     }
+  else
+    {
+      return Time (0);
+    }
+}
 
 // TODO optimize
 Ptr<MockNetDevice>
-  MockChannel::GetDevice (Address &addr) const
+MockChannel::GetDevice (Address &addr) const
+{
+  for (Ptr<MockNetDevice> dev : m_link)
     {
-      for (Ptr<MockNetDevice> dev : m_link)
-  	{
-    	  if (dev->GetAddress () == addr)
-    	    {
-      	      return dev;
-    	    }
-  	}
-
-      return 0;
+      if (dev->GetAddress () == addr)
+    	{
+      	  return dev;
+    	}
     }
+
+  return 0;
+}
 
 Ptr<PropagationDelayModel>
-  MockChannel::GetPropagationDelay () const
-    {
-      return m_propagationDelay;
-    }
+MockChannel::GetPropagationDelay () const
+{
+  return m_propagationDelay;
+}
 
 Ptr<PropagationLossModel>
-  MockChannel::GetPropagationLoss () const
-    {
-      return m_propagationLoss;
-    }
+MockChannel::GetPropagationLoss () const
+{
+  return m_propagationLoss;
+}
 
 bool
-  MockChannel::Deliver (
-    			Ptr<const Packet> p,
-    			Ptr<MockNetDevice> src,
-    			Ptr<MockNetDevice> dst,
-    			Time txTime)
+MockChannel::Deliver (
+    		    Ptr<const Packet> p,
+    		    Ptr<MockNetDevice> src,
+    		    Ptr<MockNetDevice> dst,
+    		    Time txTime)
+{
+  NS_LOG_FUNCTION (this << p << src->GetAddress () << dst->GetAddress () << txTime);
+  Time delay = txTime;
+
+  Ptr<MobilityModel> srcMob = src->GetObject<MobilityModel> ();
+  Ptr<MobilityModel> dstMob = dst->GetObject<MobilityModel> ();
+
+  if (srcMob != 0 && dstMob != 0)
     {
-      NS_LOG_FUNCTION (this << p << src->GetAddress () << dst->GetAddress () << txTime);
-      Time delay = txTime;
-
-      Ptr<MobilityModel> srcMob = src->GetObject<MobilityModel> ();
-      Ptr<MobilityModel> dstMob = dst->GetObject<MobilityModel> ();
-
-      if (srcMob != 0 && dstMob != 0)
+      Ptr<PropagationLossModel> pLoss = GetPropagationLoss ();
+      if (pLoss != 0)
     	{
-      	  Ptr<PropagationLossModel> pLoss = GetPropagationLoss ();
-      	  if (pLoss != 0)
+      	  if (pLoss->CalcRxPower (1.0, srcMob, dstMob) == 0.0)
     	    {
-      	      if (pLoss->CalcRxPower (1.0, srcMob, dstMob) == 0.0)
-    	    	{
-      	      	  return false;
-    	    	}
+      	      return false;
     	    }
-      	  delay += GetPropagationDelay (srcMob, dstMob, txTime);
     	}
-
-      Simulator::ScheduleWithContext (dst->GetNode ()->GetId (),
-        			      delay,
-        			      &MockNetDevice::Receive,
-        			      dst,
-        			      p->Copy (),
-        			      src);
-
-      // Call the tx anim callback on the net device
-      m_txrxMock (p, src, dst, txTime, delay);
-      return true;
+      delay += GetPropagationDelay (srcMob, dstMob, txTime);
     }
+
+  Simulator::ScheduleWithContext (dst->GetNode ()->GetId (),
+        			  delay,
+        			  &MockNetDevice::Receive,
+        			  dst,
+        			  p->Copy (),
+        			  src);
+
+  // Call the tx anim callback on the net device
+  m_txrxMock (p, src, dst, txTime, delay);
+  return true;
+}
 
 } // namespace ns3

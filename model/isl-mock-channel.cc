@@ -62,6 +62,11 @@ IslMockChannel::TransmitStart (
   NS_LOG_FUNCTION (this << p << srcId << destAddr << txTime);
   NS_LOG_LOGIC ("UID is " << p->GetUid () << ")");
 
+  if (srcId >= GetNDevices ())
+    {
+      NS_LOG_ERROR ("Source device unknown");
+      return false;
+    }
   Ptr<MockNetDevice> src = DynamicCast<MockNetDevice> (GetDevice (srcId));
   Ptr<MockNetDevice> dst = DynamicCast<MockNetDevice> (GetDevice (destAddr));
 

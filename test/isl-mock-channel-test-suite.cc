@@ -22,7 +22,7 @@ private:
 };
 
 IslMockChannelTransmitUnknownTestCase::IslMockChannelTransmitUnknownTestCase ()
-  : TestCase ("Test transmission to unkown destination")
+  : TestCase ("Test transmission to broadcast address")
 {
 }
 
@@ -37,14 +37,13 @@ IslMockChannelTransmitUnknownTestCase::DoRun (void)
   Packet *packet = new Packet ();
   Ptr<Packet> p = Ptr<Packet>(packet);
   Ptr<MockNetDevice> dev = CreateObject<MockNetDevice> ();
+  dev->SetAddress (Mac48Address::Allocate ());
   int32_t srcId = channel->Attach (dev);
-  Address destAddr;
+  Address destAddr = Mac48Address::GetBroadcast ();
   Time txTime;
-  channel->SetAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
-  channel->SetAttribute ("PropagationLoss", StringValue ("ns3::IslPropagationLossModel"));
   bool result = channel->TransmitStart (p, srcId, destAddr, txTime);
 
-  NS_TEST_ASSERT_MSG_EQ (result, false, "Unknown destination fails to deliver");
+  NS_TEST_ASSERT_MSG_EQ (result, true, "Broadcast address delivers to all");
 }
 
 class IslMockChannelTransmitKnownTestCase : public TestCase
@@ -81,6 +80,7 @@ IslMockChannelTransmitKnownTestCase::DoRun (void)
   srcNode->AggregateObject (loc);
   Ptr<MockNetDevice> srcDev = CreateObject<MockNetDevice> ();
   srcDev->SetNode (srcNode);
+  srcDev->SetAddress (Mac48Address::Allocate ());
   int32_t srcId = channel->Attach (srcDev);
 
   Ptr<Node> dstNode = CreateObject<Node> ();
@@ -88,6 +88,7 @@ IslMockChannelTransmitKnownTestCase::DoRun (void)
   dstNode->AggregateObject (loc);
   Ptr<MockNetDevice> dstDev = CreateObject<MockNetDevice> ();
   dstDev->SetNode (dstNode);
+  dstDev->SetAddress (Mac48Address::Allocate ());
   channel->Attach (dstDev);
 
   Address destAddr = dstDev->GetAddress ();

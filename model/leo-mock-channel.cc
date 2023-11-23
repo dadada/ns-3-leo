@@ -44,6 +44,12 @@ LeoMockChannel::TransmitStart (Ptr<const Packet> p,
   NS_LOG_FUNCTION (this << p << devId << dst << txTime);
 
   // Find devices joined to channel
+  if (devId >= GetNDevices ())
+    {
+      NS_LOG_ERROR ("Source device unknown");
+      return false;
+    }
+
   Ptr<MockNetDevice> srcDev = DynamicCast<MockNetDevice> (GetDevice (devId));
   if (srcDev == 0)
     {

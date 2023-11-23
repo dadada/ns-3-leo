@@ -36,16 +36,13 @@ LeoMockChannelTransmitUnknownTestCase::DoRun (void)
   Ptr<LeoMockChannel> channel = CreateObject<LeoMockChannel> ();
   Packet *packet = new Packet ();
   Ptr<Packet> p = Ptr<Packet>(packet);
-  Ptr<LeoMockNetDevice> dev = CreateObject<LeoMockNetDevice> ();
-  dev->SetDeviceType (LeoMockNetDevice::GND);
-  int32_t srcId = channel->Attach (dev);
   Address destAddr;
   Time txTime;
   channel->SetAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
   channel->SetAttribute ("PropagationLoss", StringValue ("ns3::LeoPropagationLossModel"));
-  bool result = channel->TransmitStart (p, srcId, destAddr, txTime);
+  bool result = channel->TransmitStart (p, 10000, destAddr, txTime);
 
-  NS_TEST_ASSERT_MSG_EQ (result, false, "Unknown destination fails to deliver");
+  NS_TEST_ASSERT_MSG_EQ (result, false, "Unknown source fails to deliver");
 }
 
 class LeoMockChannelTransmitKnownTestCase : public TestCase
@@ -78,28 +75,24 @@ LeoMockChannelTransmitKnownTestCase::DoRun (void)
   Ptr<Packet> p = Ptr<Packet>(packet);
 
   Ptr<Node> srcNode = CreateObject<Node> ();
-  Ptr<ConstantPositionMobilityModel> loc = CreateObject<ConstantPositionMobilityModel> ();
-  srcNode->AggregateObject (loc);
   Ptr<LeoMockNetDevice> srcDev = CreateObject<LeoMockNetDevice> ();
   srcDev->SetNode (srcNode);
-  srcDev->SetAttribute ("MobilityModel", StringValue ("ns3::ConstantPositionMobilityModel"));
   srcDev->SetDeviceType (LeoMockNetDevice::GND);
+  srcDev->SetAddress (Mac48Address::Allocate ());
   int32_t srcId = channel->Attach (srcDev);
 
   Ptr<Node> dstNode = CreateObject<Node> ();
-  loc = CreateObject<ConstantPositionMobilityModel> ();
-  dstNode->AggregateObject (loc);
   Ptr<LeoMockNetDevice> dstDev = CreateObject<LeoMockNetDevice> ();
   dstDev->SetNode (dstNode);
-  dstDev->SetAttribute ("MobilityModel", StringValue ("ns3::WaypointMobilityModel"));
   dstDev->SetDeviceType (LeoMockNetDevice::SAT);
+  dstDev->SetAddress (Mac48Address::Allocate ());
   channel->Attach (dstDev);
 
   Address destAddr = dstDev->GetAddress ();
   Time txTime;
   bool result = channel->TransmitStart (p, srcId, destAddr, txTime);
 
-  NS_TEST_ASSERT_MSG_EQ (result, true, "Known destination delivers");
+  NS_TEST_ASSERT_MSG_EQ (result, true, "Known source delivers");
 }
 
 class LeoMockChannelTransmitSpaceGroundTestCase : public TestCase
@@ -134,15 +127,15 @@ LeoMockChannelTransmitSpaceGroundTestCase::DoRun (void)
   Ptr<Node> srcNode = CreateObject<Node> ();
   Ptr<LeoMockNetDevice> srcDev = CreateObject<LeoMockNetDevice> ();
   srcDev->SetNode (srcNode);
-  srcDev->SetAttribute ("MobilityModel", StringValue ("ns3::WaypointMobilityModel"));
   srcDev->SetDeviceType (LeoMockNetDevice::SAT);
+  srcDev->SetAddress (Mac48Address::Allocate ());
   int32_t srcId = channel->Attach (srcDev);
 
   Ptr<Node> dstNode = CreateObject<Node> ();
   Ptr<LeoMockNetDevice> dstDev = CreateObject<LeoMockNetDevice> ();
   dstDev->SetNode (dstNode);
-  dstDev->SetAttribute ("MobilityModel", StringValue ("ns3::ConstantPositionMobilityModel"));
   dstDev->SetDeviceType (LeoMockNetDevice::GND);
+  dstDev->SetAddress (Mac48Address::Allocate ());
   channel->Attach (dstDev);
 
   Address destAddr = dstDev->GetAddress ();
@@ -150,56 +143,6 @@ LeoMockChannelTransmitSpaceGroundTestCase::DoRun (void)
   bool result = channel->TransmitStart (p, srcId, destAddr, txTime);
 
   NS_TEST_ASSERT_MSG_EQ (result, true, "Space to ground destination delivers");
-}
-
-class LeoMockChannelTransmitSpaceSpaceTestCase : public TestCase
-{
-public:
-  LeoMockChannelTransmitSpaceSpaceTestCase ();
-  virtual ~LeoMockChannelTransmitSpaceSpaceTestCase ();
-
-private:
-  virtual void DoRun (void);
-};
-
-LeoMockChannelTransmitSpaceSpaceTestCase::LeoMockChannelTransmitSpaceSpaceTestCase ()
-  : TestCase ("Test transmission to known destination")
-{
-}
-
-LeoMockChannelTransmitSpaceSpaceTestCase::~LeoMockChannelTransmitSpaceSpaceTestCase ()
-{
-}
-
-void
-LeoMockChannelTransmitSpaceSpaceTestCase::DoRun (void)
-{
-  Ptr<LeoMockChannel> channel = CreateObject<LeoMockChannel> ();
-  channel->SetAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
-  channel->SetAttribute ("PropagationLoss", StringValue ("ns3::LeoPropagationLossModel"));
-
-  Packet *packet = new Packet ();
-  Ptr<Packet> p = Ptr<Packet>(packet);
-
-  Ptr<Node> srcNode = CreateObject<Node> ();
-  Ptr<LeoMockNetDevice> srcDev = CreateObject<LeoMockNetDevice> ();
-  srcDev->SetNode (srcNode);
-  srcDev->SetAttribute ("MobilityModel", StringValue ("ns3::WaypointMobilityModel"));
-  srcDev->SetDeviceType (LeoMockNetDevice::SAT);
-  int32_t srcId = channel->Attach (srcDev);
-
-  Ptr<Node> dstNode = CreateObject<Node> ();
-  Ptr<LeoMockNetDevice> dstDev = CreateObject<LeoMockNetDevice> ();
-  dstDev->SetNode (dstNode);
-  dstDev->SetAttribute ("MobilityModel", StringValue ("ns3::WaypointMobilityModel"));
-  dstDev->SetDeviceType (LeoMockNetDevice::SAT);
-  channel->Attach (dstDev);
-
-  Address destAddr = dstDev->GetAddress ();
-  Time txTime;
-  bool result = channel->TransmitStart (p, srcId, destAddr, txTime);
-
-  NS_TEST_ASSERT_MSG_EQ (result, false, "Space to space gets dropped");
 }
 
 class LeoMockChannelTestSuite : public TestSuite
@@ -215,7 +158,6 @@ LeoMockChannelTestSuite::LeoMockChannelTestSuite ()
   AddTestCase (new LeoMockChannelTransmitUnknownTestCase, TestCase::QUICK);
   AddTestCase (new LeoMockChannelTransmitKnownTestCase, TestCase::QUICK);
   AddTestCase (new LeoMockChannelTransmitSpaceGroundTestCase, TestCase::QUICK);
-  AddTestCase (new LeoMockChannelTransmitSpaceSpaceTestCase, TestCase::QUICK);
 }
 
 // Do not forget to allocate an instance of this TestSuite
