@@ -230,6 +230,8 @@ LeoChannelHelper::EnableAsciiInternal (
 NetDeviceContainer
 LeoChannelHelper::Install (std::vector<Ptr<Node> > &satellites, std::vector<Ptr<Node> > &stations)
 {
+  NS_LOG_FUNCTION (this);
+
   Ptr<LeoMockChannel> channel = m_channelFactory.Create<LeoMockChannel> ();
 
   NetDeviceContainer container;
@@ -243,6 +245,8 @@ LeoChannelHelper::Install (std::vector<Ptr<Node> > &satellites, std::vector<Ptr<
     dev->SetQueue (queue);
     dev->Attach (channel);
     container.Add (dev);
+
+    NS_LOG_DEBUG ("Added device for node " << node->GetId ());
   }
 
   for (Ptr<Node> node : stations)
@@ -254,6 +258,8 @@ LeoChannelHelper::Install (std::vector<Ptr<Node> > &satellites, std::vector<Ptr<
     dev->SetQueue (queue);
     dev->Attach (channel);
     container.Add (dev);
+
+    NS_LOG_DEBUG ("Added device for node " << node->GetId ());
   }
 
   return container;
@@ -270,15 +276,19 @@ LeoChannelHelper::Install (NodeContainer &satellites, NodeContainer &stations)
 NetDeviceContainer
 LeoChannelHelper::Install (std::vector<std::string> &satellites, std::vector<std::string> &stations)
 {
+  NS_LOG_FUNCTION (this);
+
   std::vector<Ptr<Node> > sats;
   std::vector<Ptr<Node> > stats;
   for (std::string name : satellites)
   {
+    NS_LOG_DEBUG ("Adding node " << name);
     Ptr<Node> node = Names::Find<Node>(name);
     sats.push_back (node);
   }
   for (std::string name : stations)
   {
+    NS_LOG_DEBUG ("Adding node " << name);
     Ptr<Node> node = Names::Find<Node>(name);
     stats.push_back (node);
   }

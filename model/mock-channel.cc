@@ -115,7 +115,7 @@ MockChannel::GetDevice (std::size_t i) const
 Time
 MockChannel::GetDelay (Ptr<const MockNetDevice> src, Ptr<const MockNetDevice> dst, Time txTime) const
 {
-  NS_LOG_DEBUG ("Get delay from " << src << " to " << dst);
+  NS_LOG_FUNCTION (this << src << dst << txTime);
 
   Ptr<MobilityModel> modSrc = src->GetNode ()->GetObject<MobilityModel> ();
   Ptr<MobilityModel> modDst = dst->GetNode ()->GetObject<MobilityModel> ();
@@ -160,29 +160,19 @@ MockChannel::Deliver (
     Time txTime)
 {
   NS_LOG_FUNCTION (this << p << src->GetAddress () << dst->GetAddress () << txTime);
+
   Time delay = GetDelay (src, dst, txTime);
 
-  /* Check if there is LOS between the source and destination */
-  if (GetPropagationLoss ()->CalcRxPower(1, src->GetNode ()->GetObject<MobilityModel> (), dst->GetNode ()->GetObject<MobilityModel> ()) > 0)
-  {
-    Simulator::ScheduleWithContext (dst->GetNode ()->GetId (),
-        delay,
-        &MockNetDevice::Receive,
-        dst,
-        p->Copy (),
-        src);
+  Simulator::ScheduleWithContext (dst->GetNode ()->GetId (),
+        			  delay,
+        			  &MockNetDevice::Receive,
+        			  dst,
+        			  p->Copy (),
+        			  src);
 
-    // Call the tx anim callback on the net device
-    m_txrxMock (p, src, dst, txTime, delay);
-    return true;
-  }
-  else
-  {
-    NS_LOG_LOGIC (dst << " unreachable from " << src);
-
-    return false;
-  }
+  // Call the tx anim callback on the net device
+  m_txrxMock (p, src, dst, txTime, delay);
+  return true;
 }
-
 
 } // namespace ns3

@@ -3,6 +3,7 @@
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
+#include "ns3/log.h"
 #include "../model/leo-mock-net-device.h"
 
 #include "nd-cache-helper.h"
@@ -10,9 +11,13 @@
 namespace ns3
 {
 
+NS_LOG_COMPONENT_DEFINE ("NdCacheHelper");
+
 void
 NdCacheHelper::Install (NetDeviceContainer &devices, Ipv6InterfaceContainer &interfaces) const
 {
+  NS_LOG_FUNCTION (this);
+
   // prepare NDS cache
   for (uint32_t i = 0; i < devices.GetN (); i++)
     {
@@ -47,6 +52,8 @@ NdCacheHelper::Install (NetDeviceContainer &devices, Ipv6InterfaceContainer &int
               entry = cache->Add (ipaddr);
             }
           entry->SetMacAddress (address);
+
+	  NS_LOG_DEBUG ("Added entry for " << address);
         }
     }
 }

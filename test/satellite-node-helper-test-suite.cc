@@ -29,7 +29,6 @@ EmptySatNodeHelperTestCase::EmptySatNodeHelperTestCase ()
 
 EmptySatNodeHelperTestCase::~EmptySatNodeHelperTestCase ()
 {
-  Simulator::Destroy ();
 }
 
 void
@@ -62,7 +61,6 @@ SingleSatNodeHelperTestCase::SingleSatNodeHelperTestCase ()
 
 SingleSatNodeHelperTestCase::~SingleSatNodeHelperTestCase ()
 {
-  Simulator::Destroy ();
 }
 
 void

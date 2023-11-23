@@ -74,6 +74,7 @@ IslMockChannel::TransmitStart (
           {
             if (i == srcId) continue;
             dst = DynamicCast<MockNetDevice> (GetDevice (i));
+            // TODO check LOS using mobility model
             Deliver (p, src, dst, txTime);
           }
         return true;

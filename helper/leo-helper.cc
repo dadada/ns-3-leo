@@ -29,17 +29,17 @@ LeoHelper::Install (NodeContainer &satellites, NodeContainer &gateways, NodeCont
   m_stackHelper.Install (gateways);
   m_stackHelper.Install (terminals);
 
-  // Make all networks addressable
-  Ipv6AddressHelper address;
-  Ipv6InterfaceContainer islAddrs = address.Assign (islNet);
-  Ipv6InterfaceContainer gwAddrs = address.Assign (gwNet);
-  Ipv6InterfaceContainer utAddrs = address.Assign (utNet);
+  //// Make all networks addressable
+  //Ipv6AddressHelper address;
+  //Ipv6InterfaceContainer islAddrs = address.Assign (islNet);
+  //Ipv6InterfaceContainer gwAddrs = address.Assign (gwNet);
+  //Ipv6InterfaceContainer utAddrs = address.Assign (utNet);
 
-  // Pre-fill the ND caches of networks
-  NdCacheHelper ndCache;
-  ndCache.Install (islNet, islAddrs);
-  ndCache.Install (gwNet, gwAddrs);
-  ndCache.Install (utNet, utAddrs);
+  //// Pre-fill the ND caches of networks
+  //NdCacheHelper ndCache;
+  //ndCache.Install (islNet, islAddrs);
+  //ndCache.Install (gwNet, gwAddrs);
+  //ndCache.Install (utNet, utAddrs);
 
   // Make all networks addressable for legacy protocol
   Ipv4AddressHelper legacy;

@@ -28,7 +28,6 @@ IslIcmpTestCase::IslIcmpTestCase ()
 
 IslIcmpTestCase::~IslIcmpTestCase ()
 {
-  Simulator::Destroy ();
 }
 
 void
@@ -80,6 +79,7 @@ IslIcmpTestCase::DoRun (void)
   serverApps.Stop (Seconds (10.0));
 
   Simulator::Run ();
+  Simulator::Destroy ();
 }
 
 class IslTestSuite : public TestSuite

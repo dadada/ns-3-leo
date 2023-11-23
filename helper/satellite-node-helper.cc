@@ -28,7 +28,7 @@ LeoSatNodeHelper::SetAttribute (string name, const AttributeValue &value)
 NodeContainer
 LeoSatNodeHelper::Install (vector<string> &wpFiles)
 {
-  NS_LOG_FUNCTION (wpFiles);
+  NS_LOG_FUNCTION (this);
 
   NodeContainer nodes;
   for (size_t i = 0; i < wpFiles.size (); i ++)

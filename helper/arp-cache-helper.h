@@ -20,4 +20,4 @@ public:
 
 }; /* namespace ns3 */
 
-#endif /* ARP_CACHE_HELPER */
+#endif /* ARP_CACHE_HELPER_H */

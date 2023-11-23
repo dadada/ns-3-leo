@@ -224,12 +224,15 @@ IslHelper::Install (NodeContainer c)
 NetDeviceContainer
 IslHelper::Install (std::vector<Ptr<Node> > &nodes)
 {
+  NS_LOG_FUNCTION (this);
+
   Ptr<MockChannel> channel = m_channelFactory.Create<MockChannel> ();
 
   NetDeviceContainer container;
 
   for (Ptr<Node> node: nodes)
   {
+    NS_LOG_DEBUG ("Adding device for node " << node->GetId ());
     Ptr<MockNetDevice> dev = m_deviceFactory.Create<MockNetDevice> ();
     dev->SetAddress (Mac48Address::Allocate ());
     node->AddDevice (dev);

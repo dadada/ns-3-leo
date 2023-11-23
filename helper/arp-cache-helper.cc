@@ -3,6 +3,7 @@
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
+#include "ns3/log.h"
 #include "../model/leo-mock-net-device.h"
 
 #include "arp-cache-helper.h"
@@ -10,13 +11,18 @@
 namespace ns3
 {
 
+NS_LOG_COMPONENT_DEFINE ("ArpCacheHelper");
+
 void
 ArpCacheHelper::Install (NetDeviceContainer &devices, Ipv4InterfaceContainer &interfaces) const
 {
+  NS_LOG_FUNCTION (this);
+
   for (size_t i = 0; i < devices.GetN (); i ++)
     {
       Ptr<NetDevice> dev = devices.Get (i);
       Ptr<Node> node = dev->GetNode ();
+      NS_LOG_INFO ("Preparing ARP cache of " << node);
       Ptr<Ipv4L3Protocol> ipv4 = node->GetObject<Ipv4L3Protocol> ();
       int32_t ifIndex = ipv4->GetInterfaceForDevice (dev);
       Ptr<Ipv4Interface> interface = ipv4->GetInterface (ifIndex);
@@ -47,6 +53,8 @@ ArpCacheHelper::Install (NetDeviceContainer &devices, Ipv4InterfaceContainer &in
               entry = cache->Add (ipaddr);
             }
           entry->SetMacAddress (address);
+
+	  NS_LOG_DEBUG ("Added entry for " << address);
       	}
     }
 }

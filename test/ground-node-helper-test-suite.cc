@@ -30,7 +30,6 @@ EmptyGndNodeHelperTestCase::EmptyGndNodeHelperTestCase ()
 
 EmptyGndNodeHelperTestCase::~EmptyGndNodeHelperTestCase ()
 {
-  Simulator::Destroy ();
 }
 
 void
@@ -63,7 +62,6 @@ SomeGndNodeHelperTestCase::SomeGndNodeHelperTestCase ()
 
 SomeGndNodeHelperTestCase::~SomeGndNodeHelperTestCase ()
 {
-  Simulator::Destroy ();
 }
 
 void

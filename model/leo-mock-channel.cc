@@ -41,6 +41,8 @@ LeoMockChannel::TransmitStart (Ptr<const Packet> p,
                           Address dst,
                           Time txTime)
 {
+  NS_LOG_FUNCTION (this << p << devId << dst << txTime);
+
   // Find devices joined to channel
   Ptr<MockNetDevice> srcDev = DynamicCast<MockNetDevice> (GetDevice (devId));
   if (srcDev == 0)
@@ -50,36 +52,29 @@ LeoMockChannel::TransmitStart (Ptr<const Packet> p,
     }
 
   bool fromGround = m_groundDevices.find (srcDev->GetAddress ()) != m_groundDevices.end ();
+  bool fromSpace = m_satelliteDevices.find (srcDev->GetAddress ()) != m_satelliteDevices.end ();
 
+  NS_ASSERT_MSG (!(fromGround && fromSpace), "Source device can not be both on ground and in space");
+
+  DeviceIndex *dests;
   if (fromGround)
     {
-      // Satellites can always directly be addresses
-      // Assume beams are narrow enough to not also receive the signal at other
-      // satellites for performance reasons.
-      DeviceIndex::iterator it = m_satelliteDevices.find (dst);
-      if (it == m_satelliteDevices.end ())
-        {
-          NS_LOG_ERROR ("unable to find satellite with address " << dst);
-          return false;
-        }
-      return Deliver (p, srcDev, it->second, txTime);
+      dests = &m_satelliteDevices;
     }
-  else if (srcDev->IsBroadcast () || srcDev->IsMulticast ())
-    // space to ground delivers to everything within the beam
+  else if (fromSpace)
     {
-      DeviceIndex::iterator it = m_groundDevices.find (dst);
-      if (it == m_groundDevices.end ())
-        {
-          NS_LOG_ERROR ("unable to find satellite with address " << dst);
-          return false;
-        }
-      for (DeviceIndex::iterator it = m_groundDevices.begin ();
-           it != m_groundDevices.end ();
-           it++)
-        {
-          // TODO deliver only to devices in the same beam
-          Deliver (p, srcDev, it->second, txTime);
-        }
+      dests = &m_groundDevices;
+    }
+  else
+    {
+      NS_LOG_ERROR ("unable to find satellite with address " << dst);
+      return false;
+    }
+
+  for (DeviceIndex::iterator it = dests->begin (); it != dests->end (); it ++)
+    {
+      // TODO deliver only to devices in the same beam
+      Deliver (p, srcDev, it->second, txTime);
     }
 
   return true;

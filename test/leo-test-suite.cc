@@ -30,13 +30,12 @@ LeoTestCase1::LeoTestCase1 ()
 
 LeoTestCase1::~LeoTestCase1 ()
 {
-  Simulator::Destroy ();
 }
 
 void
 LeoTestCase1::DoRun (void)
 {
-  Time::SetResolution (Time::NS);
+  Time::SetResolution (Time::MS);
 
   std::vector<std::string> satWps =
     {
@@ -52,38 +51,78 @@ LeoTestCase1::DoRun (void)
   NodeContainer gateways = gndHelper.Install ("contrib/leo/data/test/ground-stations.txt");
   NodeContainer terminals = gndHelper.Install ("contrib/leo/data/test/ground-stations.txt");
 
-  LeoHelper leo;
-  leo.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
-  leo.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
-  AodvHelper aodv;
-  leo.SetRoutingHelper (aodv);
+  NetDeviceContainer islNet, gwNet, utNet;
 
-  NetDeviceContainer allDevices = leo.Install (satellites, gateways, terminals);
+  IslHelper islCh;
+  islCh.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
+  islCh.SetDeviceAttribute ("ReceiveErrorModel", StringValue ("ns3::BurstErrorModel"));
+  islCh.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
+  //// TODO propagation loss from mobility model
+  islCh.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::RangePropagationLossModel"));
+  islNet = islCh.Install (satellites);
+
+  LeoChannelHelper gwCh;
+  gwCh.SetGndDeviceAttribute ("DataRate", StringValue ("10Mbps"));
+  gwCh.SetGndDeviceAttribute ("ReceiveErrorModel", StringValue ("ns3::BurstErrorModel"));
+  gwCh.SetSatDeviceAttribute ("DataRate", StringValue ("10Mbps"));
+  gwCh.SetSatDeviceAttribute ("ReceiveErrorModel", StringValue ("ns3::BurstErrorModel"));
+  gwCh.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
+  // TODO propagation loss from mobility model
+  gwCh.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::RangePropagationLossModel"));
+  gwNet = gwCh.Install (satellites, gateways);
+
+  LeoChannelHelper utCh;
+  utCh.SetGndDeviceAttribute ("DataRate", StringValue ("10Mbps"));
+  utCh.SetGndDeviceAttribute ("ReceiveErrorModel", StringValue ("ns3::BurstErrorModel"));
+  utCh.SetSatDeviceAttribute ("DataRate", StringValue ("10Mbps"));
+  utCh.SetSatDeviceAttribute ("ReceiveErrorModel", StringValue ("ns3::BurstErrorModel"));
+  utCh.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
+  // TODO propagation loss from mobility model
+  utCh.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::RangePropagationLossModel"));
+  utNet = utCh.Install (satellites, terminals);
+
+  // Install internet stack on nodes
+  InternetStackHelper stack;
+  AodvHelper aodv;
+  stack.SetRoutingHelper (aodv);
+  stack.Install (satellites);
+  stack.Install (gateways);
+  stack.Install (terminals);
+
+  // Make all networks addressable for legacy protocol
+  Ipv4AddressHelper ipv4;
+  ipv4.SetBase ("10.1.0.0", "255.255.0.0");
+  Ipv4InterfaceContainer islIp = ipv4.Assign (islNet);
+  ipv4.SetBase ("10.2.0.0", "255.255.0.0");
+  Ipv4InterfaceContainer gwIp = ipv4.Assign (gwNet);
+  ipv4.SetBase ("10.3.0.0", "255.255.0.0");
+  Ipv4InterfaceContainer utIp = ipv4.Assign (utNet);
+
+  ArpCacheHelper arpCache;
+  arpCache.Install (islNet, islIp);
+  arpCache.Install (gwNet, gwIp);
+  arpCache.Install (utNet, utIp);
 
   // we want to ping terminals
   UdpEchoServerHelper echoServer (9);
   ApplicationContainer serverApps = echoServer.Install (terminals);
 
-  // install a client on each of the terminals
+  // install a client on one of the terminals
   ApplicationContainer clientApps;
-  for (uint32_t i = 1; i < terminals.GetN (); i++)
-    {
-      Address remote = terminals.Get (i)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();
-      UdpEchoClientHelper echoClient (remote, 9);
-      echoClient.SetAttribute ("MaxPackets", UintegerValue (1));
-      echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
-      echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
-
-      clientApps.Add (echoClient.Install (terminals.Get (i-1)));
-    }
-
-  clientApps.Start (Seconds (2.0));
-  clientApps.Stop (Seconds (10.0));
+  Address remote = utIp.GetAddress (1, 0);
+  UdpEchoClientHelper echoClient (remote, 9);
+  echoClient.SetAttribute ("MaxPackets", UintegerValue (3));
+  echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
+  echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
+  clientApps.Add (echoClient.Install (terminals.Get (0)));
 
   serverApps.Start (Seconds (1.0));
-  serverApps.Stop (Seconds (10.0));
+  clientApps.Start (Seconds (2.0));
+  clientApps.Stop (Seconds (9.0));
+  serverApps.Stop (Seconds (10));
 
   Simulator::Run ();
+  Simulator::Destroy ();
 }
 
 // The TestSuite class names the TestSuite, identifies what type of TestSuite,
