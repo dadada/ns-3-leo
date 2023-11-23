@@ -53,27 +53,10 @@ public:
    *
    * Same is done with each satellite and terminal node.
    */
-  NetDeviceContainer Install (NodeContainer satellites, NodeContainer gateways, NodeContainer terminals);
+  NetDeviceContainer Install (NodeContainer &satellites,
+  			      NodeContainer &gateways,
+  			      NodeContainer &terminals);
 
-  /**
-   * \param nodes Nodes
-   * \return a NetDeviceContainer for nodes
-   *
-   * Saves you from having to construct a temporary NodeContainer.
-   */
-  NetDeviceContainer Install (std::vector<Ptr<Node> > &satellites,
-			      std::vector<Ptr<Node> > &gateways,
-			      std::vector<Ptr<Node> > &terminals);
-
-  /**
-   * \param nodes Names of the nodes
-   * \return a NetDeviceContainer for nodes
-   *
-   * Saves you from having to construct a temporary NodeContainer.
-   */
-  NetDeviceContainer Install (std::vector<std::string> &satellites,
-  			      std::vector<std::string> &gateways,
-  			      std::vector<std::string> &terminals);
   /**
    * Each point to point net device must have a queue to pass packets through.
    * This method allows one to set the type of the queue that is automatically

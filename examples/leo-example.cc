@@ -1,4 +1,5 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
@@ -6,7 +7,7 @@
 #include "ns3/node-container.h"
 #include "ns3/core-module.h"
 
-#include "../helper/leo-helper.h"
+#include "ns3/leo-module.h"
 
 using namespace ns3;
 
@@ -40,17 +41,7 @@ main (int argc, char *argv[])
   leo.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::IslPropagationLossModel"));
   leo.SetDeviceAttribute ("MobilityModel", StringValue ("ns3::LeoMobilityModel"));
 
-  NetDeviceContainer devices;
-  devices = leo.Install (satellites, gateways, terminals);
-
-  InternetStackHelper stack;
-  stack.Install (satellites);
-  stack.Install (gateways);
-  stack.Install (terminals);
-
-  // make all devices addressable
-  Ipv6AddressHelper address;
-  Ipv6InterfaceContainer interfaces = address.Assign (devices);
+  leo.Install (satellites, gateways, terminals);
 
   // we want to ping terminals
   UdpEchoServerHelper echoServer (9);

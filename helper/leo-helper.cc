@@ -1,5 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
+#include "nd-cache-helper.h"
+
 #include "leo-helper.h"
 
 namespace ns3 {
@@ -10,35 +12,38 @@ LeoHelper::LeoHelper()
 
 // TODO use template?
 NetDeviceContainer
-LeoHelper::Install (NodeContainer satellites, NodeContainer gateways, NodeContainer terminals)
+LeoHelper::Install (NodeContainer &satellites, NodeContainer &gateways, NodeContainer &terminals)
 {
-  NetDeviceContainer container = m_islChannelHelper.Install (satellites);
-  container.Add (m_gwChannelHelper.Install (satellites, gateways));
-  container.Add (m_utChannelHelper.Install (satellites, terminals));
+  NetDeviceContainer container;
 
-  return container;
-}
+  // Create sets of net devices for individual networks
+  NetDeviceContainer islNet, gwNet, utNet;
+  islNet = m_islChannelHelper.Install (satellites);
+  gwNet = m_gwChannelHelper.Install (satellites, gateways);
+  utNet = m_utChannelHelper.Install (satellites, terminals);
 
-NetDeviceContainer
-LeoHelper::Install (std::vector<Ptr<Node> > &satellites,
-		    std::vector<Ptr<Node> > &gateways,
-		    std::vector<Ptr<Node> > &terminals)
-{
-  NetDeviceContainer container = m_islChannelHelper.Install (satellites);
-  container.Add (m_gwChannelHelper.Install (satellites, gateways));
-  container.Add (m_utChannelHelper.Install (satellites, terminals));
+  // Install internet stack on nodes
+  InternetStackHelper stack;
+  stack.Install (satellites);
+  stack.Install (gateways);
+  stack.Install (terminals);
 
-  return container;
-}
+  // Make all networks addressable
+  Ipv6AddressHelper address;
+  Ipv6InterfaceContainer islAddrs = address.Assign (islNet);
+  Ipv6InterfaceContainer gwAddrs = address.Assign (gwNet);
+  Ipv6InterfaceContainer utAddrs = address.Assign (utNet);
 
-NetDeviceContainer
-LeoHelper::Install (std::vector<std::string> &satellites,
-  		    std::vector<std::string> &gateways,
-  		    std::vector<std::string> &terminals)
-{
-  NetDeviceContainer container = m_islChannelHelper.Install (satellites);
-  container.Add (m_gwChannelHelper.Install (satellites, gateways));
-  container.Add (m_utChannelHelper.Install (satellites, terminals));
+  // Pre-fill the ND caches of networks
+  NdCacheHelper ndCache;
+  ndCache.Install (islNet, islAddrs);
+  ndCache.Install (gwNet, gwAddrs);
+  ndCache.Install (utNet, utAddrs);
+
+  // Add to resulting container of net devices
+  container.Add (islNet);
+  container.Add (gwNet);
+  container.Add (utNet);
 
   return container;
 }
