@@ -104,10 +104,10 @@ LeoTestCase1::DoRun (void)
   ipv4.SetBase ("10.3.0.0", "255.255.0.0");
   Ipv4InterfaceContainer utIp = ipv4.Assign (utNet);
 
-  ArpCacheHelper arpCache;
-  arpCache.Install (islNet, islIp);
-  arpCache.Install (gwNet, gwIp);
-  arpCache.Install (utNet, utIp);
+  //ArpCacheHelper arpCache;
+  //arpCache.Install (islNet, islIp);
+  //arpCache.Install (gwNet, gwIp);
+  //arpCache.Install (utNet, utIp);
 
   // we want to ping terminals
   UdpEchoServerHelper echoServer (9);
