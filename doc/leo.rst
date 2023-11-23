@@ -10,6 +10,9 @@ Low Earth Orbit Mobility
    ============= Subsection (#.#.#)
    ############# Paragraph (no number)
 
+This a maintained version of https://gitlab.ibr.cs.tu-bs.de/tschuber/ns-3-leo .
+It was originally published as part of `ns-3-leo: Evaluation Tool for Satellite Swarm Communication Protocols <https://ieeexplore.ieee.org/document/9693958>`_.
+
 Model Description
 *****************
 
