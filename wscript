@@ -12,6 +12,7 @@ def build(bld):
         'helper/arp-cache-helper.cc',
         'helper/isl-helper.cc',
         'helper/leo-channel-helper.cc',
+        'helper/leo-input-fstream-container.cc',
         'helper/leo-orbit-node-helper.cc',
         'helper/nd-cache-helper.cc',
         'helper/ground-node-helper.cc',
@@ -29,7 +30,6 @@ def build(bld):
         'model/mock-channel.cc',
         'model/isl-mock-channel.cc',
         'model/isl-propagation-loss-model.cc',
-        'utils/leo-input-fstream-container.cc',
         ]
 
     module_test = bld.create_ns3_module_test_library('leo')
@@ -55,6 +55,7 @@ def build(bld):
         'helper/arp-cache-helper.h',
         'helper/isl-helper.h',
         'helper/leo-channel-helper.h',
+        'helper/leo-input-fstream-container.h',
         'helper/leo-orbit-node-helper.h',
         'helper/nd-cache-helper.h',
         'helper/ground-node-helper.h',
@@ -75,7 +76,6 @@ def build(bld):
         'model/mock-channel.h',
         'model/isl-mock-channel.h',
         'model/isl-propagation-loss-model.h',
-        'utils/leo-input-fstream-container.h',
         ]
 
     if bld.env.ENABLE_EXAMPLES:
