@@ -10,80 +10,178 @@ Example Module Documentation
    ============= Subsection (#.#.#)
    ############# Paragraph (no number)
 
-This is a suggested outline for adding new module documentation to |ns3|.
-See ``src/click/doc/click.rst`` for an example.
-
-The introductory paragraph is for describing what this code is trying to
-model.
-
-For consistency (italicized formatting), please use |ns3| to refer to
-ns-3 in the documentation (and likewise, |ns2| for ns-2).  These macros
-are defined in the file ``replace.txt``.
-
 Model Description
 *****************
 
-The source code for the new module lives in the directory ``src/leo``.
+The source code for the new module lives in the directory ``contrib/leo``.
 
-Add here a basic description of what is being modeled.
+This module provides a mobility model for LEO satellites, propagation loss
+models for satellite to satellite and satellite to ground transmission.  It
+also includes a simplistic model of the inter-satellite and satellite-ground
+channels and the associated network devices. It also contains required helpers
+to build a LEO satellite network based on configurable parameters or import
+mobility data from TLE files.
 
 Design
 ======
 
-Briefly describe the software design of the model and how it fits into 
-the existing ns-3 architecture. 
+The models do not depend on each other, with the exception of
+``LeoMockChannel``, which requires the participating devices to be
+``MockNetDevices``, and may be used outside of the context of this module.
 
 Scope and Limitations
 =====================
 
-What can the model do?  What can it not do?  Please use this section to
-describe the scope and limitations of the model.
+There are some limitations to the precision of the model: The circular movement
+model does not take into the earths gravitational model or amospheric drag. The
+link parameters are only modelled using their statistical estimates. There is
+currently no support for multiple antennas per link. MAC layer behaviour or
+frequency coordination are currently not modelled, but any existing MAC model
+may be combined with the models provided by this module.
 
 References
 ==========
 
-Add academic citations here, such as if you published a paper on this
-model, or if readers should read a particular specification or other work.
+See the project thesis report for more details.
 
 Usage
 *****
 
-This section is principally concerned with the usage of your model, using
-the public API.  Focus first on most common usage patterns, then go
-into more advanced topics.
+Interaction with the mobility model is mostly at configuration time using the
+associated helpers.  At simulation time, various parts of |ns3| may interact
+with the mobility model and propagation loss models to obtain the position,
+heading, speed of nodes and the path loss, including if a link can be
+established between two nodes. 
 
-Building New Module
-===================
-
-Include this subsection only if there are special build instructions or
-platform limitations.
+Topologies may be constructed using ``MockDevice``s and ``MockChannels``.
 
 Helpers
 =======
 
-What helper API will users typically use?  Describe it here.
+Since the configuration of these large network can be a large task with many
+parameters and configuration steps, the helpers try to collect common
+configutation steps, such as setting up the LEO and ISL channels and adding
+devices with the correct mobility patterns based on the constellation.
 
-Attributes
-==========
+A typical usage for the position allocator and the mobility model would be through ``MobilityHelper``.
 
-What classes hold attributes, and what are the key ones worth mentioning?
+.. sourcecode:: cpp
+
+  MobilityHelper mobility;
+  mobility.SetPositionAllocator ("ns3::LeoCircularOrbitPostionAllocator",
+                                "NumOrbits", IntegerValue (32),
+                                "NumSatellites", IntegerValue (50));
+  mobility.SetMobilityModel ("ns3::LeoCircularOrbitMobilityModel",
+                            "Altitude", DoubleValue (1200),
+                            "Inclination", DoubleValue (40),
+                            "Precision", TimeValue (Minutes (1)));
+
+To configure the ground nodes, positions can be pre-defined and loaded into the simulation or generated using `PolarGridPositionAllocator`.
+
+.. sourcecode:: cpp
+
+  LeoGndNodeHelper ground;
+  NodeContainer stations = ground.Install ("contrib/leo/data/ground-stations/usa-60.waypoints");
+
+  MobilityHelper mobility;
+
+.. sourcecode:: cpp
+
+  mobility.SetPositionAllocator ("ns3::PolarGridPositionAllocator",
+    "MinX", DoubleValue (0.0),
+    "MinY", DoubleValue (0.0),
+    "DeltaX", DoubleValue (5.0),
+    "DeltaY", DoubleValue (10.0),
+    "GridWidth", UintegerValue (3),
+    "LayoutType", StringValue ("RowFirst"));
+
+The ISL network can be configured using `IslHelper`
+
+.. sourcecode:: cpp
+
+  IslHelper islCh;
+  islCh.SetDeviceAttribute ("DataRate", StringValue ("1Gbps"));
+  islCh.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
+  islCh.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::IslPropagationLossModel"));
+  islNet = islCh.Install (satellites);
+
+To select the parameters for a pre-defined constellation and construct a LEO
+channel from it us the `LeoChannelHelper` and connect the satellites and ground
+stations to it.
+
+.. sourcecode:: cpp
+
+  LeoChannelHelper utCh;
+  utCh.SetConstellation ("StarlinkUser");
+  utNet = utCh.Install (satellites, stations);
 
 Output
 ======
 
-What kind of data does the model generate?  What are the key trace
-sources?   What kind of logging output can be enabled?
-
-Advanced Usage
-==============
-
-Go into further details (such as using the API outside of the helpers)
-in additional sections, as needed.
+The module itself does only provide trace sources for the transmission /
+droppping of packets using ``MockNetDevice``. All other trace infomation
+originating from this module is written to the trace sources associated with
+the parent models (such as ``MobilityModel``).
 
 Examples
 ========
 
-What examples using this new code are available?  Describe them here.
+leo-circlular-orbit
+###################
+
+The program configures a ``LeoCircularOrbitMobilityModel`` using the provided
+parameters and logs all course changes to a CSV file.  The file format for the
+orbit configuration file is ``altitude in km,inclination in deg,number of
+planes,number of satellites per plane``. The duration is given in seconds.
+
+.. sourcode::bash
+
+  $ ./waf --run leo-circular-orbit \
+  --orbitsFile=orbits.csv \
+  --traceFile=mobility-trace.csv \
+  --duration=10.0
+
+leo-delay
+#########
+
+The delay tracing example uses `UdpServer` and `UdpClient` to measure the delay
+and packet loss on between two nodes.  The source and destination locations are
+given as pairs of longitude and latitude.
+
+.. sourcode::bash
+
+  $ ./waf --run leo-delay \
+  --orbitsFile=orbits.csv \
+  --groundFile=ground-stations.csv \
+  --traceFile=delay-trace.csv \
+  --source=54.4,77.1 \
+  --destination=-10.0,25.8 \
+  --islRate=1Gbps \
+  --constellation="StarlinkGateway" \
+  --duration=10.0 \
+  --maxPackets=360 \
+  --interval=1 \
+  --packetSize=1024
+
+leo-throughput
+##############
+
+The throughput tracing example uses ``BulSendHelper`` and ``PacketSinkHelper``
+to measure the throughput inbetween two nodes. The throughput and the TCP
+parameters are logged to the `traceFile`.
+
+.. sourcode::bash
+
+  $ ./waf --run leo-throughput \
+  --orbitsFile=orbits.csv \
+  --groundFile=ground-stations.csv \
+  --traceFile=tcp-trace.csv \
+  --source=54.4,77.1 \
+  --destination=-10.0,25.8 \
+  --islRate=1Gbps \
+  --constellation="StarlinkGateway" \
+  --duration=10.0 \
+  --maxBytes=3GB
 
 Troubleshooting
 ===============
@@ -93,6 +191,5 @@ Add any tips for avoiding pitfalls, etc.
 Validation
 **********
 
-Describe how the model has been tested/validated.  What tests run in the
-test suite?  How much API and code is covered by the tests?  Again, 
-references to outside published work may help here.
+Much of the module is covered using tests. The evalutation of the module in
+part of the project thesis.
