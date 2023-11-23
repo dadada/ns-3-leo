@@ -89,13 +89,13 @@ LeoPropagationLossModel::GetAngle (Ptr<MobilityModel> a, Ptr<MobilityModel> b)
 void
 LeoPropagationLossModel::SetElevationAngle (double angle)
 {
-  m_elevationAngle = angle * (M_PI/180.0);
+  m_elevationAngle = (90 - angle) * (M_PI/180.0);
 }
 
 double
 LeoPropagationLossModel::GetElevationAngle () const
 {
-  return m_elevationAngle * (180.0/M_PI);
+  return 90 - (m_elevationAngle * (180.0/M_PI));
 }
 
 void
@@ -125,7 +125,7 @@ LeoPropagationLossModel::DoCalcRxPower (double txPowerDbm,
     }
 
   double angle = GetAngle (a, b);
-  if (angle > m_elevationAngle / 2.0)
+  if (angle > m_elevationAngle)
     {
       NS_LOG_DEBUG ("LEO DROP angle: a=" << a->GetPosition () << " b=" << b->GetPosition () << " m_cutOff="<<m_cutoffDistance<<" m_angle="<<m_elevationAngle<<" dist=" << distance << "angle=" << angle);
       return -1000.0;

@@ -34,9 +34,9 @@ int main(int argc, char *argv[])
   std::vector<Orbit> orbits = {
       Orbit (1150, 53.0, 32, 50),
       Orbit (1110, 53.8, 32, 50),
-      Orbit (1130, 74.0,  8, 50),
-      Orbit (1275, 81, 5, 75),
-      Orbit (1325, 70, 6, 75),
+//      Orbit (1130, 74.0,  8, 50),
+//      Orbit (1275, 81, 5, 75),
+//      Orbit (1325, 70, 6, 75),
   };
   NodeContainer satellites;
   for (Orbit orb: orbits)
