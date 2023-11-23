@@ -12,14 +12,15 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("LeoDelayTracingExample");
 
+Address remote;
+
 static void
 EchoRx (std::string context, Ptr<const Packet> packet)
 {
   SeqTsHeader seqTs;
   Ptr<Packet> p = packet->Copy ();
   p->RemoveHeader (seqTs);
-  // seqnr, timestamp, delay
-  std::cout << context << "," << seqTs.GetSeq () << "," << seqTs.GetTs () << "," << Simulator::Now () - seqTs.GetTs () << std::endl;
+  std::cout << Simulator::Now () << ":" << context << ":" << packet->GetUid() << ":" << seqTs.GetSeq () << ":" << Simulator::Now () - seqTs.GetTs () << std::endl;
 }
 
 uint64_t countBytes = 0;
@@ -27,7 +28,44 @@ static void
 TracePacket (std::string context, Ptr<const Packet> packet)
 {
   Ptr<Packet> p = packet->Copy ();
-  std::cout << Simulator::Now () << ":" << context << ":" << (countBytes += p->GetSerializedSize ()) << ":" << p->GetUid () << std::endl;
+  std::cout << Simulator::Now () << ":" << context << ":" << p->GetUid () << ":" << (countBytes += p->GetSerializedSize ()) << std::endl;
+}
+
+static void
+TraceIpForward (std::string context, const Ipv4Header &header, Ptr<const Packet> packet, uint32_t interface)
+{
+  if (header.GetDestination () == Ipv4Address::ConvertFrom (remote))
+    {
+      std::cout << Simulator::Now () << ":" << context  << ":" << packet->GetUid () << ":" << interface << ":" << header.GetSource () << ":" << header.GetDestination () << std::endl;
+    }
+}
+
+static void
+TraceIpDrop (std::string context, const Ipv4Header &header, Ptr< const Packet > packet, Ipv4L3Protocol::DropReason reason, Ptr< Ipv4 > ipv4, uint32_t interface)
+{
+  std::string res;
+  switch (reason)
+    {
+    case Ipv4L3Protocol::DROP_INTERFACE_DOWN:
+      res = "Interface down";
+      break;
+    case Ipv4L3Protocol::DROP_BAD_CHECKSUM:
+      res = "Checksum";
+      break;
+    case Ipv4L3Protocol::DROP_FRAGMENT_TIMEOUT:
+      res = "Timeout";
+      break;
+    case Ipv4L3Protocol::DROP_NO_ROUTE:
+      res = "No route";
+      break;
+    case Ipv4L3Protocol::DROP_TTL_EXPIRED:
+      res = "TTL expired";
+      break;
+    case Ipv4L3Protocol::DROP_ROUTE_ERROR:
+      res = "Route error";
+      break;
+    };
+  std::cout << Simulator::Now () << ":" << context << ":" << packet->GetUid () << ":" << interface << ":" << header.GetSource () << ":" << header.GetDestination () << ":" << res << std::endl;
 }
 
 int main (int argc, char *argv[])
@@ -47,6 +85,7 @@ int main (int argc, char *argv[])
   bool islEnabled = false;
   bool traceDrops = false;
   bool traceTxRx = false;
+  bool traceFwd = false;
   std::string routingProto = "aodv";
   cmd.AddValue("orbitFile", "CSV file with orbit parameters", orbitFile);
   cmd.AddValue("traceFile", "CSV file to store mobility trace in", traceFile);
@@ -58,15 +97,14 @@ int main (int argc, char *argv[])
   cmd.AddValue("constellation", "LEO constellation link settings name", constellation);
   cmd.AddValue("interval", "Echo interval", interval);
   cmd.AddValue("routing", "Routing protocol", routingProto);
-  cmd.AddValue("ttlThresh", "ns3::aodv::RoutingProtocol::TtlThreshold");
-  cmd.AddValue("netDiameter", "ns3::aodv::RoutingProtocol::NetDiameter");
-  cmd.AddValue("routeTimeout", "ns3::aodv::RoutingProtocol::ActiveRouteTimeout");
   cmd.AddValue("islEnabled", "Enable inter-satellite links", islEnabled);
   cmd.AddValue("traceDrops", "Enable tracing of PHY and MAC drops", traceDrops);
   cmd.AddValue("traceTxRx", "Enable tracing of PHY and MAC transmits", traceTxRx);
+  cmd.AddValue("traceFwd", "Enable tracing of IP layer forwarding", traceFwd);
   cmd.AddValue("latGws", "Latitudal rows of gateways", latGws);
   cmd.AddValue("lonGws", "Longitudinal rows of gateways", lonGws);
-  cmd.AddValue("destinationOnly", "ns3::aodv::RoutingProtocol::DestinationOnly");
+  cmd.AddValue("destOnly", "ns3::aodv::RoutingProtocol::DestinationOnly");
+  cmd.AddValue("routeTimeout", "ns3::aodv::RoutingProtocol::ActiveRouteTimeout");
   cmd.Parse (argc, argv);
 
   std::streambuf *coutbuf = std::cout.rdbuf();
@@ -101,8 +139,13 @@ int main (int argc, char *argv[])
     {
       AodvHelper aodv;
       aodv.Set ("EnableHello", BooleanValue (false));
-      //aodv.Set ("RreqLimit", UintegerValue (2));
-
+      //aodv.Set ("HelloInterval", TimeValue (Seconds (5)));
+      //aodv.Set ("RreqRetries", UintegerValue (1000));
+      //aodv.Set ("RerrRateLimit", UintegerValue (1000));
+      //aodv.Set ("RreqRateLimit", UintegerValue (10));
+      aodv.Set ("TtlIncrement", UintegerValue (5));
+      aodv.Set ("TtlThreshold", UintegerValue (25));
+      aodv.Set ("NetDiameter", UintegerValue (50));
       stack.SetRoutingHelper (aodv);
     }
 
@@ -133,7 +176,7 @@ int main (int argc, char *argv[])
 
   // install a client on one of the terminals
   ApplicationContainer clientApps;
-  Address remote = server->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();
+  remote = server->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();
   UdpClientHelper echoClient (remote, 9);
   echoClient.SetAttribute ("MaxPackets", UintegerValue (duration / interval));
   echoClient.SetAttribute ("Interval", TimeValue (Seconds (interval)));
@@ -165,10 +208,18 @@ int main (int argc, char *argv[])
   		       MakeCallback (&TracePacket));
     }
 
+  if (traceFwd)
+    {
+      Config::Connect ("/NodeList/*/$ns3::Ipv4L3Protocol/UnicastForward",
+		       MakeCallback (&TraceIpForward));
+      Config::Connect ("/NodeList/*/$ns3::Ipv4L3Protocol/MulticastForward",
+		       MakeCallback (&TraceIpForward));
+      Config::Connect ("/NodeList/*/$ns3::Ipv4L3Protocol/Drop",
+		       MakeCallback (&TraceIpDrop));
+    }
+
   std::cerr << "LOCAL =" << client->GetId () << std::endl;
   std::cerr << "REMOTE=" << server->GetId () << ",addr=" << Ipv4Address::ConvertFrom (remote) << std::endl;
-
-  std::cout << "Context,Sequence Number,Timestamp,Delay" << std::endl;
 
   //serverApps.Start (Seconds (1));
   //clientApps.Start (Seconds (1));
@@ -176,10 +227,6 @@ int main (int argc, char *argv[])
   Simulator::Stop (Seconds (duration));
   Simulator::Run ();
   Simulator::Destroy ();
-
-  Ptr<UdpServer> result = StaticCast<UdpServer> (serverApps.Get (0));
-  std::cout << "Received,Lost" << std::endl
-    << result->GetReceived () << "," << result->GetLost () << std::endl;
 
   out.close ();
   std::cout.rdbuf(coutbuf);
