@@ -57,6 +57,7 @@ LeoTestCase1::DoRun (void)
   islCh.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
   islCh.SetDeviceAttribute ("ReceiveErrorModel", StringValue ("ns3::BurstErrorModel"));
   islCh.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
+  islCh.SetDeviceAttribute ("InterframeGap", TimeValue (Seconds (0.001)));
   //// TODO propagation loss from mobility model
   islCh.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::RangePropagationLossModel"));
   islNet = islCh.Install (satellites);
@@ -66,6 +67,8 @@ LeoTestCase1::DoRun (void)
   gwCh.SetGndDeviceAttribute ("ReceiveErrorModel", StringValue ("ns3::BurstErrorModel"));
   gwCh.SetSatDeviceAttribute ("DataRate", StringValue ("10Mbps"));
   gwCh.SetSatDeviceAttribute ("ReceiveErrorModel", StringValue ("ns3::BurstErrorModel"));
+  gwCh.SetSatDeviceAttribute ("InterframeGap", TimeValue (Seconds (0.001)));
+  gwCh.SetGndDeviceAttribute ("InterframeGap", TimeValue (Seconds (0.001)));
   gwCh.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
   // TODO propagation loss from mobility model
   gwCh.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::RangePropagationLossModel"));
@@ -77,8 +80,11 @@ LeoTestCase1::DoRun (void)
   utCh.SetSatDeviceAttribute ("DataRate", StringValue ("10Mbps"));
   utCh.SetSatDeviceAttribute ("ReceiveErrorModel", StringValue ("ns3::BurstErrorModel"));
   utCh.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
+  utCh.SetSatDeviceAttribute ("InterframeGap", TimeValue (Seconds (0.001)));
+  utCh.SetGndDeviceAttribute ("InterframeGap", TimeValue (Seconds (0.001)));
   // TODO propagation loss from mobility model
   utCh.SetChannelAttribute ("PropagationLoss", StringValue ("ns3::RangePropagationLossModel"));
+  utCh.SetChannelAttribute ("PropagationDelay", StringValue ("ns3::ConstantSpeedPropagationDelayModel"));
   utNet = utCh.Install (satellites, terminals);
 
   // Install internet stack on nodes
