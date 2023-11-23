@@ -83,17 +83,13 @@ IslPropagationLossModel::DoCalcRxPower (double txPowerDbm,
                                         Ptr<MobilityModel> a,
                                         Ptr<MobilityModel> b) const
 {
-
-  // TODO perform line-earth intersection (ray tracing or based on earth
-  // curvature + distance)
-
   // primitivec cut-of at 1000 km
   if (!GetLos (a, b))
     {
-      return 0;
+      return 0.0;
     }
 
-  double rxc = 0;//-m_variable->GetValue ();
+  double rxc = 0.0;//-m_variable->GetValue ();
   NS_LOG_DEBUG ("attenuation coefficient="<<rxc<<"Db");
   return txPowerDbm + rxc;
 }

@@ -67,14 +67,13 @@ IslMockChannel::TransmitStart (
 
   if (dst == nullptr)
   {
-    if (src->IsBroadcast () || src->IsMulticast ())
+    if (Mac48Address::ConvertFrom (destAddr).IsBroadcast () || Mac48Address::ConvertFrom (destAddr).IsBroadcast ())
       // try to deliver to every node in LOS
       {
         for (size_t i = 0; i < GetNDevices (); i ++)
           {
             if (i == srcId) continue;
             dst = DynamicCast<MockNetDevice> (GetDevice (i));
-            // TODO check LOS using mobility model
             Deliver (p, src, dst, txTime);
           }
         return true;

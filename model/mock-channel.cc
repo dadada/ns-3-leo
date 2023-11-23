@@ -161,6 +161,13 @@ MockChannel::Deliver (
 {
   NS_LOG_FUNCTION (this << p << src->GetAddress () << dst->GetAddress () << txTime);
 
+  double rxPower = GetPropagationLoss ()->CalcRxPower (1.0, src, dst);
+
+  if (rxPower == 0.0)
+    {
+      return false;
+    }
+
   Time delay = GetDelay (src, dst, txTime);
 
   Simulator::ScheduleWithContext (dst->GetNode ()->GetId (),

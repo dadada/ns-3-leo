@@ -578,15 +578,11 @@ MockNetDevice::AddLinkChangeCallback (Callback<void> callback)
   m_linkChangeCallbacks.ConnectWithoutContext (callback);
 }
 
-//
-// This is a point-to-point device, so every transmission is a broadcast to
-// all of the devices on the network.
-//
 bool
 MockNetDevice::IsBroadcast (void) const
 {
   NS_LOG_FUNCTION (this);
-  return true;
+  return false;
 }
 
 //
@@ -605,7 +601,7 @@ bool
 MockNetDevice::IsMulticast (void) const
 {
   NS_LOG_FUNCTION (this);
-  return true;
+  return false;
 }
 
 Address

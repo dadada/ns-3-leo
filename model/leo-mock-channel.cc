@@ -73,7 +73,6 @@ LeoMockChannel::TransmitStart (Ptr<const Packet> p,
       return false;
     }
 
-  // TODO deliver only to devices in the same beam
   for (DeviceIndex::iterator it = dests->begin (); it != dests->end(); it ++)
     {
       Deliver (p, srcDev, it->second, txTime);

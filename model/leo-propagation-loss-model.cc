@@ -61,13 +61,12 @@ LeoPropagationLossModel::DoCalcRxPower (double txPowerDbm,
                                         Ptr<MobilityModel> a,
                                         Ptr<MobilityModel> b) const
 {
-  // TODO create attributes for max distance and angle
   if (a->GetDistanceFrom (b) > m_cutoffDistance && GetAngle (a, b) > m_cutoffAngle)
     {
-      return 0;
+      return 0.0;
     }
 
-  double rxc = 0;//-m_variable->GetValue ();
+  double rxc = 0.0;//-m_variable->GetValue ();
   //NS_LOG_DEBUG ("attenuation coefficient="<<rxc<<"Db");
   return txPowerDbm + rxc;
 }
