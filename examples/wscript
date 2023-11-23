@@ -13,5 +13,5 @@ def build(bld):
     obj.source = 'leo-delay-tracing-example.cc'
 
     obj = bld.create_ns3_program('leo-bulk-send',
-                                 ['core', 'leo', 'mobility', 'aodv'])
+                                 ['core', 'leo', 'mobility', 'aodv', 'epidemic-routing'])
     obj.source = 'leo-bulk-send-example.cc'
