@@ -42,13 +42,14 @@ private:
 class LeoOrbitProgressTestCase : public TestCase
 {
 public:
-  LeoOrbitProgressTestCase () : TestCase ("Test position for 0 altitude and 0 inclination after 60 seconds") {}
+  LeoOrbitProgressTestCase () : TestCase ("Test position for 0 altitude and 1.0 inclination after 360 seconds") {}
   virtual ~LeoOrbitProgressTestCase () {}
 private:
-  void TestLengthPosition (double expected, Ptr<LeoCircularOrbitMobilityModel> mob)
+  void TestLengthPosition (double expl, double expx, Ptr<LeoCircularOrbitMobilityModel> mob)
   {
     Vector pos = mob->GetPosition ();
-    NS_TEST_EXPECT_MSG_EQ_TOL_INTERNAL (pos.GetLength (), expected, 0.001, "Position not equal", __FILE__, __LINE__);
+    NS_TEST_EXPECT_MSG_NE_INTERNAL (pos.x, expx, "Position not equal", __FILE__, __LINE__);
+    NS_TEST_EXPECT_MSG_EQ_TOL_INTERNAL (pos.GetLength (), expl, 0.001, "Position must be different", __FILE__, __LINE__);
   }
 
   virtual void DoRun (void)
@@ -57,12 +58,33 @@ private:
     mob->SetAttribute ("Altitude", DoubleValue (0.0));
     mob->SetAttribute ("Inclination", DoubleValue (1.0));
 
-    Simulator::Schedule (Seconds (360.0), &LeoOrbitProgressTestCase::TestLengthPosition, this, LEO_EARTH_RAD_M, mob);
+    Vector pos = mob->GetPosition ();
+    Simulator::Schedule (Seconds (360.0), &LeoOrbitProgressTestCase::TestLengthPosition, this, LEO_EARTH_RAD_M, pos.x, mob);
     Simulator::Run ();
     Simulator::Destroy ();
   }
 };
-// TODO offset
+
+class LeoOrbitOffsetTestCase : public TestCase
+{
+public:
+  LeoOrbitOffsetTestCase () : TestCase ("Test offset between neighboring satellites") {}
+  virtual ~LeoOrbitOffsetTestCase () {}
+private:
+  virtual void DoRun (void)
+  {
+    Ptr<LeoCircularOrbitMobilityModel> mob = CreateObject<LeoCircularOrbitMobilityModel> ();
+    mob->SetAttribute ("Altitude", DoubleValue (1000.0));
+    mob->SetAttribute ("Inclination", DoubleValue (20.0));
+
+    Vector pos1 = mob->GetPosition ();
+
+    mob->SetAttribute ("Offset", DoubleValue (20.0));
+    Vector pos2 = mob->GetPosition ();
+
+    NS_TEST_ASSERT_MSG_NE (pos1.x, pos2.x, "Neighboring satellite should have different position");
+  }
+};
 
 class LeoOrbitTestSuite : TestSuite
 {
@@ -71,6 +93,7 @@ public:
       AddTestCase (new LeoOrbitSpeedTestCase, TestCase::QUICK);
       AddTestCase (new LeoOrbitPositionTestCase, TestCase::QUICK);
       AddTestCase (new LeoOrbitProgressTestCase, TestCase::QUICK);
+      AddTestCase (new LeoOrbitOffsetTestCase, TestCase::QUICK);
   }
 };
 

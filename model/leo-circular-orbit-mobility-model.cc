@@ -105,7 +105,7 @@ double
 LeoCircularOrbitMobilityModel::GetProgress (Time t) const
 {
   // TODO use nanos or ms instead? does it give higher precision?
-  return 2 * M_PI * ((GetSpeed () * t.GetSeconds ()) / LEO_EARTH_RAD_M);
+  return 2 * M_PI * ((GetSpeed () * t.GetSeconds ()) / LEO_EARTH_RAD_M) + m_offset;
 }
 
 Vector3D
