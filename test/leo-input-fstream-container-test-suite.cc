@@ -28,7 +28,7 @@ void
 LeoWaypointFileEmptyTestCase::DoRun (void)
 {
   Ptr<LeoWaypointInputFileStreamContainer> container = CreateObject<LeoWaypointInputFileStreamContainer> ();
-  container->SetAttribute("File", StringValue ("contrib/leo/data/empty"));
+  container->SetAttribute("File", StringValue ("contrib/leo/data/test/empty"));
   container->SetAttribute("LastTime", TimeValue (Time (1)));
   Waypoint wp;
 
