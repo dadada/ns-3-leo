@@ -31,6 +31,7 @@ def build(bld):
         'test/isl-mock-channel-test-suite.cc',
         'test/leo-mock-channel-test-suite.cc',
         'test/leo-input-fstream-container-test-suite.cc',
+        'test/leo-mobility-test-suite.cc',
         ]
 
     headers = bld(features='ns3header')

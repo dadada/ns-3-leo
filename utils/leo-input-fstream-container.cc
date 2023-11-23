@@ -63,16 +63,19 @@ LeoWaypointInputFileStreamContainer::GetNextSample (Waypoint &sample)
       NS_ABORT_MSG ("Input stream is bad");
     }
 
-  Time newLast = m_lastTime;
-  while (m_input && sample.time < m_lastTime)
+  sample.time = Time (0);
+  sample.position = Vector (0.0, 0.0, 0.0);
+  bool updated = false;
+  while (sample.time < m_lastTime && (m_input >> sample))
     {
-      m_input >> sample;
-      newLast = sample.time;
+      updated = true;
     }
-  bool res = (newLast != m_lastTime) && m_input;
-  m_lastTime = newLast;
+  if (updated)
+    {
+      m_lastTime = sample.time;
+    }
 
-  return res;
+  return updated;
 }
 
 void
